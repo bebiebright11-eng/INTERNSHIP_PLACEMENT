@@ -1,8 +1,21 @@
 from rest_framework import viewsets
-from .models import User
-from .serializers import UserSerializer
+from .models import Organization, Application, Placement
+from .serializers import (
+    OrganizationSerializer,
+    ApplicationSerializer,
+    PlacementSerializer
+)
+
+class OrganizationViewSet(viewsets.ModelViewSet):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class ApplicationViewSet(viewsets.ModelViewSet):
+    queryset = Application.objects.all()
+    serializer_class = ApplicationSerializer
+
+
+class PlacementViewSet(viewsets.ModelViewSet):
+    queryset = Placement.objects.all()
+    serializer_class = PlacementSerializer
