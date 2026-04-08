@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('api/accounts/', include('accounts.urls')),
     
-    path('api/internships/',include(internships.urls)),
+    path('api/internships/',include('internships.urls')),
 
     path ( 'api/supervision/',include('supervision.urls')),
 ] 
