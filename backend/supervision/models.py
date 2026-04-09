@@ -6,6 +6,11 @@ User = settings.AUTH_USER_MODEL
 
 
 class WeeklyLog(models.Model):
+    STATUS_CHOICES = (
+        ('draft','Draft'),
+        ('submitted','Submitted'),
+        ('reviewed','Reviewed')
+    )
 
     placement = models.ForeignKey(Placement, on_delete=models.CASCADE)
 
@@ -19,6 +24,8 @@ class WeeklyLog(models.Model):
     supervisor_feedback = models.TextField(blank=True)
 
     submitted_at = models.DateTimeField(auto_now_add=True)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
 
     class meta:
         unique_together = ('placement', 'week_number')
