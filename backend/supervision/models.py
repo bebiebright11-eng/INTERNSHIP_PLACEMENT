@@ -20,6 +20,9 @@ class WeeklyLog(models.Model):
 
     submitted_at = models.DateTimeField(auto_now_add=True)
 
+    class meta:
+        unique_together = ('placement', 'week_number')
+
     def __str__(self):
         return f"Week {self.week_number} - {self.placement}"
 
