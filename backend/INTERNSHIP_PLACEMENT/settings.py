@@ -79,7 +79,8 @@ WSGI_APPLICATION = 'INTERNSHIP_PLACEMENT.wsgi.application'
 import os
 from dotenv import load_dotenv
 
-load_dotenv() # This loads the variables from .env
+# This line finds your .env file and reads the values
+load_dotenv()
 
 DATABASES = {
     'default': {
@@ -87,8 +88,8 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
