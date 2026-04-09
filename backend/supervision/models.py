@@ -56,3 +56,10 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return f"Evaluation - {self.placement}"
+
+class EvaluationCriteria(models.Model):
+    name = models.CharField(max_length=100)
+    max_score = models.IntegerField()
+
+    def __str__(self):
+        return self.name
