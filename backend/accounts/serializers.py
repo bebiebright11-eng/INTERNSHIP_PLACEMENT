@@ -14,4 +14,4 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(cls, user)
         # Add the role inside the encrypted token
         token['role'] = user.role
-        return token        
+        return token
