@@ -25,8 +25,9 @@ class IsStudentOrSupervisor(BasePermission):
             'academic',
             'workplace'
         ]
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        # Add the role to the visible JSON response for Postman/React
-        data['role'] = self.user.role
-        return data
+class IsEvaluator(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role in [
+            'academic',
+            'workplace'
+        ]
