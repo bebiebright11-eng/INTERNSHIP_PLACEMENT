@@ -15,3 +15,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add the role inside the encrypted token
         token['role'] = user.role
         return token
+    
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Add the role to the visible JSON response for Postman/React
+        data['role'] = self.user.role
+        return data
