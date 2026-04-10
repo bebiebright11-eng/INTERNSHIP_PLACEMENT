@@ -58,3 +58,22 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return f"Evaluation - {self.placement}"
+
+class EvaluationCriteria(models.Model):
+    name = models.CharField(max_length=100)
+    max_score = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+    
+class CriteriaScore(models.Model):
+    evaluation = models.ForeignKey(
+        Evaluation,
+        on_delete=models.CASCADE,
+        related_name='criteria_scores'   
+    )
+    criteria = models.ForeignKey(EvaluationCriteria, on_delete=models.CASCADE)
+    score = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.criteria} - {self.score}"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import WeeklyLog, Evaluation
+from .models import WeeklyLog, Evaluation, EvaluationCriteria, CriteriaScore
 
 @admin.register(WeeklyLog)
 class WeeklyLogAdmin(admin.ModelAdmin):
@@ -9,3 +9,11 @@ class WeeklyLogAdmin(admin.ModelAdmin):
 @admin.register(Evaluation)
 class EvaluationAdmin(admin.ModelAdmin):
     list_display = ('placement', 'supervisor', 'score', 'created_at')
+
+@admin.register(EvaluationCriteria)
+class EvaluationCriteriaAdmin(admin.ModelAdmin):
+    list_display = ('name', 'max_score')
+
+@admin.register(CriteriaScore)
+class CriteriaScoreAdmin(admin.ModelAdmin):
+    list_display = ('evaluation', 'criteria', 'score')

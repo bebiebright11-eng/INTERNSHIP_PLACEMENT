@@ -8,6 +8,8 @@ class Organization(models.Model):
     location = models.CharField(max_length=255)
     contact_email = models.EmailField()
     phone = models.CharField(max_length=20)
+    description = models.TextField(blank=True)
+    website = models.URLField(blank=True)
 
     def __str__(self):
         return self.name
@@ -53,6 +55,11 @@ class Placement(models.Model):
 
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=(('active', 'Active'), ('completed', 'Completed')),
+        default='active'
+    )
 
     def __str__(self):
         return f"{self.student} Placement"
