@@ -14,3 +14,8 @@ class EvaluationCriteriaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+class CriteriaScoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CriteriaScore
+        fields = ['id', 'criteria', 'score']
