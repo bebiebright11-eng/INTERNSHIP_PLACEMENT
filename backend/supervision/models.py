@@ -39,11 +39,22 @@ class Evaluation(models.Model):
     placement = models.ForeignKey(Placement, on_delete=models.CASCADE)
 
     supervisor = models.ForeignKey(User, on_delete=models.CASCADE)
+    supervisor_type = models.CharField(
+        max_length=20,
+        choices=(
+            ('workplace', 'Workplace Supervisor'),
+            ('academic', 'Academic Supervisor'),
+        )
+    )
 
     score = models.IntegerField()
     comments = models.TextField()
+    final_grade = models.FloatField(null=True, blank=True)
+    is_final = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ['placement', 'supervisor']
 
     def __str__(self):
         return f"Evaluation - {self.placement}"
