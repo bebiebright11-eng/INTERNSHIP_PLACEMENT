@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import WeeklyLog, Evaluation
+from .models import WeeklyLog, Evaluation, EvaluationCriteria, CriteriaScore
 
 
 class WeeklyLogSerializer(serializers.ModelSerializer):
@@ -8,7 +8,9 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EvaluationSerializer(serializers.ModelSerializer):
+class EvaluationCriteriaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Evaluation
+        model = EvaluationCriteria
         fields = '__all__'
+
+
