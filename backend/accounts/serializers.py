@@ -7,6 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'role']
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -15,9 +16,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add the role inside the encrypted token
         token['role'] = user.role
         return token
-    
     def validate(self, attrs):
         data = super().validate(attrs)
         # Add the role to the visible JSON response for Postman/React
         data['role'] = self.user.role
         return data
+    

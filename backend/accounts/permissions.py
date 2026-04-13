@@ -13,3 +13,21 @@ class IsWorkplaceSupervisor(BasePermission):
 class IsAcademicSupervisor(BasePermission):
     def has_permission(self, request, view):
         return request.user.role == 'academic'
+    
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == 'admin'
+    
+class IsStudentOrSupervisor(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role in [
+            'student',
+            'academic',
+            'workplace'
+        ]
+class IsEvaluator(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role in [
+            'academic',
+            'workplace'
+        ]
