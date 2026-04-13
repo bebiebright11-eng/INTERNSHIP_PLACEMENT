@@ -12,3 +12,4 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         ('Role Info', {'fields': ('role',)}),
     )
+  
