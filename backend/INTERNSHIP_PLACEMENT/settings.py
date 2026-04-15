@@ -143,3 +143,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'accounts.User'  # Replace 'accounts' with your actual app name
 CORS_ALLOW_ALL_ORIGINS = True 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
