@@ -43,3 +43,13 @@ class EvaluationCriteriaViewSet(viewsets.ModelViewSet):
     queryset = EvaluationCriteria.objects.all()
     serializer_class = EvaluationCriteriaSerializer
     permission_classes = [IsAuthenticated]
+
+
+class CriteriaScoreViewSet(viewsets.ModelViewSet):
+    queryset = CriteriaScore.objects.all()
+    serializer_class = CriteriaScoreSerializer
+    permission_classes = [IsAuthenticated, IsEvaluator]
+
+    def get_queryset(self):
+        user = self.request.user
+        return CriteriaScore.objects.filter(evaluation__supervisor=user)    
