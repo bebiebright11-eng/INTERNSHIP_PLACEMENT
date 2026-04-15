@@ -25,6 +25,21 @@ class WeeklyLogViewSet(viewsets.ModelViewSet):
 
         return WeeklyLog.objects.all()
 
-    
+class EvaluationViewSet(viewsets.ModelViewSet):
+    queryset = Evaluation.objects.all()
+    serializer_class = EvaluationSerializer
+    permission_classes = [IsAuthenticated, IsEvaluator]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.role == 'student':
+            return Evaluation.objects.filter(placement__student=user)
+
+        return Evaluation.objects.filter(supervisor=user)    
 
 
+class EvaluationCriteriaViewSet(viewsets.ModelViewSet):
+    queryset = EvaluationCriteria.objects.all()
+    serializer_class = EvaluationCriteriaSerializer
+    permission_classes = [IsAuthenticated]
