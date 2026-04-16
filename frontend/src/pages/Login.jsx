@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");  
+  
   return (
     <div style={{ padding: "40px" }}>
       <h2>LOGIN</h2>
