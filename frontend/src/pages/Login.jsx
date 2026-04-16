@@ -9,7 +9,7 @@ function Login() {
   
   return (
     <div style={{ padding: "40px" }}>
-      <h2>LOGIN</h2>
+      <h6>Login</h6>
     </div>
   );
 }
