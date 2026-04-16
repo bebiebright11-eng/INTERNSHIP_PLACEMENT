@@ -5,11 +5,13 @@ function StudentDashboard() {
   const [applications, setApplications] = useState([]);
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
+  const [organizations, setOrganizations] = useState([]);
   
   useEffect(() => {
   fetchApplications();
   fetchLogs();
   fetchEvaluations();
+  fetchOrganizations();
 }, []);
 
 const fetchApplications = async () => {
@@ -48,6 +50,15 @@ const fetchEvaluations = async () => {
     console.log(error);
   }
 };
+const fetchOrganizations = async () => {
+  try {
+    const res = await API.get("internships/organizations/");
+    setOrganizations(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 
   return (
