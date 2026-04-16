@@ -79,8 +79,6 @@ const applyToOrganization = async (orgId) => {
 };
 
 
-
-
   return (
     <div style={{ padding: "20px" }}>
       <h1>Student Dashboard</h1>
@@ -125,14 +123,17 @@ const applyToOrganization = async (orgId) => {
       {organizations.length === 0 ? (
         <p>No organizations available</p>
       ) : (
-        organizations.map((org) => (
-          <div key={org.id}>
-            <p>Name: {org.name}</p>
-            <p>Location: {org.location}</p>
+                organizations.map((org) => (
+          <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}
+          >
+            <p><strong>Name:</strong> {org.name}</p>
+            <p><strong>Location:</strong> {org.location}</p>
+            <button onClick={() => applyToOrganization(org.id)}>
+              Apply
+            </button>
           </div>
         ))
       )}
-
     </div>
   ); 
 }
