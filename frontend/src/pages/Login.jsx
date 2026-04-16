@@ -1,7 +1,3 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import API from "../api";
-
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +11,11 @@ function Login() {
       username: username,
       password: password,
     });
+    console.log(res.data);
+   } catch (error) {
+    console.log(error);
    }
+
 
 };
 
