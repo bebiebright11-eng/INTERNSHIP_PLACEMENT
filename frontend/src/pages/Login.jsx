@@ -4,7 +4,15 @@ function Login() {
   const navigate = useNavigate();  
 
   const handleLogin = async (e) => {
-  if (e) e.preventDefault();
+   if (e) e.preventDefault();
+
+   try{
+    const res = await API.post("accounts/login/", {
+      username: username,
+      password: password,
+    });
+   }
+
 };
 
   
