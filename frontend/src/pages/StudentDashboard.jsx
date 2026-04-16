@@ -59,6 +59,26 @@ const fetchOrganizations = async () => {
   }
 };
 
+const applyToOrganization = async (orgId) => {
+  try {
+    await API.post(
+      "internships/applications/",
+      { organization: orgId },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    alert("Application submitted!");
+    fetchApplications();
+  } catch (error) {
+    alert("Failed to apply");
+  }
+};
+
+
 
 
   return (
