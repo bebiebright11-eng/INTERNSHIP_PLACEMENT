@@ -18,15 +18,28 @@ const fetchApplications = async () => {
     console.log(error);
   }
 };
-
-
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Student Dashboard</h1>
-    </div>
-  );
-}
+  <div style={{ padding: "20px" }}>
+    <h1>Student Dashboard</h1>
+
+    <h2>My Applications</h2>
+
+    {applications.length === 0 ? (
+      <p>No applications yet</p>
+    ) : (
+      applications.map((app) => (
+        <div key={app.id}>
+          <p>Organization: {app.organization}</p>
+          <p>Status: {app.status}</p>
+        </div>
+      ))
+    )}
+  </div>
+);
 
 export default StudentDashboard;
+
+
+
+
 
