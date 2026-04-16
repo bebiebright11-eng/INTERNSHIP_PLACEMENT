@@ -101,6 +101,18 @@ const fetchOrganizations = async () => {
           </div>
         ))
       )}
+      <h2>Available Organizations</h2>
+      {organizations.length === 0 ? (
+        <p>No organizations available</p>
+      ) : (
+        organizations.map((org) => (
+          <div key={org.id}>
+            <p>Name: {org.name}</p>
+            <p>Location: {org.location}</p>
+          </div>
+        ))
+      )}
+
     </div>
   ); 
 }
