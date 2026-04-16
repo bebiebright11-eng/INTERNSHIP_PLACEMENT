@@ -36,6 +36,7 @@ const fetchApplications = async () => {
     )}
   </div>
 );
+}
 
 export default StudentDashboard;
 
