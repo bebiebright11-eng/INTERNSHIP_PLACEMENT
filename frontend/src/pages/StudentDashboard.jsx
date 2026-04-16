@@ -4,10 +4,12 @@ import API from "../api";
 function StudentDashboard() {
   const [applications, setApplications] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [evaluations, setEvaluations] = useState([]);
   
   useEffect(() => {
   fetchApplications();
   fetchLogs();
+  fetchEvaluations();
 }, []);
 
 const fetchApplications = async () => {
@@ -34,6 +36,20 @@ const fetchLogs = async () => {
     console.log(error);
   }
 };
+const fetchEvaluations = async () => {
+  try {
+    const res = await API.get("supervision/evaluations/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    setEvaluations(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
   return (
   <div style={{ padding: "20px" }}>
     <h1>Student Dashboard</h1>
@@ -52,19 +68,17 @@ const fetchLogs = async () => {
     )}
     <h2>My Weekly Logs</h2>
 
-{logs.length === 0 ? (
-  <p>No logs yet</p>
-) : (
-  logs.map((log) => (
-    <div key={log.id}>
-      <p>Week: {log.week_number}</p>
-      <p>Tasks: {log.tasks}</p>
-    </div>
-  ))
-)}
-
-
-  </div>
+    {logs.length === 0 ? (
+    <p>No logs yet</p>
+    ) : (
+    logs.map((log) => (
+      <div key={log.id}>
+        <p>Week: {log.week_number}</p>
+        <p>Tasks: {log.tasks}</p>
+      </div>
+    ))
+  )}
+</div>
 );
 }
 
