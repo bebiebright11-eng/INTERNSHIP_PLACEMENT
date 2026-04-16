@@ -3,8 +3,9 @@ from rest_framework.routers import DefaultRouter
 from .views import WeeklyLogViewSet, EvaluationViewSet
 
 router = DefaultRouter()
-router.register(r'weeklylogs',WeeklyLogViewSet)
-router.register(r'evaluations',EvaluationViewSet)
+router.register(r'weeklylogs', WeeklyLogViewSet, basename='weeklylog')
+router.register(r'evaluations', EvaluationViewSet, basename='evaluation')
+
 
 
 urlpatterns = [
