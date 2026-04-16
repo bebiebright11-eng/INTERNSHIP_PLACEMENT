@@ -50,6 +50,20 @@ const fetchLogs = async () => {
         </div>
       ))
     )}
+    <h2>My Weekly Logs</h2>
+
+{logs.length === 0 ? (
+  <p>No logs yet</p>
+) : (
+  logs.map((log) => (
+    <div key={log.id}>
+      <p>Week: {log.week_number}</p>
+      <p>Tasks: {log.tasks}</p>
+    </div>
+  ))
+)}
+
+
   </div>
 );
 }
