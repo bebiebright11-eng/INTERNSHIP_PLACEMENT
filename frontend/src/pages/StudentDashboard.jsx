@@ -3,9 +3,13 @@ import API from "../api";
 
 function StudentDashboard() {
   const [applications, setApplications] = useState([]);
+  const [logs, setLogs] = useState([]);
+  
   useEffect(() => {
   fetchApplications();
+  fetchLogs();
 }, []);
+
 const fetchApplications = async () => {
   try {
     const res = await API.get("internships/applications/", {
@@ -14,6 +18,18 @@ const fetchApplications = async () => {
       },
     });
     setApplications(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const fetchLogs = async () => {
+  try {
+    const res = await API.get("internships/logs/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    setLogs(res.data);
   } catch (error) {
     console.log(error);
   }
