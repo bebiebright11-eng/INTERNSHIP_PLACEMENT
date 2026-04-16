@@ -51,40 +51,46 @@ const fetchEvaluations = async () => {
 
 
   return (
-  <div style={{ padding: "20px" }}>
-    <h1>Student Dashboard</h1>
+    <div style={{ padding: "20px" }}>
+      <h1>Student Dashboard</h1>
 
-    <h2>My Applications</h2>
+      <h2>My Applications</h2>
+      {applications.length === 0 ? (
+        <p>No applications yet</p>
+      ) : (
+        applications.map((app) => (
+          <div key={app.id}>
+            <p>Organization: {app.organization}</p>
+            <p>Status: {app.status}</p>
+          </div>
+        ))
+      )}
 
-    {applications.length === 0 ? (
-      <p>No applications yet</p>
-    ) : (
-      applications.map((app) => (
-        <div key={app.id}>
-          <p>Organization: {app.organization}</p>
-          <p>Status: {app.status}</p>
-        </div>
-      ))
-    )}
-    <h2>My Weekly Logs</h2>
+      <h2>My Weekly Logs</h2>
+      {logs.length === 0 ? (
+        <p>No logs yet</p>
+      ) : (
+        logs.map((log) => (
+          <div key={log.id}>
+            <p>Week: {log.week_number}</p>
+            <p>Tasks: {log.tasks}</p>
+          </div>
+        ))
+      )}
 
-    {logs.length === 0 ? (
-    <p>No logs yet</p>
-    ) : (
-    logs.map((log) => (
-      <div key={log.id}>
-        <p>Week: {log.week_number}</p>
-        <p>Tasks: {log.tasks}</p>
-      </div>
-    ))
-  )}
-</div>
-);
+      <h2>My Evaluations</h2>
+      {evaluations.length === 0 ? (
+        <p>No evaluations yet</p>
+      ) : (
+        evaluations.map((ev) => (
+          <div key={ev.id}>
+            <p>Score: {ev.score}</p>
+            <p>Comments: {ev.comments}</p>
+            <p>Final Grade: {ev.final_grade || "Not finalized"}</p>
+          </div>
+        ))
+      )}
+    </div>
+  ); 
 }
-
 export default StudentDashboard;
-
-
-
-
-
