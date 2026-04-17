@@ -11,6 +11,11 @@ function Login() {
       username: username,
       password: password,
     });
+
+    localStorage.setItem("token", res.data.access);
+    localStorage.setItem("role", res.data.role);
+    localStorage.setItem("user_id", res.data.user_id); 
+
     console.log(res.data);
    } catch (error) {
     console.log(error);
