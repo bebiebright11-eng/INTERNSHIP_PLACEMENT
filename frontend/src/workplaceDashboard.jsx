@@ -11,4 +11,4 @@ function WorkplaceDashboard() {
 }
 
 export default WorkplaceDashboard;
-constante
+const [placements, setPlacements] = useState([]);
