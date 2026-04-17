@@ -22,6 +22,19 @@ function Login() {
 
     alert("SUCCESS: Logged in as " + res.data.role);
 
+    const role = res.data.role.toLowerCase();
+    if (role === "student") {
+      navigate("/student");
+    } else if (role === "admin") {
+      navigate("/admin");
+    } else if (role === "workplace") {
+      navigate("/workplace");
+    } else if (role === "academic") {
+      navigate("/academic");
+    } else {
+      alert("Unknown role: " + role);
+   }
+   
     console.log(res.data);
    } catch (error) {
     console.log(error);
