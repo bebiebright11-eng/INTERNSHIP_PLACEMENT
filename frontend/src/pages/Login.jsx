@@ -65,6 +65,7 @@ function Login() {
         <input
           type="password"
           placeholder="Password"
+          value={password}
         />
       </form>
     </div>
