@@ -33,15 +33,23 @@ function Login() {
       navigate("/academic");
     } else {
       alert("Unknown role: " + role);
-   }
+    }
    
     console.log(res.data);
+
    } catch (error) {
-    console.log(error);
+     if (error.response) {
+       alert("DJANGO ERROR: " + JSON.stringify(error.response.data));
+     } else {
+       alert("NETWORK ERROR: 1. Restart Vite terminal. 2. Ensure Django is running.");
+     }
+     console.log(error);
    }
+    
+  }; 
 
 
-};
+
 
   
   return (
