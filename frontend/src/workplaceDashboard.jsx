@@ -21,7 +21,12 @@ const fetchPlacements = async () => {
       },
     });
 
-    setPlacements(res.data);
+    const filtered = res.data.filter(
+  (p) => p.workplace_supervisor === parseInt(localStorage.getItem("user_id"))
+);
+
+setPlacements(filtered);
+
   } catch (error) {
     console.log(error);
   }
