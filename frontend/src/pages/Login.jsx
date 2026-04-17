@@ -59,6 +59,8 @@ function Login() {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          required
+
 />
       </form>
     </div>
