@@ -70,6 +70,7 @@ function Login() {
           required
         />
         <br /><br />
+        <button type="submit">Login</button>
       </form>
     </div>
   );
