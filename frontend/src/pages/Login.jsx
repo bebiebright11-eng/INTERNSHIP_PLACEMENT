@@ -16,6 +16,8 @@ function Login() {
     localStorage.setItem("role", res.data.role);
     localStorage.setItem("user_id", res.data.user_id); 
 
+    alert("SUCCESS: Logged in as " + res.data.role);
+
     console.log(res.data);
    } catch (error) {
     console.log(error);
