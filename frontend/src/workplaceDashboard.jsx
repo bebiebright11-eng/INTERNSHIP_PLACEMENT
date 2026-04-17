@@ -12,3 +12,20 @@ function WorkplaceDashboard() {
 
 export default WorkplaceDashboard;
 const [placements, setPlacements] = useState([]);
+
+const fetchPlacements = async () => {
+  try {
+    const res = await API.get("internships/placements/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    setPlacements(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+useEffect(() => {
+  fetchPlacements();
+}, []);
