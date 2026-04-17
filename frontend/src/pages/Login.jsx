@@ -66,6 +66,7 @@ function Login() {
           type="password"
           placeholder="Password"
           value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </form>
     </div>
