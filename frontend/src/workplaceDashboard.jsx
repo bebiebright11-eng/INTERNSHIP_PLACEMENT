@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import API from "../api";
+
+
 function WorkplaceDashboard() {
   return (
     <div style={{ padding: "20px" }}>
@@ -7,3 +11,4 @@ function WorkplaceDashboard() {
 }
 
 export default WorkplaceDashboard;
+constante
