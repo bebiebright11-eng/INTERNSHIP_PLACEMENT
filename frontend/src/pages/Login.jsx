@@ -62,6 +62,10 @@ function Login() {
           required
         />
         <br /><br />
+        <input
+          type="password"
+          placeholder="Password"
+        />
       </form>
     </div>
   );
