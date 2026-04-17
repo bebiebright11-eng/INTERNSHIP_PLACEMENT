@@ -49,13 +49,16 @@ function Login() {
   }; 
 
 
-
-
   
   return (
     <div style={{ padding: "40px" }}>
       <h2>Login</h2>
-      <form onSubmit={handleLogin}></form>
+      <form onSubmit={handleLogin}>
+        <input
+          type="text"
+          placeholder="Username"
+/>
+      </form>
     </div>
   );
 }
