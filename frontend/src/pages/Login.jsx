@@ -67,7 +67,9 @@ function Login() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
+        <br /><br />
       </form>
     </div>
   );
