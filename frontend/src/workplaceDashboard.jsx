@@ -78,3 +78,13 @@ useEffect(() => {
     <input type="number" min="0" max={c.max_score} />
   </div>
 ))}
+const [scores, setScores] = useState({});
+const handleScoreChange = (placementId, criteriaId, value) => {
+  setScores((prev) => ({
+    ...prev,
+    [placementId]: {
+      ...prev[placementId],
+      [criteriaId]: parseInt(value),
+    },
+  }));
+};
