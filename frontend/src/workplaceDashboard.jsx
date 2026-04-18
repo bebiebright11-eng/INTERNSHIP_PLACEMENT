@@ -75,7 +75,14 @@ useEffect(() => {
     <label>
       {c.name} (Max: {c.max_score})
     </label>
-    <input type="number" min="0" max={c.max_score} />
+    <input
+  type="number"
+  min="0"
+  max={c.max_score}
+  onChange={(e) =>
+    handleScoreChange(p.id, c.id, e.target.value)
+  }
+/>
   </div>
 ))}
 const [scores, setScores] = useState({});
