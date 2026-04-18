@@ -68,3 +68,13 @@ useEffect(() => {
   fetchPlacements();
   fetchCriteria();
 }, []);
+<h4>Evaluation</h4>
+
+{criteria.map((c) => (
+  <div key={c.id}>
+    <label>
+      {c.name} (Max: {c.max_score})
+    </label>
+    <input type="number" min="0" max={c.max_score} />
+  </div>
+))}
