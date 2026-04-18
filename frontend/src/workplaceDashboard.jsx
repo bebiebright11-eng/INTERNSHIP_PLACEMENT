@@ -70,21 +70,32 @@ useEffect(() => {
 }, []);
 <h4>Evaluation</h4>
 
-{criteria.map((c) => (
-  <div key={c.id}>
-    <label>
-      {c.name} (Max: {c.max_score})
-    </label>
-    <input
-  type="number"
-  min="0"
-  max={c.max_score}
-  onChange={(e) =>
-    handleScoreChange(p.id, c.id, e.target.value)
-  }
-/>
+{placements.map((p) => (
+  <div key={p.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
+    <h3>Student: {p.student}</h3>
+    
+    {/* Loop for criteria inputs */}
+    {criteria.map((c) => (
+      <div key={c.id}>
+        <label>
+          {c.name} (Max: {c.max_score})
+        </label>
+        <input
+          type="number"
+          min="0"
+          max={c.max_score}
+          onChange={(e) => handleScoreChange(p.id, c.id, e.target.value)}
+        />
+      </div>
+    ))}
+
+    {/* The button goes HERE: Outside the criteria map, but inside the placement div */}
+    <button onClick={() => submitAllEvaluations(p.id)} style={{ marginTop: "10px" }}>
+      Submit Evaluation
+    </button>
   </div>
 ))}
+  
 const [scores, setScores] = useState({});
 const handleScoreChange = (placementId, criteriaId, value) => {
   setScores((prev) => ({
