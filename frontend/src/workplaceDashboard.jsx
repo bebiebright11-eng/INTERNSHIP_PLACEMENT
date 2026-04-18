@@ -106,3 +106,33 @@ const handleScoreChange = (placementId, criteriaId, value) => {
     },
   }));
 };
+const submitEvaluation = async (placementId) => {
+  try {
+    const criteriaScores = Object.entries(scores[placementId] || {}).map(
+      ([criteriaId, score]) => ({
+        criteria: parseInt(criteriaId),
+        score: score,
+      })
+    );
+
+    await API.post(
+      "supervision/evaluations/",
+      {
+        placement: placementId,
+        supervisor_type: "workplace",
+        comments: "Workplace evaluation submitted",
+        criteria_scores: criteriaScores,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    alert("Evaluation submitted!");
+  } catch (error) {
+    console.log(error.response?.data);
+    alert("Failed to submit evaluation");
+  }
+};
