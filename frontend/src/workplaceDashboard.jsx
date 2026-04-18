@@ -130,7 +130,10 @@ const submitEvaluation = async (placementId) => {
       }
     );
 
-    alert("Evaluation submitted!");
+    console.log("FULL ERROR:", error);
+    console.log("BACKEND RESPONSE:", error.response?.data);
+    alert(JSON.stringify(error.response?.data));
+
   } catch (error) {
     console.log(error.response?.data);
     alert("Failed to submit evaluation");
