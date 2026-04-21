@@ -31,10 +31,20 @@ setPlacements(filtered);
 
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Academic Supervisor Dashboard</h1>
-    </div>
-  );
-}
+  <div style={{ padding: "20px" }}>
+    <h1>Academic Supervisor Dashboard</h1>
 
+    {placements.length === 0 ? (
+      <p>No students assigned</p>
+    ) : (
+      placements.map((p) => (
+        <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
+          <h3>Student: {p.student}</h3>
+          <p>Organization: {p.organization}</p>
+        </div>
+      ))
+    )}
+  </div>
+);
+}
 export default AcademicDashboard;
