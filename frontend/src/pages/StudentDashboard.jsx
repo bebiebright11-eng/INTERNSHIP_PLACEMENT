@@ -8,6 +8,15 @@ function StudentDashboard() {
   const [organizations, setOrganizations] = useState([]);
   //Stores students placement
   const [placement, setPlacement] = useState(null);
+
+    // store form inputs for weekly log
+const [formData, setFormData] = useState({
+  placement: "",
+  week_number: "",
+  tasks: "",
+  challenges: "",
+  attendance_days: 5,
+});
   
   useEffect(() => {
   fetchApplications();
