@@ -27,9 +27,24 @@ setPlacements(filtered);
     console.log(error);
   }
 };
+const fetchCriteria = async () => {
+  try {
+    const res = await API.get("supervision/evaluationcriteria/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    setCriteria(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
   useEffect(() => {
     fetchPlacements();
+    fetchCriteria();
   }, []);
 
 
