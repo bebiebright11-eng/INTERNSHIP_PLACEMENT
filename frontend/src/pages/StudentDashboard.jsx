@@ -6,6 +6,8 @@ function StudentDashboard() {
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
   const [organizations, setOrganizations] = useState([]);
+  //Stores students placement
+  const [placement, setPlacement] = useState(null);
   
   useEffect(() => {
   fetchApplications();
