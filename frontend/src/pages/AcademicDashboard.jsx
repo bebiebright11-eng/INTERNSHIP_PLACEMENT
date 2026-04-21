@@ -4,6 +4,7 @@ import API from "../api";
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]);
+  const [evaluations, setEvaluations] = useState([]);
   
 
 
