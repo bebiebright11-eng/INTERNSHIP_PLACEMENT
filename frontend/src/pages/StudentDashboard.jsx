@@ -112,6 +112,19 @@ const fetchPlacement = async () => {
     <div style={{ padding: "20px" }}>
       <h1>Student Dashboard</h1>
 
+      <h2>My Placement</h2>
+
+{placement ? (
+  <div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
+    <p><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
+    <p><strong>Status:</strong> {placement.status}</p>
+    <p><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
+    <p><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
+  </div>
+) : (
+  <p>No placement assigned yet</p>
+)}
+
       <h2>My Applications</h2>
       {applications.length === 0 ? (
         <p>No applications yet</p>
