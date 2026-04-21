@@ -20,6 +20,26 @@ function AdminDashboard() {
   }
 };
 
+const updateStatus = async (id, status) => {
+    try {
+      await API.patch(
+        `internships/applications/${id}/`,
+        { status: status },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      alert("Updated successfully!");
+      fetchApplications(); // refresh data
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
 useEffect(() => {
   fetchApplications();
