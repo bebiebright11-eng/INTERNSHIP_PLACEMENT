@@ -23,6 +23,7 @@ const [formData, setFormData] = useState({
   fetchLogs();
   fetchEvaluations();
   fetchOrganizations();
+  fetchPlacement();
 }, []);
 
 const fetchApplications = async () => {
@@ -86,6 +87,23 @@ const applyToOrganization = async (orgId) => {
     fetchApplications();
   } catch (error) {
     alert("Failed to apply");
+  }
+};
+const fetchPlacement = async () => {
+  try {
+    const res = await API.get("internships/placements/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    const studentPlacement = res.data.find(
+      (p) => p.student === parseInt(localStorage.getItem("user_id"))
+    );
+
+    setPlacement(studentPlacement);
+  } catch (error) {
+    console.log(error);
   }
 };
 
