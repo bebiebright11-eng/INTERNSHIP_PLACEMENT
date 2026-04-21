@@ -20,6 +20,11 @@ function AdminDashboard() {
   }
 };
 
+
+useEffect(() => {
+  fetchApplications();
+}, []);
+
   return (
     <div>
       <h1>Admin Dashboard</h1>
