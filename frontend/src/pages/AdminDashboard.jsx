@@ -1,6 +1,8 @@
+import React from "react";
+
 function AdminDashboard() {
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h1>Admin Dashboard</h1>
     </div>
   );
