@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import API from "../api";
 
@@ -5,11 +6,13 @@ function StudentDashboard() {
   const [applications, setApplications] = useState([]);
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
+  // The below has been added
   const [organizations, setOrganizations] = useState([]);
-  //Stores students placement
+  // 🔥 NEW: Store student's placement (VERY IMPORTANT FEATURE)
   const [placement, setPlacement] = useState(null);
+  
 
-    // store form inputs for weekly log
+  // 🔥 NEW: store form inputs for weekly log
 const [formData, setFormData] = useState({
   placement: "",
   week_number: "",
@@ -17,65 +20,72 @@ const [formData, setFormData] = useState({
   challenges: "",
   attendance_days: 5,
 });
-  
-  useEffect(() => {
-  fetchApplications();
-  fetchLogs();
-  fetchEvaluations();
-  fetchOrganizations();
-  fetchPlacement();
-}, []);
 
-const fetchApplications = async () => {
-  try {
-    const res = await API.get("internships/applications/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    setApplications(res.data);
-  } catch (error) {
-    console.log(error);
-  }
-};
-const fetchLogs = async () => {
-  try {
-    const res = await API.get("internships/logs/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    setLogs(res.data);
-  } catch (error) {
-    console.log(error);
-  }
-};
-const fetchEvaluations = async () => {
-  try {
-    const res = await API.get("supervision/evaluations/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    setEvaluations(res.data);
-  } catch (error) {
-    console.log(error);
-  }
-};
-const fetchOrganizations = async () => {
+
+  useEffect(() => {
+    fetchApplications();
+    fetchLogs();
+    fetchEvaluations();
+    fetchOrganizations(); // 🔥 ADD THIS LINE
+    fetchPlacement(); // 🔥 ADD THIS LINE
+  }, []);
+
+  const fetchApplications = async () => {
+    try {
+      const res = await API.get("internships/applications/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setApplications(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchLogs = async () => {
+    try {
+      const res = await API.get("supervision/weeklylogs/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setLogs(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchEvaluations = async () => {
+    try {
+      const res = await API.get("supervision/evaluations/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setEvaluations(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // This line has also been added to fetch organizations
+  const fetchOrganizations = async () => {
   try {
     const res = await API.get("internships/organizations/");
-    setOrganizations(res.data);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
+      setOrganizations(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+// added for applying
 const applyToOrganization = async (orgId) => {
   try {
     await API.post(
       "internships/applications/",
-      { organization: orgId },
+      {
+        organization: orgId,
+      },
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -84,11 +94,15 @@ const applyToOrganization = async (orgId) => {
     );
 
     alert("Application submitted!");
-    fetchApplications();
+    fetchApplications(); // refresh applications
   } catch (error) {
-    alert("Failed to apply");
-  }
+  console.log("FULL ERROR:", error);
+  console.log("BACKEND RESPONSE:", error.response?.data);
+
+  alert(JSON.stringify(error.response?.data));
+}
 };
+// 🔥 NEW: Fetch student's placement
 const fetchPlacement = async () => {
   try {
     const res = await API.get("internships/placements/", {
@@ -97,31 +111,31 @@ const fetchPlacement = async () => {
       },
     });
 
-    const studentPlacement = res.data.find(
+    // 🔥 Find ONLY this student's placement
+    const myPlacement = res.data.find(
       (p) => p.student === parseInt(localStorage.getItem("user_id"))
     );
 
-    setPlacement(studentPlacement);
+    setPlacement(myPlacement || null);
+
   } catch (error) {
     console.log(error);
   }
 };
+// added for handling form input changes after building dassboards
 const handleChange = (e) => {
   setFormData({
     ...formData,
     [e.target.name]: e.target.value,
   });
 };
-// 🔥 NEW: Submit weekly log to backend
-const submitLog = async () => {
+const submitLog = async (e) => {
+  e.preventDefault();
+
   try {
     await API.post(
       "supervision/weeklylogs/",
-      {
-        ...formData,
-        // ⚠️ Make sure placement exists before using it
-        placement: placement?.id,
-      },
+      formData,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -129,84 +143,175 @@ const submitLog = async () => {
       }
     );
 
-    alert("Log submitted!");
-    fetchLogs(); // refresh logs after submission
+    alert("Weekly log submitted!");
+
+    setFormData({
+      placement: "",
+      week_number: "",
+      tasks: "",
+      challenges: "",
+      attendance_days: 5,
+    });
+
+    fetchLogs();
 
   } catch (error) {
     console.log(error.response?.data);
-    alert("Failed to submit log");
+    alert(JSON.stringify(error.response?.data));
   }
 };
+
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>Student Dashboard</h1>
+      {/* 🔥 NEW: PLACEMENT STATUS SECTION */}
+<div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
+  <h2>My Placement</h2>
 
-      <h2>My Placement</h2>
-
-{placement ? (
-  <div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
-    <p><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
-    <p><strong>Status:</strong> {placement.status}</p>
-    <p><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
-    <p><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
-  </div>
-) : (
-  <p>No placement assigned yet</p>
-)}
-
+  {placement ? (
+    <>
+      <p><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
+{/* 🔥 use name instead of ID */}
+      <p><strong>Status:</strong> {placement.status}</p>
+      <p><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
+      <p><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
+    </>
+  ) : (
+    <p>You have not been placed yet.</p>
+  )}
+</div>
+       <hr /> {/* 🔥 VISUAL SEPARATOR */}
+      {/* APPLICATIONS */}
       <h2>My Applications</h2>
       {applications.length === 0 ? (
         <p>No applications yet</p>
       ) : (
         applications.map((app) => (
-          <div key={app.id}>
-            <p>Organization: {app.organization_name || app.organization}</p>
-            <p>Status: {app.status}</p>
+          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
+            <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
+{/* 🔥 uses name if available, fallback to ID */}
+            <p><strong>Status:</strong> {app.status}</p>
           </div>
         ))
       )}
 
+      {/* WEEKLY LOGS */}
+      // 🔥 NEW: Form to submit weekly log
+      <h2>Add Weekly Log</h2>
+
+<form onSubmit={submitLog} style={{ border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
+
+  <input
+    type="number"
+    name="placement"
+    placeholder="Placement ID"
+    value={formData.placement}
+    onChange={handleChange}
+    required
+  />
+  <br /><br />
+
+  <input
+    type="number"
+    name="week_number"
+    placeholder="Week Number"
+    value={formData.week_number}
+    onChange={handleChange}
+    required
+  />
+  <br /><br />
+
+  <textarea
+    name="tasks"
+    placeholder="Tasks done"
+    value={formData.tasks}
+    onChange={handleChange}
+    required
+  />
+  <br /><br />
+
+  <textarea
+    name="challenges"
+    placeholder="Challenges faced"
+    value={formData.challenges}
+    onChange={handleChange}
+  />
+  <br /><br />
+
+  <input
+    type="number"
+    name="attendance_days"
+    value={formData.attendance_days}
+    onChange={handleChange}
+  />
+  <br /><br />
+
+  <button type="submit">Submit Log</button>
+</form>
+        <hr /> {/* 🔥 VISUAL SEPARATOR */}
       <h2>My Weekly Logs</h2>
       {logs.length === 0 ? (
         <p>No logs yet</p>
       ) : (
         logs.map((log) => (
-          <div key={log.id}>
+          <div key={log.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
             <p>Week: {log.week_number}</p>
+            <p>Organization: {log.organization_name}</p> 
+{/* 🔥 shows organization name */}
+
+            <p>Student: {log.student_name}</p> 
+{/* 🔥 shows student name */}
             <p>Tasks: {log.tasks}</p>
+            // CODE BELOW WAS REPLACED
+            <p>Status: {log.status}</p>
           </div>
         ))
       )}
 
+      {/* EVALUATIONS */}
       <h2>My Evaluations</h2>
       {evaluations.length === 0 ? (
         <p>No evaluations yet</p>
       ) : (
         evaluations.map((ev) => (
-          <div key={ev.id}>
+          <div key={ev.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
+            <p>Student: {ev.student_name}</p>
+            <p>Organization: {ev.organization_name}</p>
+            <p>Supervisor: {ev.supervisor_name}</p>
+{/* 🔥 shows readable names */}
             <p>Score: {ev.score}</p>
             <p>Comments: {ev.comments}</p>
-            <p>Final Grade: {ev.final_grade || "Not finalized"}</p>
+            <p>Final Grade: {ev.final_grade || "Not finalised"}</p>
           </div>
         ))
       )}
+
+       <hr /> {/* 🔥 VISUAL SEPARATOR */}
+      {/* ORGANIZATIONS */}
       <h2>Available Organizations</h2>
       {organizations.length === 0 ? (
         <p>No organizations available</p>
-      ) : (
-                organizations.map((org) => (
+        ) : (
+        organizations.map((org) => (
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}
           >
             <p><strong>Name:</strong> {org.name}</p>
             <p><strong>Location:</strong> {org.location}</p>
-            <button onClick={() => applyToOrganization(org.id)}>
-              Apply
-            </button>
+            {/* 🔥 PREVENT APPLYING IF ALREADY PLACED */}
+{placement ? (
+  <button disabled style={{ backgroundColor: "gray" }}>
+    Already Placed
+  </button>
+) : (
+  <button onClick={() => applyToOrganization(org.id)}>
+    Apply
+  </button>
+)}
           </div>
         ))
       )}
     </div>
-  ); 
+  );
 }
 export default StudentDashboard;
