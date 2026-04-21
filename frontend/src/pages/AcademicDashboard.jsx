@@ -96,6 +96,26 @@ function AcademicDashboard() {
               ) : (
                 <p>No workplace evaluation yet</p>
               )}
+
+
+              <h4>Academic Evaluation</h4>
+
+{criteria.map((c) => (
+  <div key={c.id}>
+    <label>
+      {c.name} (Max: {c.max_score})
+    </label>
+    <input
+      type="number"
+      min="0"
+      max={c.max_score}
+      onChange={(e) =>
+        handleScoreChange(p.id, c.id, e.target.value)
+      }
+    />
+  </div>
+))}
+
             </div>
           );
         })
