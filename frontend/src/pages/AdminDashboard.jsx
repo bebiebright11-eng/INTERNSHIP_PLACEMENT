@@ -28,7 +28,21 @@ useEffect(() => {
   return (
     <div>
       <h1>Admin Dashboard</h1>
-    </div>
+      <h2>Applications</h2>
+
+      {applications.length === 0 ? (
+        <p>No applications yet</p>
+      ) : (
+        applications.map((app) => (
+          <div key={app.id}>
+            <p><strong>Student:</strong> {app.student}</p>
+            <p><strong>Organization:</strong> {app.organization}</p>
+            <p><strong>Status:</strong> {app.status}</p>
+          </div>
+         ))
+       )}
+
+    </div>    
   );
 }
 
