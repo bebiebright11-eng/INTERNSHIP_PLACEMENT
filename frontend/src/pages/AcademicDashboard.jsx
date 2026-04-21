@@ -7,6 +7,8 @@ function AcademicDashboard() {
   const [evaluations, setEvaluations] = useState([]);
   const [scores, setScores] = useState({});
 
+  // --- Data Fetching Functions ---
+
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/", {
@@ -52,53 +54,59 @@ function AcademicDashboard() {
       console.log(error);
     }
   };
+
+  // --- Event Handlers ---
+
   const handleScoreChange = (placementId, criteriaId, value) => {
-  setScores((prev) => ({
-    ...prev,
-    [placementId]: {
-      ...prev[placementId],
-      [criteriaId]: parseInt(value),
-    },
-  }));
-};
-const submitEvaluation = async (placementId) => {
-  try {
-    const criteriaScores = Object.entries(scores[placementId] || {}).map(
-      ([criteriaId, score]) => ({
-        criteria: parseInt(criteriaId),
-        score: score,
-      })
-    );
-
-    await API.post(
-      "supervision/evaluations/",
-      {
-        placement: placementId,
-        supervisor_type: "academic",
-        comments: "Final academic evaluation",
-        criteria_scores: criteriaScores,
+    setScores((prev) => ({
+      ...prev,
+      [placementId]: {
+        ...prev[placementId],
+        [criteriaId]: parseInt(value),
       },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+    }));
+  };
+
+  const submitEvaluation = async (placementId) => {
+    try {
+      const criteriaScores = Object.entries(scores[placementId] || {}).map(
+        ([criteriaId, score]) => ({
+          criteria: parseInt(criteriaId),
+          score: score,
+        })
+      );
+
+      await API.post(
+        "supervision/evaluations/",
+        {
+          placement: placementId,
+          supervisor_type: "academic",
+          comments: "Final academic evaluation",
+          criteria_scores: criteriaScores,
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-    alert("Final Evaluation submitted!");
-  } catch (error) {
-    console.log(error.response?.data);
-    alert(JSON.stringify(error.response?.data));
-  }
-};
+      alert("Final Evaluation submitted!");
+    } catch (error) {
+      console.log(error.response?.data);
+      alert(JSON.stringify(error.response?.data));
+    }
+  };
 
-
+  // --- Lifecycle ---
 
   useEffect(() => {
     fetchPlacements();
     fetchCriteria();
     fetchEvaluations();
   }, []);
+
+  // --- Main Render ---
 
   return (
     <div style={{ padding: "20px" }}>
@@ -112,13 +120,12 @@ const submitEvaluation = async (placementId) => {
             (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
           );
 
-          // This return was missing - it's required for the map function to output JSX
           return (
             <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
               <h3>Student: {p.student}</h3>
               <p>Organization: {p.organization}</p>
-              <h4>Workplace Evaluation</h4>
 
+              <h4>Workplace Evaluation</h4>
               {workplaceEval ? (
                 <div>
                   <p>Total Score: {workplaceEval.score}</p>
@@ -128,30 +135,25 @@ const submitEvaluation = async (placementId) => {
                 <p>No workplace evaluation yet</p>
               )}
 
-
               <h4>Academic Evaluation</h4>
+              {criteria.map((c) => (
+                <div key={c.id}>
+                  <label>
+                    {c.name} (Max: {c.max_score})
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max={c.max_score}
+                    onChange={(e) => handleScoreChange(p.id, c.id, e.target.value)}
+                  />
+                </div>
+              ))}
+              <br />
 
-{criteria.map((c) => (
-  <div key={c.id}>
-    <label>
-      {c.name} (Max: {c.max_score})
-    </label>
-    <input
-      type="number"
-      min="0"
-      max={c.max_score}
-      onChange={(e) =>
-        handleScoreChange(p.id, c.id, e.target.value)
-      }
-    />
-  </div>
-))}
-<br />
-
-<button onClick={() => submitEvaluation(p.id)}>
-  Submit Final Evaluation
-</button>
-
+              <button onClick={() => submitEvaluation(p.id)}>
+                Submit Final Evaluation
+              </button>
             </div>
           );
         })
