@@ -168,6 +168,39 @@ const submitLog = async () => {
       )}
 
       <h2>My Weekly Logs</h2>
+      {/* 🔥 NEW: Weekly Log Form */}
+<h3>Add Weekly Log</h3>
+
+<input
+  type="number"
+  name="week_number"
+  placeholder="Week Number"
+  onChange={handleChange}
+/>
+
+<br /><br />
+
+<input
+  type="text"
+  name="tasks"
+  placeholder="Tasks Done"
+  onChange={handleChange}
+/>
+
+<br /><br />
+
+<input
+  type="text"
+  name="challenges"
+  placeholder="Challenges"
+  onChange={handleChange}
+/>
+
+<br /><br />
+
+<button onClick={submitLog}>
+  Submit Log
+</button>
       {logs.length === 0 ? (
         <p>No logs yet</p>
       ) : (
