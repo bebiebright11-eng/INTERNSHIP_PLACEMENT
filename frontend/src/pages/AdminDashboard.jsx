@@ -1,10 +1,11 @@
 import {useEffect, useState} from "react";
+import API from "../api";
 
 function AdminDashboard() {
   const [applications, setApplications] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
-  
+
   return (
     <div>
       <h1>Admin Dashboard</h1>
