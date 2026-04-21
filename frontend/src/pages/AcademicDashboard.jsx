@@ -5,6 +5,7 @@ function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
+  const [scores, setScores] = useState({});
 
   const fetchPlacements = async () => {
     try {
@@ -51,6 +52,16 @@ function AcademicDashboard() {
       console.log(error);
     }
   };
+  const handleScoreChange = (placementId, criteriaId, value) => {
+  setScores((prev) => ({
+    ...prev,
+    [placementId]: {
+      ...prev[placementId],
+      [criteriaId]: parseInt(value),
+    },
+  }));
+};
+
 
   useEffect(() => {
     fetchPlacements();
