@@ -41,11 +41,27 @@ const fetchCriteria = async () => {
     console.log(error);
   }
 };
+const fetchEvaluations = async () => {
+  try {
+    const res = await API.get("supervision/evaluations/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    setEvaluations(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 
   useEffect(() => {
     fetchPlacements();
     fetchCriteria();
+    fetchEvaluations();
+
   }, []);
 
 
