@@ -106,7 +106,37 @@ const fetchPlacement = async () => {
     console.log(error);
   }
 };
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+// 🔥 NEW: Submit weekly log to backend
+const submitLog = async () => {
+  try {
+    await API.post(
+      "supervision/weeklylogs/",
+      {
+        ...formData,
+        // ⚠️ Make sure placement exists before using it
+        placement: placement?.id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
+    alert("Log submitted!");
+    fetchLogs(); // refresh logs after submission
+
+  } catch (error) {
+    console.log(error.response?.data);
+    alert("Failed to submit log");
+  }
+};
 
   return (
     <div style={{ padding: "20px" }}>
