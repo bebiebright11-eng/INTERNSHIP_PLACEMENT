@@ -118,7 +118,7 @@ const fetchPlacement = async () => {
       ) : (
         applications.map((app) => (
           <div key={app.id}>
-            <p>Organization: {app.organization}</p>
+            <p>Organization: {app.organization_name || app.organization}</p>
             <p>Status: {app.status}</p>
           </div>
         ))
