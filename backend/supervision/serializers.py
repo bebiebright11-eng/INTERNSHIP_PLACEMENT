@@ -22,6 +22,17 @@ class CriteriaScoreSerializer(serializers.ModelSerializer):
 
 
 class EvaluationSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='placement.student.username', read_only=True)
+
+    #  ADD: organization name
+    organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
+
+    supervisor_name = serializers.CharField(source='supervisor.username', read_only=True)
+    
+    # This grabs the "Readable Name" from your choices (e.g., 'Workplace Supervisor')
+    supervisor_type = serializers.CharField(source='get_supervisor_type_display', read_only=True)
+    #  ADD THIS LINE
+    supervisor = serializers.HiddenField(default=serializers.CurrentUserDefault())
     criteria_scores = CriteriaScoreSerializer(many=True)
 
     class Meta:
