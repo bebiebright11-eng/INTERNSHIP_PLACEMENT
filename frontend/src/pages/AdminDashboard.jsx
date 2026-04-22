@@ -92,6 +92,19 @@ useEffect(() => {
           </div>
          ))
        )}
+       
+      <h2>Placements</h2>
+
+    {placements.length === 0 ? (
+      <p>No placements yet</p>
+    ) : (
+      placements.map((p) => (
+        <div key={p.id}>
+          <p><strong>Student:</strong> {p.student}</p>
+          <p><strong>Organization:</strong> {p.organization}</p>
+        </div>
+      ))
+    )}
 
     </div>    
   );
