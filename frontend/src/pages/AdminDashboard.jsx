@@ -92,7 +92,7 @@ useEffect(() => {
           </div>
          ))
        )}
-       
+
       <h2>Placements</h2>
 
     {placements.length === 0 ? (
@@ -102,6 +102,19 @@ useEffect(() => {
         <div key={p.id}>
           <p><strong>Student:</strong> {p.student}</p>
           <p><strong>Organization:</strong> {p.organization}</p>
+
+          <select id={`workplace-${p.id}`}>
+            <option>Select Workplace Supervisor</option>
+            {supervisors
+              .filter((u) => u.role === "workplace")
+              .map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.username}
+                </option>
+              ))}
+          </select>
+
+
         </div>
       ))
     )}
