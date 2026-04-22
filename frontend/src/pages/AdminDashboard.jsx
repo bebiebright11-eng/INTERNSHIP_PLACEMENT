@@ -115,6 +115,20 @@ useEffect(() => {
           </select>
 
 
+          <br /><br />
+          
+          <select id={`academic-${p.id}`}>
+            <option>Select Academic Supervisor</option>
+            {supervisors
+              .filter((u) => u.role === "academic")
+              .map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.username}
+                </option>
+              ))}
+          </select>  
+
+          
         </div>
       ))
     )}
