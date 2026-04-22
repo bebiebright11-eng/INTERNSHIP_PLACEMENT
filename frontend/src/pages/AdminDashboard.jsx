@@ -39,7 +39,14 @@ const updateStatus = async (id, status) => {
       console.log(error);
     }
   };
-
+const fetchPlacements = async () => {
+    try {
+      const res = await API.get("internships/placements/");
+      setPlacements(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 useEffect(() => {
   fetchApplications();
