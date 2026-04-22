@@ -165,23 +165,24 @@ const submitLog = async (e) => {
   return (
     <div style={{ padding: "20px" }}>
       <h1>Student Dashboard</h1>
-      {/* 🔥 NEW: PLACEMENT STATUS SECTION */}
-<div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
-  <h2>My Placement</h2>
 
-  {placement ? (
-    <>
-      <p><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
-{/* 🔥 use name instead of ID */}
-      <p><strong>Status:</strong> {placement.status}</p>
-      <p><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
-      <p><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
-    </>
-  ) : (
-    <p>You have not been placed yet.</p>
-  )}
-</div>
-       <hr /> {/* 🔥 VISUAL SEPARATOR */}
+      {/* PLACEMENT STATUS SECTION */}
+      <div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
+        <h2>My Placement</h2>
+        {placement ? (
+          <>
+            <p><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
+            <p><strong>Status:</strong> {placement.status}</p>
+            <p><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
+            <p><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
+          </>
+        ) : (
+          <p>You have not been placed yet.</p>
+        )}
+      </div>
+
+      <hr />
+
       {/* APPLICATIONS */}
       <h2>My Applications</h2>
       {applications.length === 0 ? (
@@ -190,66 +191,65 @@ const submitLog = async (e) => {
         applications.map((app) => (
           <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
             <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
-{/* 🔥 uses name if available, fallback to ID */}
             <p><strong>Status:</strong> {app.status}</p>
           </div>
         ))
       )}
 
-      {/* WEEKLY LOGS */}
-      // 🔥 NEW: Form to submit weekly log
+      {/* WEEKLY LOGS FORM */}
       <h2>Add Weekly Log</h2>
+      <form onSubmit={submitLog} style={{ border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
+        <input
+          type="number"
+          name="placement"
+          placeholder="Placement ID"
+          value={formData.placement}
+          onChange={handleChange}
+          required
+        />
+        <br /><br />
 
-<form onSubmit={submitLog} style={{ border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
+        <input
+          type="number"
+          name="week_number"
+          placeholder="Week Number"
+          value={formData.week_number}
+          onChange={handleChange}
+          required
+        />
+        <br /><br />
 
-  <input
-    type="number"
-    name="placement"
-    placeholder="Placement ID"
-    value={formData.placement}
-    onChange={handleChange}
-    required
-  />
-  <br /><br />
+        <textarea
+          name="tasks"
+          placeholder="Tasks done"
+          value={formData.tasks}
+          onChange={handleChange}
+          required
+        />
+        <br /><br />
 
-  <input
-    type="number"
-    name="week_number"
-    placeholder="Week Number"
-    value={formData.week_number}
-    onChange={handleChange}
-    required
-  />
-  <br /><br />
+        <textarea
+          name="challenges"
+          placeholder="Challenges faced"
+          value={formData.challenges}
+          onChange={handleChange}
+        />
+        <br /><br />
 
-  <textarea
-    name="tasks"
-    placeholder="Tasks done"
-    value={formData.tasks}
-    onChange={handleChange}
-    required
-  />
-  <br /><br />
+        <input
+          type="number"
+          name="attendance_days"
+          value={formData.attendance_days}
+          onChange={handleChange}
+        />
+        <br /><br />
 
-  <textarea
-    name="challenges"
-    placeholder="Challenges faced"
-    value={formData.challenges}
-    onChange={handleChange}
-  />
-  <br /><br />
+        <button type="submit">Submit Log</button>
+      </form>
 
-  <input
-    type="number"
-    name="attendance_days"
-    value={formData.attendance_days}
-    onChange={handleChange}
-  />
-  <br /><br />
+      <hr />
 
-  <button type="submit">Submit Log</button>
-</form>
-        <hr /> {/* 🔥 VISUAL SEPARATOR */}
+      {/* MY WEEKLY LOGS LIST */}
       <h2>My Weekly Logs</h2>
       {logs.length === 0 ? (
         <p>No logs yet</p>
@@ -257,13 +257,9 @@ const submitLog = async (e) => {
         logs.map((log) => (
           <div key={log.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
             <p>Week: {log.week_number}</p>
-            <p>Organization: {log.organization_name}</p> 
-{/* 🔥 shows organization name */}
-
-            <p>Student: {log.student_name}</p> 
-{/* 🔥 shows student name */}
+            <p>Organization: {log.organization_name}</p>
+            <p>Student: {log.student_name}</p>
             <p>Tasks: {log.tasks}</p>
-            // CODE BELOW WAS REPLACED
             <p>Status: {log.status}</p>
           </div>
         ))
@@ -279,7 +275,6 @@ const submitLog = async (e) => {
             <p>Student: {ev.student_name}</p>
             <p>Organization: {ev.organization_name}</p>
             <p>Supervisor: {ev.supervisor_name}</p>
-{/* 🔥 shows readable names */}
             <p>Score: {ev.score}</p>
             <p>Comments: {ev.comments}</p>
             <p>Final Grade: {ev.final_grade || "Not finalised"}</p>
@@ -287,27 +282,26 @@ const submitLog = async (e) => {
         ))
       )}
 
-       <hr /> {/* 🔥 VISUAL SEPARATOR */}
+      <hr />
+
       {/* ORGANIZATIONS */}
       <h2>Available Organizations</h2>
       {organizations.length === 0 ? (
         <p>No organizations available</p>
-        ) : (
+      ) : (
         organizations.map((org) => (
-          <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}
-          >
+          <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
             <p><strong>Name:</strong> {org.name}</p>
             <p><strong>Location:</strong> {org.location}</p>
-            {/* 🔥 PREVENT APPLYING IF ALREADY PLACED */}
-{placement ? (
-  <button disabled style={{ backgroundColor: "gray" }}>
-    Already Placed
-  </button>
-) : (
-  <button onClick={() => applyToOrganization(org.id)}>
-    Apply
-  </button>
-)}
+            {placement ? (
+              <button disabled style={{ backgroundColor: "gray" }}>
+                Already Placed
+              </button>
+            ) : (
+              <button onClick={() => applyToOrganization(org.id)}>
+                Apply
+              </button>
+            )}
           </div>
         ))
       )}
