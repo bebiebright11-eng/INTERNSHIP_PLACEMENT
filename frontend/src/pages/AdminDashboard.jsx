@@ -60,6 +60,8 @@ const fetchSupervisors = async () => {
 
 useEffect(() => {
   fetchApplications();
+  fetchPlacements();
+  fetchSupervisors();
 }, []);
 
   return (
