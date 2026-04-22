@@ -142,7 +142,21 @@ useEffect(() => {
                   {u.username}
                 </option>
               ))}
-          </select>  
+          </select>
+         
+         <br /><br />
+         
+          <button
+            onClick={() =>
+              assignSupervisors(
+                p.id,
+               document.getElementById(`workplace-${p.id}`).value,
+               document.getElementById(`academic-${p.id}`).value
+             )
+           }
+          >
+           Assign Supervisors
+          </button>  
 
 
         </div>
