@@ -14,7 +14,6 @@ function StudentDashboard() {
 
   // 🔥 NEW: store form inputs for weekly log
 const [formData, setFormData] = useState({
-  placement: "",
   week_number: "",
   tasks: "",
   challenges: "",
@@ -149,7 +148,6 @@ const submitLog = async (e) => {
     alert("Weekly log submitted!");
 // RESET FORM AFTER SUBMISSION
     setFormData({
-      placement: "",
       week_number: "",
       tasks: "",
       challenges: "",
@@ -202,15 +200,6 @@ const submitLog = async (e) => {
       {/* WEEKLY LOGS FORM */}
       <h2>Add Weekly Log</h2>
       <form onSubmit={submitLog} style={{ border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
-        <input
-          type="number"
-          name="placement"
-          placeholder="Placement ID"
-          value={formData.placement}
-          onChange={handleChange}
-          required
-        />
-        <br /><br />
 
         <input
           type="number"
