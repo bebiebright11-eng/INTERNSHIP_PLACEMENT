@@ -3,6 +3,10 @@ from .models import WeeklyLog, Evaluation, EvaluationCriteria, CriteriaScore
 
 
 class WeeklyLogSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='placement.student.username', read_only=True)
+
+    # 🔥 ADD THIS: show organization name
+    organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
     class Meta:
         model = WeeklyLog
         fields = '__all__'
