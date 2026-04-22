@@ -96,10 +96,10 @@ const applyToOrganization = async (orgId) => {
     alert("Application submitted!");
     fetchApplications(); // refresh applications
   } catch (error) {
-  console.log("FULL ERROR:", error);
-  console.log("BACKEND RESPONSE:", error.response?.data);
+  console.log(error);
+  console.log(error.response?.data);
 
-  alert(JSON.stringify(error.response?.data));
+  alert("Failed to apply");
 }
 };
 // 🔥 NEW: Fetch student's placement
@@ -156,11 +156,11 @@ const submitLog = async (e) => {
       attendance_days: 5,
     });
 
-    fetchLogs();
+    fetchLogs(); // Refresh logs to show the new entry
 
   } catch (error) {
     console.log(error.response?.data);
-    alert(JSON.stringify(error.response?.data));
+    alert("Failed to submit log");
   }
 };
 
