@@ -58,6 +58,22 @@ const fetchSupervisors = async () => {
     }
   };  
 
+const assignSupervisors = async (placementId, workplaceId, academicId) => {
+  try {
+    await API.patch(`internships/placements/${placementId}/`, {
+      workplace_supervisor: workplaceId,
+      academic_supervisor: academicId,
+    });
+
+    alert("Supervisors assigned!");
+    fetchPlacements(); // refresh placements
+
+  } catch (error) {
+    console.log(error);
+    alert("Failed to assign supervisors");
+  }
+};
+
 useEffect(() => {
   fetchApplications();
   fetchPlacements();
@@ -128,7 +144,7 @@ useEffect(() => {
               ))}
           </select>  
 
-          
+
         </div>
       ))
     )}
