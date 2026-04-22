@@ -39,6 +39,7 @@ const updateStatus = async (id, status) => {
       console.log(error);
     }
   };
+
 const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/");
@@ -47,6 +48,15 @@ const fetchPlacements = async () => {
       console.log(error);
     }
   };
+
+const fetchSupervisors = async () => {
+    try {
+      const res = await API.get("accounts/users/");
+      setSupervisors(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };  
 
 useEffect(() => {
   fetchApplications();
