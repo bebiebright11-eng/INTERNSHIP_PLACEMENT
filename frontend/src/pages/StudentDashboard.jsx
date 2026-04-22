@@ -278,6 +278,7 @@ const submitLog = async (e) => {
             <p>Student: {ev.student_name}</p>
             <p>Organization: {ev.organization_name}</p>
             <p>Supervisor: {ev.supervisor_name}</p>
+            <p>Role: {ev.supervisor_type}</p>
             <p>Score: {ev.score}</p>
             <p>Comments: {ev.comments}</p>
             <p>Final Grade: {ev.final_grade || "Not finalised"}</p>
