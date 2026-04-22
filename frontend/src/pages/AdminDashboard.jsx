@@ -58,6 +58,18 @@ useEffect(() => {
             <p><strong>Student:</strong> {app.student}</p>
             <p><strong>Organization:</strong> {app.organization}</p>
             <p><strong>Status:</strong> {app.status}</p>
+
+            {app.status === "pending" && (
+      <>
+        <button onClick={() => updateStatus(app.id, "approved")}>
+          Approve
+        </button>
+
+        <button onClick={() => updateStatus(app.id, "rejected")}>
+          Reject
+        </button>
+      </>
+    )}
           </div>
          ))
        )}
