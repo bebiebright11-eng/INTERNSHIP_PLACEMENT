@@ -135,7 +135,10 @@ const submitLog = async (e) => {
   try {
     await API.post(
       "supervision/weeklylogs/",
-      formData,
+      {
+        ...formData,
+        placement:placement?.id,
+      },
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -144,7 +147,7 @@ const submitLog = async (e) => {
     );
 
     alert("Weekly log submitted!");
-
+// RESET FORM AFTER SUBMISSION
     setFormData({
       placement: "",
       week_number: "",
