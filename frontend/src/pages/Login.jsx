@@ -56,6 +56,7 @@ function Login() {
       <form onSubmit={handleLogin}>
         <input
           type="text"
+          name="username"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -64,6 +65,7 @@ function Login() {
         <br /><br />
         <input
           type="password"
+          name="username"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
