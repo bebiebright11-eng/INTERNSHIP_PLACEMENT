@@ -177,6 +177,7 @@ const submitLog = async (e) => {
             <p><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
             <p><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
           </>
+        
         ) : (
           <p>You have not been placed yet.</p>
         )}
@@ -219,7 +220,7 @@ const submitLog = async (e) => {
           required
         />
         <br /><br />
-
+          
         <textarea
           name="challenges"
           placeholder="Challenges faced"
