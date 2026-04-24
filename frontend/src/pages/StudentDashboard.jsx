@@ -159,11 +159,11 @@ function StudentDashboard() {
   return (
     <div style={{ padding: "20px" }}>
       <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
-        Internship Placement System (ILES)
+        INTERNSHIP  PLACEMENT  SYSTEM (ILES)
       </h1>
 
-      <h2 style={{ marginBottom: "5px" }}>Student Dashboard</h2>
-      <p style={{ fontWeight: "bold", marginTop: "0px" }}>Welcome, Student</p>
+      <h2 style={{textAlign: "center", marginBottom: "5px" }}>Student Dashboard</h2>
+      <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, Student</p>
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <button
@@ -230,24 +230,24 @@ function StudentDashboard() {
           marginTop: "20px",
         }}
       >
-        <h2>My Placement</h2>
+        <h2 style={{textAlign: "center"}}>My Placement</h2>
         {placement ? (
           <>
-            <p><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
-            <p><strong>Status:</strong> {placement.status}</p>
-            <p><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
-            <p><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
+            <p style={{textAlign: "center"}}><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
+            <p style={{textAlign: "center"}}><strong>Status:</strong> {placement.status}</p>
+            <p style={{textAlign: "center"}}><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
+            <p style={{textAlign: "center"}}><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
           </>
         ) : (
-          <p>You have not been placed yet.</p>
+          <p style={{textAlign: "center"}}>You have not been placed yet.</p>
         )}
       </div>
 
       <hr />
 
       {/* WEEKLY LOGS FORM */}
-      <h2>Add Weekly Log</h2>
-      <form onSubmit={submitLog} style={{ border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
+      <h2 style={{textAlign: "center"}}>Add Weekly Log</h2>
+      <form onSubmit={submitLog} style={{ textAlign: "center", border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
         <input
           type="number"
           name="week_number"
@@ -285,16 +285,16 @@ function StudentDashboard() {
       <hr />
 
       {/* MY WEEKLY LOGS LIST */}
-      <h2>My Weekly Logs</h2>
+      <h2 style={{textAlign: "center"}}>My Weekly Logs</h2>
       {logs.length === 0 ? (
-        <p>No logs yet</p>
+        <p style={{textAlign: "center"}}>No logs yet</p>
       ) : (
         logs.map((log) => (
           <div key={log.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
-            <p>Week: {log.week_number}</p>
-            <p>Organization: {log.organization_name}</p>
-            <p>Tasks: {log.tasks}</p>
-            <p>Status: {log.status}</p>
+            <p style={{textAlign: "center"}}>Week: {log.week_number}</p>
+            <p style={{textAlign: "center"}}>Organization: {log.organization_name}</p>
+            <p style={{textAlign: "center"}}>Tasks: {log.tasks}</p>
+            <p style={{textAlign: "center"}}>Status: {log.status}</p>
           </div>
         ))
       )}
@@ -305,14 +305,14 @@ function StudentDashboard() {
 {activeView === "applications" && (
   <>
             {/* APPLICATIONS */}
-      <h2>My Applications</h2>
+      <h2 style={{textAlign: "center"}}>My Applications</h2>
       {applications.length === 0 ? (
-        <p>No applications yet</p>
+        <p style={{textAlign: "center"}}>No applications yet</p>
       ) : (
         applications.map((app) => (
           <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
-            <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
-            <p><strong>Status:</strong> {app.status}</p>
+            <p style={{textAlign: "center"}}><strong>Organization:</strong> {app.organization_name || app.organization}</p>
+            <p style={{textAlign: "center"}}><strong>Status:</strong> {app.status}</p>
           </div>
         ))
       )}
@@ -323,16 +323,16 @@ function StudentDashboard() {
   <>
 
       {/* EVALUATIONS */}
-      <h2>My Evaluations</h2>
+      <h2 style={{textAlign: "center"}}>My Evaluations</h2>
       {evaluations.length === 0 ? (
-        <p>No evaluations yet</p>
+        <p style={{textAlign: "center"}}>No evaluations yet</p>
       ) : (
         evaluations.map((ev) => (
           <div key={ev.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
-            <p>Supervisor: {ev.supervisor_name} ({ev.supervisor_type})</p>
-            <p>Score: {ev.score}</p>
-            <p>Comments: {ev.comments}</p>
-            <p>Final Grade: {ev.final_grade || "Not finalised"}</p>
+            <p style={{textAlign: "center"}}>Supervisor: {ev.supervisor_name} ({ev.supervisor_type})</p>
+            <p style={{textAlign: "center"}}>Score: {ev.score}</p>
+            <p style={{textAlign: "center"}}>Comments: {ev.comments}</p>
+            <p style={{textAlign: "center"}}>Final Grade: {ev.final_grade || "Not finalised"}</p>
           </div>
         ))
       )}
@@ -345,16 +345,16 @@ function StudentDashboard() {
   {activeView === "organizations" && (
     <>
       {/* ORGANIZATIONS */}
-      <h2>Available Organizations</h2>
+      <h2 style={{textAlign: "center"}}>Available Organizations</h2>
       {organizations.length === 0 ? (
-        <p>No organizations available</p>
+        <p style={{textAlign: "center"}}>No organizations available</p>
       ) : (
         organizations.map((org) => (
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
-            <p><strong>Name:</strong> {org.name}</p>
-            <p><strong>Location:</strong> {org.location}</p>
+            <p style={{textAlign: "center"}}><strong>Name:</strong> {org.name}</p>
+            <p style={{textAlign: "center"}}><strong>Location:</strong> {org.location}</p>
             {placement ? (
-              <button disabled style={{ backgroundColor: "gray" }}>Already Placed</button>
+              <button disabled style={{backgroundColor: "pink" }}>Already Placed</button>
             ) : (
               <button onClick={() => applyToOrganization(org.id)}>Apply</button>
             )}
