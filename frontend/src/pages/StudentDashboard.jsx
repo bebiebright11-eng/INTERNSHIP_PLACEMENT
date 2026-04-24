@@ -218,6 +218,9 @@ function StudentDashboard() {
         </div>
       )}
 
+
+        {activeView === "home" && (
+          <>
       {/* PLACEMENT STATUS SECTION */}
       <div
         style={{
@@ -241,19 +244,6 @@ function StudentDashboard() {
       </div>
 
       <hr />
-
-      {/* APPLICATIONS */}
-      <h2>My Applications</h2>
-      {applications.length === 0 ? (
-        <p>No applications yet</p>
-      ) : (
-        applications.map((app) => (
-          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
-            <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
-            <p><strong>Status:</strong> {app.status}</p>
-          </div>
-        ))
-      )}
 
       {/* WEEKLY LOGS FORM */}
       <h2>Add Weekly Log</h2>
@@ -305,6 +295,23 @@ function StudentDashboard() {
             <p>Organization: {log.organization_name}</p>
             <p>Tasks: {log.tasks}</p>
             <p>Status: {log.status}</p>
+          </div>
+        ))
+      )}
+
+       </>
+      )}
+
+
+            {/* APPLICATIONS */}
+      <h2>My Applications</h2>
+      {applications.length === 0 ? (
+        <p>No applications yet</p>
+      ) : (
+        applications.map((app) => (
+          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
+            <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
+            <p><strong>Status:</strong> {app.status}</p>
           </div>
         ))
       )}
