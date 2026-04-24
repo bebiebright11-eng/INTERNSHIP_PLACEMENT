@@ -369,7 +369,7 @@ function StudentDashboard() {
             <p><strong>Name:</strong> {org.name}</p>
             <p><strong>Location:</strong> {org.location}</p>
             {placement ? (
-              <button disabled style={{ backgroundColor: "gray" }}>Already Placed</button>
+              <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>Already Placed</button>
             ) : (
               <button onClick={() => applyToOrganization(org.id)}>Apply</button>
             )}
