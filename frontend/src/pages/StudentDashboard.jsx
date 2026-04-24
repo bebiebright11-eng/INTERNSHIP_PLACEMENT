@@ -218,6 +218,9 @@ function StudentDashboard() {
         </div>
       )}
 
+
+        {activeView === "home" && (
+          <>
       {/* PLACEMENT STATUS SECTION */}
       <div
         style={{
@@ -310,6 +313,26 @@ function StudentDashboard() {
           </div>
         ))
       )}
+
+       </>
+      )}
+
+{activeView === "applications" && (
+  <>
+            {/* APPLICATIONS */}
+      <h2>My Applications</h2>
+      {applications.length === 0 ? (
+        <p>No applications yet</p>
+      ) : (
+        applications.map((app) => (
+          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
+            <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
+            <p><strong>Status:</strong> {app.status}</p>
+          </div>
+        ))
+      )}
+        </>
+)} 
 
       {/* EVALUATIONS */}
       <h2>My Evaluations</h2>
