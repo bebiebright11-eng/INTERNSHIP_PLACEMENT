@@ -3,16 +3,21 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function StudentDashboard() {
+  // Adding a menu 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeView, setActiveView] = useState("home");
+
+  
   const [applications, setApplications] = useState([]);
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
   // The below has been added
   const [organizations, setOrganizations] = useState([]);
-  // 🔥 NEW: Store student's placement (VERY IMPORTANT FEATURE)
+  // NEW: Store student's placement 
   const [placement, setPlacement] = useState(null);
   
 
-  // 🔥 NEW: store form inputs for weekly log
+  //  NEW: store form inputs for weekly log
 const [formData, setFormData] = useState({
   week_number: "",
   tasks: "",
@@ -25,8 +30,8 @@ const [formData, setFormData] = useState({
     fetchApplications();
     fetchLogs();
     fetchEvaluations();
-    fetchOrganizations(); // 🔥 ADD THIS LINE
-    fetchPlacement(); // 🔥 ADD THIS LINE
+    fetchOrganizations(); 
+    fetchPlacement(); 
   }, []);
 
   const fetchApplications = async () => {
@@ -101,7 +106,7 @@ const applyToOrganization = async (orgId) => {
   alert("Failed to apply");
 }
 };
-// 🔥 NEW: Fetch student's placement
+// NEW: Fetch student's placement
 const fetchPlacement = async () => {
   try {
     const res = await API.get("internships/placements/", {
@@ -110,7 +115,7 @@ const fetchPlacement = async () => {
       },
     });
 
-    // 🔥 Find ONLY this student's placement
+    //  Find ONLY this student's placement
     const myPlacement = res.data.find(
       (p) => p.student === parseInt(localStorage.getItem("user_id"))
     );
