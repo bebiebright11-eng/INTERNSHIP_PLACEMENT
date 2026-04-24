@@ -7,7 +7,7 @@ function StudentDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState("home");
 
-  
+
   const [applications, setApplications] = useState([]);
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
@@ -24,6 +24,14 @@ const [formData, setFormData] = useState({
   challenges: "",
   attendance_days: 5,
 });
+
+const menuItemStyle = {
+  padding: "10px",
+  cursor: "pointer",
+  borderRadius: "5px",
+  marginBottom: "5px",
+  transition: "0.2s",
+};
 
 
   useEffect(() => {
