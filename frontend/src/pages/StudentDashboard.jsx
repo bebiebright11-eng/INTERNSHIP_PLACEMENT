@@ -279,7 +279,9 @@ function StudentDashboard() {
           onChange={handleChange}
         />
         <br /><br />
-        <button type="submit">Submit Log</button>
+        <button type="submit" disabled={!placement}>
+          Submit Log
+        </button>
       </form>
 
       <hr />
