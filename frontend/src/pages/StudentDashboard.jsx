@@ -209,6 +209,19 @@ const submitLog = async (e) => {
 
 </div>
 
+{menuOpen && (
+  <div style={{
+    position: "absolute",
+    marginTop: "10px",
+    background: "white",
+    border: "1px solid #ccc",
+    padding: "10px",
+    width: "200px",
+    boxShadow: "0px 2px 8px rgba(0,0,0,0.2)",
+    borderRadius: "8px",
+    zIndex: 999
+  }}>
+
       {/* PLACEMENT STATUS SECTION */}
       <div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
         <h2>My Placement</h2>
