@@ -302,7 +302,8 @@ function StudentDashboard() {
        </>
       )}
 
-
+{activeView === "applications" && (
+  <>
             {/* APPLICATIONS */}
       <h2>My Applications</h2>
       {applications.length === 0 ? (
@@ -315,6 +316,8 @@ function StudentDashboard() {
           </div>
         ))
       )}
+        </>
+)} 
 
       {/* EVALUATIONS */}
       <h2>My Evaluations</h2>
