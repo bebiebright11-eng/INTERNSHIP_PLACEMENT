@@ -334,6 +334,9 @@ function StudentDashboard() {
         </>
 )} 
 
+{activeView === "evaluations" && (
+  <>
+
       {/* EVALUATIONS */}
       <h2>My Evaluations</h2>
       {evaluations.length === 0 ? (
@@ -348,9 +351,14 @@ function StudentDashboard() {
           </div>
         ))
       )}
+      </>
+)} 
 
       <hr />
 
+
+  {activeView === "organizations" && (
+    <>
       {/* ORGANIZATIONS */}
       <h2>Available Organizations</h2>
       {organizations.length === 0 ? (
@@ -368,6 +376,8 @@ function StudentDashboard() {
           </div>
         ))
       )}
+     </>
+)} 
     </div>
   );
 }
