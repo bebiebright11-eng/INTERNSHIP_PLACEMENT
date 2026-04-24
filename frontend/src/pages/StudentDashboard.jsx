@@ -245,7 +245,7 @@ function StudentDashboard() {
       {/* APPLICATIONS */}
       <h2>My Applications</h2>
       {applications.length === 0 ? (
-        <p>No applications yet</p>
+        <p>No applications yet or still loading...</p>
       ) : (
         applications.map((app) => (
           <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
