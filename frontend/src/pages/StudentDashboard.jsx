@@ -319,6 +319,9 @@ function StudentDashboard() {
         </>
 )} 
 
+{activeView === "evaluations" && (
+  <>
+
       {/* EVALUATIONS */}
       <h2>My Evaluations</h2>
       {evaluations.length === 0 ? (
@@ -333,6 +336,8 @@ function StudentDashboard() {
           </div>
         ))
       )}
+      </>
+)} 
 
       <hr />
 
