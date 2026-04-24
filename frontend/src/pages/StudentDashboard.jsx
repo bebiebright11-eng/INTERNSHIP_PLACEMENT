@@ -188,6 +188,27 @@ const submitLog = async (e) => {
         Welcome, Student
       </p>
 
+<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+  
+  <button 
+    onClick={() => setMenuOpen(!menuOpen)}
+    style={{
+      fontSize: "22px",
+      background: "none",
+      border: "none",
+      cursor: "pointer"
+    }}
+  >
+    ☰
+  </button>
+
+  <span style={{ fontWeight: "bold", cursor: "pointer" }}
+        onClick={() => setMenuOpen(!menuOpen)}>
+    Menu
+  </span>
+
+</div>
+
       {/* PLACEMENT STATUS SECTION */}
       <div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
         <h2>My Placement</h2>
