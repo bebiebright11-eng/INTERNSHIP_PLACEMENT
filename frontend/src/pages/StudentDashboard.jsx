@@ -341,6 +341,9 @@ function StudentDashboard() {
 
       <hr />
 
+
+  {activeView === "organizations" && (
+    <>
       {/* ORGANIZATIONS */}
       <h2>Available Organizations</h2>
       {organizations.length === 0 ? (
@@ -358,6 +361,8 @@ function StudentDashboard() {
           </div>
         ))
       )}
+     </>
+)} 
     </div>
   );
 }
