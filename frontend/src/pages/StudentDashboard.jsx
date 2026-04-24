@@ -178,7 +178,15 @@ const submitLog = async (e) => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Student Dashboard</h1>
+      <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
+        Internship Placement System (ILES)
+      </h1>
+
+      <h2 style={{ marginBottom: "5px" }}>Student Dashboard</h2>
+
+      <p style={{ fontWeight: "bold", marginTop: "0px" }}>
+        Welcome, Student
+      </p>
 
       {/* PLACEMENT STATUS SECTION */}
       <div style={{ border: "2px solid orange", padding: "10px", marginBottom: "20px" }}>
