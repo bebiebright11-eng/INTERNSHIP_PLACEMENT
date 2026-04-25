@@ -306,19 +306,6 @@ function StudentDashboard() {
 
       <hr />
 
-      {/* APPLICATIONS */}
-      <h2>My Applications</h2>
-      {applications.length === 0 ? (
-        <p>No applications yet or still loading...</p>
-      ) : (
-        applications.map((app) => (
-          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
-            <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
-            <p><strong>Status:</strong> {app.status}</p>
-          </div>
-        ))
-      )}
-
       {/* WEEKLY LOGS FORM */}
       <h2 style={{textAlign: "center"}}>Add Weekly Log</h2>
       <form onSubmit={submitLog} style={{ textAlign: "center", border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
@@ -381,10 +368,10 @@ function StudentDashboard() {
         ))
       )}
 
-            <div style={{
+      <div style={{
   marginTop: "30px",
   padding: "15px",
-  backgroundColor: "#f9f9f9",
+  backgroundColor: "#fce2e2",
   borderLeft: "5px solid #007bff",
   borderRadius: "6px"
 }}>
@@ -397,8 +384,8 @@ function StudentDashboard() {
   <p>• Ensure all logs are submitted on time and accurately reflect your weekly activities.</p>
 </div>
 
-       </>
-      )}
+        </>
+ )}
 
       {activeView === "weekly logs" && (
   <>
