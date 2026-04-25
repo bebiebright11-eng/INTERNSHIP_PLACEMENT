@@ -1,3 +1,5 @@
+from time import timezone
+
 from django.db import models
 from django.conf import settings
 
@@ -55,11 +57,21 @@ class Placement(models.Model):
 
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=(('active', 'Active'), ('completed', 'Completed')),
-        default='active'
-    )
+    @property
+    def status(self):
+        today = timezone.now().date()
+
+        if not self.start_date:
+            return "not_started"
+
+        if self.start_date > today:
+            return "not_started"
+
+        if self.start_date <= today and (not self.end_date or today <= self.end_date):
+            return "active"
+
+        if self.end_date and today > self.end_date:
+            return "completed"
 
     def __str__(self):
         return f"{self.student} Placement"

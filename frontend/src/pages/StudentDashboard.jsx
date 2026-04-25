@@ -368,10 +368,10 @@ function StudentDashboard() {
         ))
       )}
 
-            <div style={{
+      <div style={{
   marginTop: "30px",
   padding: "15px",
-  backgroundColor: "#f9f9f9",
+  backgroundColor: "#fce2e2",
   borderLeft: "5px solid #007bff",
   borderRadius: "6px"
 }}>
@@ -384,8 +384,8 @@ function StudentDashboard() {
   <p>• Ensure all logs are submitted on time and accurately reflect your weekly activities.</p>
 </div>
 
-       </>
-      )}
+        </>
+ )}
 
       {activeView === "weekly logs" && (
   <>
