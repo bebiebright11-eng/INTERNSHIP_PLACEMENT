@@ -306,19 +306,6 @@ function StudentDashboard() {
 
       <hr />
 
-      {/* APPLICATIONS */}
-      <h2>My Applications</h2>
-      {applications.length === 0 ? (
-        <p>No applications yet or still loading...</p>
-      ) : (
-        applications.map((app) => (
-          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
-            <p><strong>Organization:</strong> {app.organization_name || app.organization}</p>
-            <p><strong>Status:</strong> {app.status}</p>
-          </div>
-        ))
-      )}
-
       {/* WEEKLY LOGS FORM */}
       <h2 style={{textAlign: "center"}}>Add Weekly Log</h2>
       <form onSubmit={submitLog} style={{ textAlign: "center", border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
