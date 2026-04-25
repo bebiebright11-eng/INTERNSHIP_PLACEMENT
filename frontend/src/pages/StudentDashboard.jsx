@@ -448,7 +448,52 @@ function StudentDashboard() {
         evaluations.map((ev) => (
           <div key={ev.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
             <p style={{textAlign: "center"}}>Supervisor: {ev.supervisor_name} ({ev.supervisor_type})</p>
-            <p style={{textAlign: "center"}}>Score: {ev.score}</p>
+            <div key={ev.id} style={{
+  border: "1px solid #4caf50",
+  margin: "15px",
+  padding: "15px",
+  borderRadius: "10px",
+  backgroundColor: "#f9fff9"
+}}>
+
+  <p style={{textAlign: "center"}}>
+    Supervisor: {ev.supervisor_name} ({ev.supervisor_type})
+  </p>
+
+  {/* WORKPLACE SCORE */}
+  {ev.supervisor_type === "workplace" && (
+    <>
+      <h4>🔵 Workplace Evaluation</h4>
+
+      {ev.criteria_scores?.map((cs, index) => (
+        <p key={index}>
+          {cs.criteria}: {cs.score}
+        </p>
+      ))}
+
+      <p><strong>Total:</strong> {ev.score} / 60</p>
+    </>
+  )}
+
+  {/* ACADEMIC SCORE */}
+  {ev.supervisor_type === "academic" && (
+    <>
+      <h4>🧑‍🏫 Academic Evaluation</h4>
+
+      <p><strong>Logs Score:</strong> {getLogScore()} / 20</p>
+      <p><strong>Reviewed Logs:</strong> {getReviewedLogsCount()}</p>
+
+      <p><strong>Academic Score:</strong> {ev.score} / 20</p>
+
+      <hr />
+
+      <h3>🎯 Final Score: {ev.final_grade}%</h3>
+    </>
+  )}
+
+  <p><strong>Comments:</strong> {ev.comments}</p>
+
+</div>
             <p style={{textAlign: "center"}}>Comments: {ev.comments}</p>
             <p style={{textAlign: "center"}}>Final Grade: {ev.final_grade || "Not finalised"}</p>
           </div>
