@@ -36,6 +36,7 @@ function StudentDashboard() {
   background: "#ebc6eb",  // lighter background
   padding: "10px",     // reduced padding
   borderRadius: "8px",
+  border: "1px solid #e97407",
   boxShadow: "0px 1px 4px hsla(0, 66%, 75%, 0.08)", // softer shadow
   textAlign: "center",
   fontSize: "14px"     // smaller text
@@ -204,7 +205,7 @@ function StudentDashboard() {
             position: "absolute",
             marginTop: "10px",
             background: "white",
-            border: "1px solid #ccc",
+            border: "1px solid #f35f5f",
             padding: "10px",
             width: "250px",
             boxShadow: "0px 2px 8px rgba(0,0,0,0.2)",
@@ -269,16 +270,18 @@ function StudentDashboard() {
     </p>
   </div>
   </div>
+
+
+  
       {/* PLACEMENT STATUS SECTION */}
-      <div
-        style={{
-          border: "2px solid orange",
-          padding: "10px",
-          marginBottom: "20px",
-          marginTop: "20px",
-        }}
-      >
-        <h2 style={{textAlign: "center"}}>My Placement</h2>
+      <div style={{
+        border: "2px solid #ee9714",
+        padding: "15px",
+        marginBottom: "25px",
+        borderRadius: "10px",
+        backgroundColor: "#fff8e1"  // soft highlight
+   }}>
+       <h2 style={{ textAlign: "center", marginTop: "0" }}>📍 My Placement</h2>   
         {placement ? (
           <>
             <p style={{textAlign: "center"}}><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
@@ -346,6 +349,22 @@ function StudentDashboard() {
           </div>
         ))
       )}
+
+            <div style={{
+  marginTop: "30px",
+  padding: "15px",
+  backgroundColor: "#f9f9f9",
+  borderLeft: "5px solid #007bff",
+  borderRadius: "6px"
+}}>
+  <h3>Important Notes</h3>
+
+  <p>• At least <strong>8 weekly logs</strong> should be submitted for this placement.</p>
+
+  <p>• This placement will be evaluated based on <strong>evaluation criteria</strong> including performance, punctuality, and professionalism.</p>
+
+  <p>• Ensure all logs are submitted on time and accurately reflect your weekly activities.</p>
+</div>
 
        </>
       )}
