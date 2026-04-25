@@ -51,7 +51,11 @@ class EvaluationSerializer(serializers.ModelSerializer):
             'comments',
             'final_grade',
             'is_final',
-            'criteria_scores'
+            'criteria_scores',
+
+            'student_name',
+            'organization_name',
+            'supervisor_name'
         ]
 
     def get_log_score(self, placement):
@@ -64,6 +68,8 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
         return min(score, 20)  # cap at 20
     
+
+
 
 
     def create(self, validated_data):
