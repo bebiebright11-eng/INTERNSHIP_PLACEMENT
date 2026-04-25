@@ -72,7 +72,9 @@ function Login() {
           required
         />
         <br /><br />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={!username || !password}>
+          Login
+        </button>
       </form>
     </div>
   );
