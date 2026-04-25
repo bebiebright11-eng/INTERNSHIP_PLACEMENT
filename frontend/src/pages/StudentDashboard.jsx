@@ -13,6 +13,16 @@ function StudentDashboard() {
   // NEW: Store student's placement
   const [placement, setPlacement] = useState(null);
 
+  const getReviewedLogsCount = () => {
+    return logs.filter(log => log.status === "reviewed").length;
+  };
+
+  const getLogScore = () => {
+    const reviewed = getReviewedLogsCount();
+    return Math.min(reviewed * 2.5, 20);
+  };
+
+
   // NEW: store form inputs for weekly log
   const [formData, setFormData] = useState({
     week_number: "",
