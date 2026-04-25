@@ -408,7 +408,9 @@ function StudentDashboard() {
       {logs.length === 0 ? (
         <p style={{textAlign: "center"}}>No logs yet</p>
       ) : (
-        logs.map((log) => (
+        logs
+          .sort((a, b) => a.week_number - b.week_number)
+          .map((log) => (
           <div key={log.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
             <p style={{textAlign: "center"}}>Week: {log.week_number}</p>
             <p style={{textAlign: "center"}}>Organization: {log.organization_name}</p>
