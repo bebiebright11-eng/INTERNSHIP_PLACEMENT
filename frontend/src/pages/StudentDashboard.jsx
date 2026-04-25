@@ -29,6 +29,18 @@ function StudentDashboard() {
     transition: "0.2s",
   };
 
+  const cardStyle = {
+  flex: "1",
+  minWidth: "120px",   // reduced from 150+
+  maxWidth: "120px",   // prevents cards from stretching too big
+  background: "#ebc6eb",  // lighter background
+  padding: "10px",     // reduced padding
+  borderRadius: "8px",
+  boxShadow: "0px 1px 4px hsla(0, 66%, 75%, 0.08)", // softer shadow
+  textAlign: "center",
+  fontSize: "14px"     // smaller text
+};
+
   useEffect(() => {
     fetchApplications();
     fetchLogs();
@@ -221,6 +233,42 @@ function StudentDashboard() {
 
         {activeView === "home" && (
           <>
+
+  <div style={{
+  display: "flex",
+  gap: "10px",
+  marginBottom: "15px",
+  flexWrap: "wrap",
+}}>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {logs.length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {applications.length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       <p>{applications.filter(a=>a.status==="approved").length}</p>
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
+    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
+       {evaluations.length}
+    </p>
+  </div>
+  </div>
       {/* PLACEMENT STATUS SECTION */}
       <div
         style={{
@@ -301,6 +349,26 @@ function StudentDashboard() {
 
        </>
       )}
+
+      {activeView === "weekly logs" && (
+  <>
+
+            {/* MY WEEKLY LOGS LIST */}
+      <h2 style={{textAlign: "center"}}>My Weekly Logs</h2>
+      {logs.length === 0 ? (
+        <p style={{textAlign: "center"}}>No logs yet</p>
+      ) : (
+        logs.map((log) => (
+          <div key={log.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
+            <p style={{textAlign: "center"}}>Week: {log.week_number}</p>
+            <p style={{textAlign: "center"}}>Organization: {log.organization_name}</p>
+            <p style={{textAlign: "center"}}>Tasks: {log.tasks}</p>
+            <p style={{textAlign: "center"}}>Status: {log.status}</p>
+          </div>
+        ))
+      )}
+     </>
+  )}
 
 {activeView === "applications" && (
   <>
