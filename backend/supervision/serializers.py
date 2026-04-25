@@ -3,9 +3,10 @@ from .models import WeeklyLog, Evaluation, EvaluationCriteria, CriteriaScore
 
 
 class WeeklyLogSerializer(serializers.ModelSerializer):
+    # show student_name
     student_name = serializers.CharField(source='placement.student.username', read_only=True)
 
-    # 🔥 ADD THIS: show organization name
+    # show organization name
     organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
     class Meta:
         model = WeeklyLog
@@ -52,6 +53,18 @@ class EvaluationSerializer(serializers.ModelSerializer):
             'is_final',
             'criteria_scores'
         ]
+
+    def get_log_score(self, placement):
+        logs = WeeklyLog.objects.filter(
+            placement=placement,
+            status='reviewed'
+        ).count()
+
+        score = logs * 2.5
+
+        return min(score, 20)  # cap at 20
+    
+    
 
     def create(self, validated_data):
         criteria_data = validated_data.pop('criteria_scores')
