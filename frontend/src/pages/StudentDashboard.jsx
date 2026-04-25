@@ -345,7 +345,13 @@ function StudentDashboard() {
             <p style={{textAlign: "center"}}>Week: {log.week_number}</p>
             <p style={{textAlign: "center"}}>Organization: {log.organization_name}</p>
             <p style={{textAlign: "center"}}>Tasks: {log.tasks}</p>
-            <p style={{textAlign: "center"}}>Status: {log.status}</p>
+            <p style={{textAlign: "center"}}> Status: 
+  <span style={{
+    color: log.status === "reviewed" ? "green" : "orange",
+    fontWeight: "bold"
+  }}>
+    {log.status === "reviewed" ? "Reviewed ✅" : "Pending ⏳"}
+  </span></p>
           </div>
         ))
       )}
