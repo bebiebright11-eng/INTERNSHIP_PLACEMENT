@@ -467,7 +467,7 @@ function StudentDashboard() {
 
       {ev.criteria_scores?.map((cs, index) => (
         <p key={index}>
-          {cs.criteria}: {cs.score}
+          {cs.criteria_name || cs.criteria}: {cs.score}
         </p>
       ))}
 
