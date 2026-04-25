@@ -55,8 +55,8 @@ function Login() {
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
-          type="text"
-          name="username"
+          type="password"
+          name="password"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
