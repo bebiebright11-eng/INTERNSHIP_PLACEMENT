@@ -82,14 +82,19 @@ class EvaluationSerializer(serializers.ModelSerializer):
     #  Workplace Supervisor → Criteria scoring (60)
         if evaluation.supervisor_type == 'workplace':
            for item in criteria_data:
-               CriteriaScore.objects.create(
+                score_obj = CriteriaScore(
                    evaluation=evaluation,
                    criteria=item['criteria'],
                    score=item['score']
                 )
-               total += item['score']
 
-               evaluation.score = total  # out of 60
+                score_obj.full_clean()  # 🔥 VALIDATION
+                score_obj.save()
+
+
+                total += item['score']
+
+           evaluation.score = total  # out of 60
 
     #  Academic Supervisor → Manual score (20)
         elif evaluation.supervisor_type == 'academic':
@@ -103,8 +108,10 @@ class EvaluationSerializer(serializers.ModelSerializer):
                 placement=evaluation.placement,
                 supervisor_type='workplace'
             ).first()
-
-            workplace_score = workplace_eval.score if workplace_eval else 0
+            if not workplace_eval:
+                raise serializers.ValidationError("Workplace evaluation must be completed first")
+            
+            workplace_score = workplace_eval.score
 
         #  FINAL CALCULATION
             final = workplace_score + log_score + evaluation.score
