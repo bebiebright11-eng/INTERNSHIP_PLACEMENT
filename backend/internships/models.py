@@ -33,6 +33,8 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.student} → {self.organization} ({self.status})"
+    
+
         #added to prevent duplicate applications
     class Meta:
         unique_together = ['student', 'organization']
@@ -75,6 +77,16 @@ class Placement(models.Model):
 
         if self.end_date and today > self.end_date:
             return "completed"
+        
+
+    @property
+    def is_fully_assigned(self):
+        return (
+            self.start_date is not None and
+            self.end_date is not None and
+            self.workplace_supervisor is not None and
+            self.academic_supervisor is not None
+        )
 
     def __str__(self):
         return f"{self.student} Placement"
