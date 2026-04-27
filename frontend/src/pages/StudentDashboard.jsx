@@ -295,7 +295,26 @@ function StudentDashboard() {
         {placement ? (
           <>
             <p style={{textAlign: "center"}}><strong>Organization:</strong> {placement.organization_name || placement.organization}</p>
-            <p style={{textAlign: "center"}}><strong>Status:</strong> {placement.status}</p>
+            <p style={{ textAlign: "center" }}>
+  <strong>Status:</strong>
+  <span style={{
+    color:
+      placement.status === "active"
+        ? "green"
+        : placement.status === "completed"
+        ? "blue"
+        : "orange",
+    fontWeight: "bold",
+    marginLeft: "5px"
+  }}>
+    {placement.status === "active"
+      ? "Active 🟢"
+      : placement.status === "completed"
+      ? "Completed ✅"
+      : "Not Started ⏳"}
+  </span>
+</p>
+             
             <p style={{textAlign: "center"}}><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
             <p style={{textAlign: "center"}}><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
           </>
