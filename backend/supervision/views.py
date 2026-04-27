@@ -7,15 +7,15 @@ from .serializers import (
     EvaluationCriteriaSerializer,
     CriteriaScoreSerializer
 )
-
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import IsStudentOrSupervisor, IsEvaluator
+from accounts.permissions import IsStudentOrAcademic, IsEvaluator
 
 
 class WeeklyLogViewSet(viewsets.ModelViewSet):
     queryset = WeeklyLog.objects.all()
     serializer_class = WeeklyLogSerializer
-    permission_classes = [IsAuthenticated, IsStudentOrSupervisor]
+    permission_classes = [IsAuthenticated, IsStudentOrAcademic]
 
     def get_queryset(self):
         user = self.request.user
@@ -23,12 +23,28 @@ class WeeklyLogViewSet(viewsets.ModelViewSet):
         if user.role == 'student':
             return WeeklyLog.objects.filter(placement__student=user)
 
-        return WeeklyLog.objects.all()
+
+    # 🔹 ACADEMIC SUPERVISOR → only logs of their assigned students
+        if user.role == 'academic':
+            return WeeklyLog.objects.filter(
+                placement__academic_supervisor=user
+           )
+
+    #  🚫 Everyone else sees nothing
+        return WeeklyLog.objects.none()      
+    
+
+        def perform_create(self, serializer):
+    # 🔹 Only students can create weekly logs
+            if self.request.user.role != 'student':
+                raise PermissionDenied("Only students can submit weekly logs")
+
+        serializer.save()
 
 class EvaluationViewSet(viewsets.ModelViewSet):
     queryset = Evaluation.objects.all()
     serializer_class = EvaluationSerializer
-    permission_classes = [IsAuthenticated, IsEvaluator]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
