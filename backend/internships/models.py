@@ -33,6 +33,9 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.student} → {self.organization} ({self.status})"
+        #added to prevent duplicate applications
+    class Meta:
+        unique_together = ['student', 'organization']
     
 class Placement(models.Model):
 
