@@ -54,6 +54,23 @@ const saveEdit = async (id) => {
   }
 };
 
+const deleteOrganization = async (id) => {
+  const confirmDelete = window.confirm("Delete this organization?");
+  if (!confirmDelete) return;
+
+  try {
+    await API.delete(`organizations/${id}/`);
+
+    // remove from UI instantly
+    setOrganizations((prev) => prev.filter((org) => org.id !== id));
+
+    alert("Deleted!");
+  } catch (err) {
+    console.log(err);
+    alert("Delete failed");
+  }
+};
+
 const fetchOrganizations = async () => {
   try {
     const res = await API.get("internships/organizations/");
