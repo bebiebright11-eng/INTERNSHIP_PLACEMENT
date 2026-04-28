@@ -25,6 +25,7 @@ const fetchOrganizations = async () => {
     console.log(err);
   }
 };
+
 const groupApplicationsByOrganization = () => {
   const grouped = {};
 
@@ -52,6 +53,23 @@ const groupApplicationsByOrganization = () => {
     console.log(error);
   }
 };
+
+const[pacementFormData, setPlacementFormData] = useState({
+  start_date: '',
+  end_date:'',
+});
+
+const[selectedSupervisors, setSelectedSupervisors]  = useState({});
+
+const[showDropdown, setShowDropdown] = useState({});
+
+const[savedRows,setSavedRows] =useState({});
+const[criteria, setcriteria] =useState({});
+const[newCriteria, setNewCriteria] = useState({
+  name: '',
+  max_score: '',
+});
+
 
 const updateStatus = async (id, status) => {
     try {
@@ -82,6 +100,7 @@ const fetchPlacements = async () => {
     }
   };
 
+
 const fetchSupervisors = async () => {
     try {
       const res = await API.get("accounts/users/");
@@ -90,6 +109,16 @@ const fetchSupervisors = async () => {
       console.log(error);
     }
   };  
+
+const handleSupervisorChange = (placementId, type, value) => {  
+  setSelectedSupervisors((prev) => ({ 
+    ...prev,
+    [placementId]: {
+      ...prev[placementId],
+      [type]: value,
+    },
+  }));
+};  
 
 const assignSupervisors = async (placementId, workplaceId, academicId) => {
   try {
