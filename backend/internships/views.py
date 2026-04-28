@@ -1,5 +1,6 @@
 
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from .models import Organization, Application, Placement
 from .serializers import (
     OrganizationSerializer,
@@ -10,6 +11,7 @@ from .serializers import (
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
+    permission_classes = [IsAuthenticated]  
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):

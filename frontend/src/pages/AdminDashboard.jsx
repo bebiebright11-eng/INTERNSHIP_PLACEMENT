@@ -6,6 +6,25 @@ function AdminDashboard() {
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
 
+const [organizations, setOrganizations] = useState([]);
+
+  const [orgForm, setOrgForm] = useState({
+  name: "",
+  location: "",
+  email: "",
+  phone: "",
+  description: "",
+  website: "",
+});
+
+const fetchOrganizations = async () => {
+  try {
+    const res = await API.get("internships/organizations/");
+    setOrganizations(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   const fetchApplications = async () => {
    try {
@@ -74,10 +93,39 @@ const assignSupervisors = async (placementId, workplaceId, academicId) => {
   }
 };
 
+  const createOrganization = async () => {
+  if (!orgForm.name || !orgForm.location) {
+    alert("Name and location are required");
+    return;
+  }
+
+  try {
+    const res = await API.post("organizations/", orgForm);
+
+    setOrganizations((prev) => [...prev, res.data]);
+
+    // reset form
+    setOrgForm({
+      name: "",
+      location: "",
+      email: "",
+      phone: "",
+      description: "",
+      website: "",
+    });
+
+    alert("Organization created!");
+  } catch (err) {
+    console.log(err.response?.data);
+    alert("Failed to create organization");
+  }
+};
+
 useEffect(() => {
   fetchApplications();
   fetchPlacements();
   fetchSupervisors();
+  fetchOrganizations();
 }, []);
 
   return (
