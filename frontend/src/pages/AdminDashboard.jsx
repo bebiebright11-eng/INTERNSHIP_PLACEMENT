@@ -17,6 +17,43 @@ const [organizations, setOrganizations] = useState([]);
   website: "",
 });
 
+const [editingOrg, setEditingOrg] = useState(null);
+const [editForm, setEditForm] = useState({
+  name: "",
+  location: "",
+  email: "",
+  phone: "",
+  description: "",
+  website: "",
+});
+const startEdit = (org) => {
+  setEditingOrg(org.id);
+  setEditForm({
+    name: org.name,
+    location: org.location,
+    email: org.email,
+    phone: org.phone,
+    description: org.description,
+    website: org.website,
+  });
+};
+const saveEdit = async (id) => {
+  try {
+    const res = await API.patch(`organizations/${id}/`, editForm);
+
+    // update UI instantly
+    setOrganizations((prev) =>
+      prev.map((org) => (org.id === id ? res.data : org))
+    );
+
+    setEditingOrg(null);
+    alert("Organization updated!");
+  } catch (err) {
+    console.log(err.response?.data);
+    alert("Update failed");
+  }
+};
+
 const fetchOrganizations = async () => {
   try {
     const res = await API.get("internships/organizations/");
