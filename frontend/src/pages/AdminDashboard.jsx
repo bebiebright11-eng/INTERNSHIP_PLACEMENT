@@ -121,11 +121,22 @@ const assignSupervisors = async (placementId, workplaceId, academicId) => {
   }
 };
 
+const fetchCriteria = async () => {
+  try {
+    const res = await API.get("supervision/criteria/");
+    console.log("CRITERIA:", res.data); // 🔥 DEBUG
+    setCriteria(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 useEffect(() => {
   fetchApplications();
   fetchPlacements();
   fetchSupervisors();
   fetchOrganizations();
+  fetchCriteria();
 }, []);
 
   return (
