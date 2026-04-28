@@ -25,6 +25,20 @@ const fetchOrganizations = async () => {
     console.log(err);
   }
 };
+const groupApplicationsByOrganization = () => {
+  const grouped = {};
+
+  applications.forEach((app) => {
+    const student = app.student_name;
+
+    if (!grouped[student]) {
+      grouped[student] = [];
+    }
+    grouped[student].push(app);
+  });
+  return grouped;
+
+}
 
   const fetchApplications = async () => {
    try {
