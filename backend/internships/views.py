@@ -1,5 +1,6 @@
 
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from .models import Organization, Application, Placement
 from .serializers import (
     OrganizationSerializer,
@@ -10,6 +11,7 @@ from .serializers import (
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
+    permission_classes = [IsAuthenticated]  
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -23,12 +25,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         instance = serializer.save()
 
-        #  CREATE PLACEMENT WHEN APPROVED
-        if instance.status == 'approved':
-            Placement.objects.get_or_create(
-                student=instance.student,
-                organization=instance.organization
-            )
         #  Reject all other applications of this student
         Application.objects.filter(
             student=instance.student
