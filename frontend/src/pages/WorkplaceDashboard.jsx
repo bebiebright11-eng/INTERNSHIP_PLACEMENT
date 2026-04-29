@@ -110,6 +110,35 @@ function WorkplaceDashboard() {
               <h3>Student: {p.student_name}</h3>
               <p><strong>Organization:</strong> {p.organization_name}</p>
 
+              <table style={{ width: "100%", marginTop: "10px" }}>
+                <thead>
+                  <tr>
+                    <th>Criteria</th>
+                    <th>Max</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {criteria.map((c) => (
+                    <tr key={c.id}>
+                      <td>{c.name}</td>
+                      <td>{c.max_score}</td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          max={c.max_score}
+                          onChange={(e) =>
+                            handleScoreChange(p.id, c.id, e.target.value)
+                          }
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
               <div style={{ background: "#f9f9f9", padding: "10px", marginTop: "10px" }}>
                 {criteria.map((c) => (
                   <div key={c.id} style={{ marginBottom: "10px" }}>
