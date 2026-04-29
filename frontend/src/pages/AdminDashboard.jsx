@@ -580,59 +580,188 @@ useEffect(() => {
          ))
        )}
 
-      <h2>Placements</h2>
+        <h2>Placements</h2>
 
     {placements.length === 0 ? (
       <p>No placements yet</p>
     ) : (
-      placements.map((p) => (
+      placements.map((p) => {
+        // 🔥 filter supervisors per placement
+      const workplaceSupervisors = supervisors.filter(
+        (u) => u.role === "workplace" && u.organization === p.organization
+      );
+
+      const academicSupervisors = supervisors.filter(
+        (u) => u.role === "academic"
+      );
+      return(
         <div key={p.id}>
-          <p><strong>Student:</strong> {p.student}</p>
-          <p><strong>Organization:</strong> {p.organization}</p>
+  <p><strong>Student:</strong> {p.student_name}</p>
+  <p><strong>Organization:</strong> {p.organization_name}</p>
+  <p><strong>Start Date:</strong> {p.start_date || "Not set"}</p>
+  <p><strong>End Date:</strong> {p.end_date || "Not set"}</p>
 
-          <select id={`workplace-${p.id}`}>
-            <option>Select Workplace Supervisor</option>
-            {supervisors
-              .filter((u) => u.role === "workplace")
-              .map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.username}
-                </option>
-              ))}
-          </select>
+  {/* ✅ SHOW FINAL STATE */}
+  {p.is_fully_assigned ? (
+    <>
+      <p><strong>Status:</strong> {p.status}</p>
 
+      <p><strong>Workplace Supervisor:</strong> {p.workplace_supervisor_name}</p>
+      <p><strong>Academic Supervisor:</strong> {p.academic_supervisor_name}</p>
 
-          <br /><br />
-          
-          <select id={`academic-${p.id}`}>
-            <option>Select Academic Supervisor</option>
-            {supervisors
-              .filter((u) => u.role === "academic")
-              .map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.username}
-                </option>
-              ))}
-          </select>
-         
-         <br /><br />
-         
-          <button
-            onClick={() =>
-              assignSupervisors(
-                p.id,
-               document.getElementById(`workplace-${p.id}`).value,
-               document.getElementById(`academic-${p.id}`).value
-             )
-           }
-          >
-           Assign Supervisors
-          </button>  
+      <p style={{ color: "green", fontWeight: "bold" }}>
+        ✅ Placement Confirmed
+      </p>
+    </>
+  ) : (
+    <>
+      {/* 🔧 EDIT MODE (ONLY BEFORE ASSIGNMENT) */}
 
+      <br />
 
+      <input
+        type="date"
+        defaultValue={p.start_date || ""}
+        onBlur={async (e) => {
+          try {
+            await API.patch(`internships/placements/${p.id}/`, {
+              start_date: e.target.value,
+            });
+            fetchPlacements();
+          } catch (err) {
+            alert("Failed to update start date");
+          }
+        }}
+      />
+
+      <br /><br />
+
+      <input
+        type="date"
+        defaultValue={p.end_date || ""}
+        onBlur={async (e) => {
+          try {
+            await API.patch(`internships/placements/${p.id}/`, {
+              end_date: e.target.value,
+            });
+            fetchPlacements();
+          } catch (err) {
+            alert("Failed to update end date");
+          }
+        }}
+      />
+
+      <br /><br />
+
+      {/* 🔍 WORKPLACE SEARCH */}
+<input
+  type="text"
+  placeholder="Search workplace supervisor"
+  value={selectedSupervisors[p.id]?.workplace_search || ""}
+  onFocus={() =>
+    setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
+  }
+  onChange={(e) => {
+    handleSupervisorChange(p.id, "workplace_search", e.target.value);
+    setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
+  }}
+/>
+
+{/* ✅ DROPDOWN */}
+{showDropdown[p.id] && (
+  <div style={{
+    border: "1px solid #ccc",
+    maxHeight: "120px",
+    overflowY: "auto",
+    background: "#fff"
+  }}>
+    {workplaceSupervisors
+      .filter((u) => {
+        const search = selectedSupervisors[p.id]?.workplace_search || "";
+        return u.username.toLowerCase().includes(search.toLowerCase());
+      })
+      .map((u) => (
+        <div
+          key={u.id}
+          onClick={() => {
+            handleSupervisorChange(p.id, "workplace", u.id);
+            handleSupervisorChange(p.id, "workplace_search", u.username);
+
+            setShowDropdown((prev) => ({
+              ...prev,
+              [p.id]: false,
+            }));
+          }}
+          style={{ padding: "5px", cursor: "pointer" }}
+        >
+          {u.username}
         </div>
-      ))
-    )}
+      ))}
+  </div>
+)}
+
+
+      <br /><br />
+
+      {/* 🔍 ACADEMIC SEARCH */}
+<input
+  type="text"
+  placeholder="Search academic supervisor"
+  value={selectedSupervisors[p.id]?.academic_search || ""}
+  onFocus={() =>
+    setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
+  }
+  onChange={(e) => {
+    handleSupervisorChange(p.id, "academic_search", e.target.value);
+    setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
+  }}
+/>
+
+{showDropdown[p.id] && (
+  <div style={{
+    border: "1px solid #ccc",
+    maxHeight: "120px",
+    overflowY: "auto",
+    background: "#fff"
+  }}>
+    {academicSupervisors
+      .filter((u) => {
+        const search = selectedSupervisors[p.id]?.academic_search || "";
+        return u.username.toLowerCase().includes(search.toLowerCase());
+      })
+      .map((u) => (
+        <div
+          key={u.id}
+          onClick={() => {
+            handleSupervisorChange(p.id, "academic", u.id);
+            handleSupervisorChange(p.id, "academic_search", u.username);
+
+            setShowDropdown((prev) => ({
+              ...prev,
+              [p.id]: false,
+            }));
+          }}
+          style={{ padding: "5px", cursor: "pointer" }}
+        >
+          {u.username}
+        </div>
+      ))}
+  </div>
+)}
+
+      <br /><br />
+
+      <button onClick={() => assignSupervisors(p.id)}>
+        Assign Supervisors
+      </button>
+    </>
+  )}
+</div>
+        
+
+      );
+    })
+  )}
 
     </div>    
   );
