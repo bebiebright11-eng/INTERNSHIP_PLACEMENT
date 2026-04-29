@@ -301,6 +301,100 @@ useEffect(() => {
   />
   <br /><br />  
 
+  <button onClick ={createOrganisation}>
+    Create Organiztion
+  </button>
+</div>
+  
+
+<h3>Existing Organizations</h3>
+{organizations.length === 0 ? (
+  <p>No organizations yet</p>
+) : (
+  organizations.map((org) => (
+    <div
+      key={org.id}
+      style={{
+        border: "1px solid #ddd",
+        padding: "10px",
+        marginBottom: "10px",
+        borderRadius: "6px",
+        background: "#fff",
+      }}
+    >
+      {editingOrg === org.id ? (
+        <>
+          <input
+            value={editForm.name}
+            onChange={(e) =>
+              setEditForm({ ...editForm, name: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.location}
+            onChange={(e) =>
+              setEditForm({ ...editForm, location: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.email}
+            onChange={(e) =>
+              setEditForm({ ...editForm, email: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.phone}
+            onChange={(e) =>
+              setEditForm({ ...editForm, phone: e.target.value })
+            }
+          />
+          <br />
+
+          <textarea
+            value={editForm.description}
+            onChange={(e) =>
+              setEditForm({ ...editForm, description: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.website}
+            onChange={(e) =>
+              setEditForm({ ...editForm, website: e.target.value })
+            }
+          />
+          <br /><br />
+
+          <button onClick={() => saveEdit(org.id)}>Save</button>
+          <button onClick={() => setEditingOrg(null)}>Cancel</button>
+        </>
+      ) : (
+        <>
+          <p><strong>{org.name}</strong></p>
+          <p>{org.location}</p>
+          <p>{org.email}</p>
+          <p>{org.phone}</p>
+          <p>{org.description}</p>
+          <p>{org.website}</p>
+
+          <button onClick={() => startEdit(org)}>Edit</button>
+          <button onClick={() => deleteOrganization(org.id)}>
+            Delete
+          </button>
+        </>
+      )}
+    </div>
+  ))
+)}
+   
+
       <h2>Applications</h2>
 
       {applications.length === 0 ? (
