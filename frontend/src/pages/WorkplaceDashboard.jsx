@@ -7,16 +7,23 @@ function WorkplaceDashboard() {
   const [scores, setScores] = useState({});
 
   // 1. Fetch Placements
+  // 🔹 Fetch students assigned to this workplace supervisor
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      const userId = parseInt(localStorage.getItem("user_id"));
-      const filtered = res.data.filter((p) => p.workplace_supervisor === userId);
+
+      // filter only workplace supervisor students
+      const filtered = res.data.filter(
+        (p) => p.workplace_supervisor === parseInt(localStorage.getItem("user_id"))
+      );
+
       setPlacements(filtered);
     } catch (error) {
-      console.error("Error fetching placements:", error);
+      console.log(error);
     }
   };
 
@@ -94,8 +101,8 @@ function WorkplaceDashboard() {
           <h4>Student Evaluations</h4>
           {placements.map((p) => (
             <div key={p.id} style={{ border: "1px solid #ccc", margin: "10px 0", padding: "15px", borderRadius: "8px" }}>
-              <h3>Student: {p.student}</h3>
-              <p><strong>Organization:</strong> {p.organization}</p>
+              <h3>Student: {p.student_name}</h3>
+              <p><strong>Organization:</strong> {p.organization_name}</p>
 
               <div style={{ background: "#f9f9f9", padding: "10px", marginTop: "10px" }}>
                 {criteria.map((c) => (
