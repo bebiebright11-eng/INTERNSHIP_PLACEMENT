@@ -301,6 +301,259 @@ useEffect(() => {
   />
   <br /><br />  
 
+  <button onClick ={createOrganisation}>
+    Create Organiztion
+  </button>
+</div>
+  
+
+<h3>Existing Organizations</h3>
+{organizations.length === 0 ? (
+  <p>No organizations yet</p>
+) : (
+  organizations.map((org) => (
+    <div
+      key={org.id}
+      style={{
+        border: "1px solid #ddd",
+        padding: "10px",
+        marginBottom: "10px",
+        borderRadius: "6px",
+        background: "#fff",
+      }}
+    >
+      {editingOrg === org.id ? (
+        <>
+          <input
+            value={editForm.name}
+            onChange={(e) =>
+              setEditForm({ ...editForm, name: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.location}
+            onChange={(e) =>
+              setEditForm({ ...editForm, location: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.email}
+            onChange={(e) =>
+              setEditForm({ ...editForm, email: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.phone}
+            onChange={(e) =>
+              setEditForm({ ...editForm, phone: e.target.value })
+            }
+          />
+          <br />
+
+          <textarea
+            value={editForm.description}
+            onChange={(e) =>
+              setEditForm({ ...editForm, description: e.target.value })
+            }
+          />
+          <br />
+
+          <input
+            value={editForm.website}
+            onChange={(e) =>
+              setEditForm({ ...editForm, website: e.target.value })
+            }
+          />
+          <br /><br />
+
+          <button onClick={() => saveEdit(org.id)}>Save</button>
+          <button onClick={() => setEditingOrg(null)}>Cancel</button>
+        </>
+      ) : (
+        <>
+          <p><strong>{org.name}</strong></p>
+          <p>{org.location}</p>
+          <p>{org.email}</p>
+          <p>{org.phone}</p>
+          <p>{org.description}</p>
+          <p>{org.website}</p>
+
+          <button onClick={() => startEdit(org)}>Edit</button>
+          <button onClick={() => deleteOrganization(org.id)}>
+            Delete
+          </button>
+        </>
+      )}
+    </div>
+  ))
+)}
+
+<h2>Global Evaluation Criteria (Admin only)</h2>
+
+<table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginleft: "30px" }}>
+  <thead>
+    <tr>
+      <th>Criteria</th>
+      <th>Max Score</th>
+      <th>Score</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {criteria.map((c) => (
+      <tr key={c.id}>
+        <td>
+          <input
+            type="text"
+            value={c.name}
+            onChange={(e) => {
+              const updated = criteria.map((item) =>
+                item.id === c.id ? { ...item, name: e.target.value } : item
+              );
+              setCriteria(updated);
+            }}
+          />
+        </td>
+
+        <td>
+          <input
+            type="number"
+            value={c.max_score}
+            onChange={(e) => {
+              const updated = criteria.map((item) =>
+                item.id === c.id
+                  ? { ...item, max_score: e.target.value }
+                  : item
+              );
+              setCriteria(updated);
+            }}
+          />
+        </td>
+
+        {/* 🔥 Score column (Admin optional / future use) */}
+        <td>
+          <input type="number" placeholder="-" disabled />
+        </td>
+
+        <td>
+<button
+  onClick={async () => {
+    try {
+      await API.patch(`supervision/criteria/${c.id}/`, {
+        name: c.name,
+        max_score: Number(c.max_score),
+      });
+
+      setSavedRows((prev) => ({
+        ...prev,
+        [c.id]: true,
+      }));
+
+    } catch {
+      alert("Update failed");
+    }
+  }}
+>
+  {savedRows[c.id] ? "Saved ✅" : "Save"}
+</button>
+  <button
+  onClick={async () => {
+    try {
+      await API.delete(`supervision/criteria/${c.id}/`);
+
+      // ✅ remove instantly from UI
+      setCriteria((prev) => prev.filter((item) => item.id !== c.id));
+
+    } catch {
+      alert("Delete failed");
+    }
+  }}
+>
+  Delete
+</button>
+
+
+        </td>
+      </tr>
+    ))}
+
+    {/* 🔥 ADD NEW ROW */}
+    <tr>
+      <td>
+        <input
+          type="text"
+          placeholder="New Criteria"
+          value={newCriteria.name}
+          onChange={(e) =>
+            setNewCriteria({ ...newCriteria, name: e.target.value })
+          }
+        />
+      </td>
+
+      <td>
+        <input
+          type="number"
+          placeholder="Max"
+          value={newCriteria.max_score}
+          onChange={(e) =>
+            setNewCriteria({ ...newCriteria, max_score: e.target.value })
+          }
+        />
+      </td>
+
+      <td>-</td>
+
+      <td>
+<button
+  onClick={async () => {
+    if (!newCriteria.name || !newCriteria.max_score) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    // 🚨 LIMIT CHECK
+    if (criteria.length >= 6) {
+      const confirmAdd = window.confirm(
+        "You have reached 6 criteria. Do you want to add another?"
+      );
+
+      if (!confirmAdd) return;
+    }
+
+    try {
+      const res = await API.post("supervision/criteria/", {
+        name: newCriteria.name,
+        max_score: Number(newCriteria.max_score),
+      });
+
+      // ✅ add instantly to UI
+      setCriteria((prev) => [...prev, res.data]);
+
+      setNewCriteria({ name: "", max_score: "" });
+
+    } catch (err) {
+      console.log(err.response?.data);
+      alert("Failed to create criteria");
+    }
+  }}
+>
+  Add
+</button>
+
+      </td>
+    </tr>
+  </tbody>
+</table>  
+
+   
+
       <h2>Applications</h2>
 
       {applications.length === 0 ? (
