@@ -17,6 +17,60 @@ const [organizations, setOrganizations] = useState([]);
   website: "",
 });
 
+const [editingOrg, setEditingOrg] = useState(null);
+const [editForm, setEditForm] = useState({
+  name: "",
+  location: "",
+  email: "",
+  phone: "",
+  description: "",
+  website: "",
+});
+const startEdit = (org) => {
+  setEditingOrg(org.id);
+  setEditForm({
+    name: org.name,
+    location: org.location,
+    email: org.email,
+    phone: org.phone,
+    description: org.description,
+    website: org.website,
+  });
+};
+const saveEdit = async (id) => {
+  try {
+    const res = await API.patch(`organizations/${id}/`, editForm);
+
+    // update UI instantly
+    setOrganizations((prev) =>
+      prev.map((org) => (org.id === id ? res.data : org))
+    );
+
+    setEditingOrg(null);
+    alert("Organization updated!");
+  } catch (err) {
+    console.log(err.response?.data);
+    alert("Update failed");
+  }
+};
+
+const deleteOrganization = async (id) => {
+  const confirmDelete = window.confirm("Delete this organization?");
+  if (!confirmDelete) return;
+
+  try {
+    await API.delete(`organizations/${id}/`);
+
+    // remove from UI instantly
+    setOrganizations((prev) => prev.filter((org) => org.id !== id));
+
+    alert("Deleted!");
+  } catch (err) {
+    console.log(err);
+    alert("Delete failed");
+  }
+};
+
 const fetchOrganizations = async () => {
   try {
     const res = await API.get("internships/organizations/");
@@ -25,6 +79,21 @@ const fetchOrganizations = async () => {
     console.log(err);
   }
 };
+
+const groupApplicationsByOrganization = () => {
+  const grouped = {};
+
+  applications.forEach((app) => {
+    const student = app.student_name;
+
+    if (!grouped[student]) {
+      grouped[student] = [];
+    }
+    grouped[student].push(app);
+  });
+  return grouped;
+
+}
 
   const fetchApplications = async () => {
    try {
@@ -38,6 +107,23 @@ const fetchOrganizations = async () => {
     console.log(error);
   }
 };
+
+const[pacementFormData, setPlacementFormData] = useState({
+  start_date: '',
+  end_date:'',
+});
+
+const[selectedSupervisors, setSelectedSupervisors]  = useState({});
+
+const[showDropdown, setShowDropdown] = useState({});
+
+const[savedRows,setSavedRows] =useState({});
+const[criteria, setcriteria] =useState({});
+const[newCriteria, setNewCriteria] = useState({
+  name: '',
+  max_score: '',
+});
+
 
 const updateStatus = async (id, status) => {
     try {
@@ -68,6 +154,7 @@ const fetchPlacements = async () => {
     }
   };
 
+
 const fetchSupervisors = async () => {
     try {
       const res = await API.get("accounts/users/");
@@ -76,6 +163,16 @@ const fetchSupervisors = async () => {
       console.log(error);
     }
   };  
+
+const handleSupervisorChange = (placementId, type, value) => {  
+  setSelectedSupervisors((prev) => ({ 
+    ...prev,
+    [placementId]: {
+      ...prev[placementId],
+      [type]: value,
+    },
+  }));
+};  
 
 const assignSupervisors = async (placementId, workplaceId, academicId) => {
   try {
@@ -121,16 +218,89 @@ const assignSupervisors = async (placementId, workplaceId, academicId) => {
   }
 };
 
+const fetchCriteria = async () => {
+  try {
+    const res = await API.get("supervision/criteria/");
+    console.log("CRITERIA:", res.data); // 🔥 DEBUG
+    setCriteria(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 useEffect(() => {
   fetchApplications();
   fetchPlacements();
   fetchSupervisors();
   fetchOrganizations();
+  fetchCriteria();
 }, []);
 
   return (
     <div>
       <h1>Admin Dashboard</h1>
+
+
+      <h2>Organization</h2>
+<div
+  style={{
+    border: "1px solid #ccc",
+    padding: "15px",
+    marginBottom: "20px",
+    borderRadius: "8px",
+    background: "#f9f9f9",
+    maxWidth: "500px"
+  }}
+>
+  <h3>Add Organization</h3>    
+
+  <input
+    type="text"
+    placeholder="Name"
+    value={orgForm.name}
+    onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type ='text'
+    placeholder="Location"
+    value={orgForm.location}
+    onChange={(e) => setOrgForm({ ...orgForm, location: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type="email"
+    placeholder="Email"
+    value={orgForm.email}
+    onChange={(e) => setOrgForm({ ...orgForm, email: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type="text"
+    placeholder="Phone"
+    value={orgForm.phone}
+    onChange={(e) => setOrgForm({ ...orgForm, phone: e.target.value })}
+  />
+  <br /><br />
+
+  <textarea
+    placeholder="Description"
+    value={orgForm.description}
+    onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type='text'
+    placeholder ='website'
+    value={orgForm.website}
+    onChange={(e) => setOrgForm({...orgForm,website: e.target.value})}
+  />
+  <br /><br />  
+
       <h2>Applications</h2>
 
       {applications.length === 0 ? (
