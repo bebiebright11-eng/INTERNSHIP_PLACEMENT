@@ -592,10 +592,32 @@ useEffect(() => {
               </button>
             </>
           )}
+
+{/* 🔥 SHOW BUTTON ONLY IF APPROVED */}
+{app.status === "approved" && (
+  placements.some((p) => p.student === app.student) ? (
+    <p style={{ color: "green", fontWeight: "bold" }}>
+      ✅ Placement Created
+    </p>
+  ) : (
+    <button
+      onClick={() => {
+        setActivePlacementForm(app.id);
+        setPlacementFormData({
+          start_date: "",
+          end_date: "",
+        });
+      }}
+    >
+      Create Placement
+    </button>
+  )
+)}
+
       
 
 
-      
+
         <h2>Placements</h2>
 
     {placements.length === 0 ? (
