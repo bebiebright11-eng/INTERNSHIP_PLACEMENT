@@ -30,7 +30,7 @@ function WorkplaceDashboard() {
 
 
   // 2. Fetch Criteria
-  // 🔹 Fetch evaluation criteria
+
   const fetchCriteria = async () => {
     try {
       const res = await API.get("supervision/criteria/", {
