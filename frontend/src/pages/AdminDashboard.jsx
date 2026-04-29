@@ -556,30 +556,46 @@ useEffect(() => {
 
       <h2>Applications</h2>
 
-      {applications.length === 0 ? (
-        <p>No applications yet</p>
-      ) : (
-        applications.map((app) => (
-          <div key={app.id}>
-            <p><strong>Student:</strong> {app.student}</p>
-            <p><strong>Organization:</strong> {app.organization}</p>
-            <p><strong>Status:</strong> {app.status}</p>
+{applications.length === 0 ? (
+  <p>No applications yet</p>
+) : (
+  Object.entries(groupApplicationsByStudent()).map(([student, apps]) => (
+    <div
+      key={student}
+      style={{ border: "2px solid black", margin: "15px", padding: "10px" }}
+    >
+      
+      {/* 🔥 STUDENT NAME */}
+      <h3>Student: {student}</h3>
 
-            {app.status === "pending" && (
-      <>
-        <button onClick={() => updateStatus(app.id, "approved")}>
-          Approve
-        </button>
+      {/* 🔥 APPLICATIONS UNDER THAT STUDENT */}
+      {apps.map((app) => (
+        <div
+          key={app.id}
+          style={{
+            marginLeft: "20px",
+            borderTop: "1px solid gray",
+            padding: "5px",
+          }}
+        >
+          <p><strong>Organization:</strong> {app.organization_name}</p>
+          <p><strong>Status:</strong> {app.status}</p>
 
-        <button onClick={() => updateStatus(app.id, "rejected")}>
-          Reject
-        </button>
-      </>
-    )}
-          </div>
-         ))
-       )}
+          {app.status === "pending" && (
+            <>
+              <button onClick={() => updateStatus(app.id, "approved")}>
+                Approve
+              </button>
 
+              <button onClick={() => updateStatus(app.id, "rejected")}>
+                Reject
+              </button>
+            </>
+          )}
+      
+
+
+      
         <h2>Placements</h2>
 
     {placements.length === 0 ? (
