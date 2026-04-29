@@ -8,7 +8,7 @@ function AdminDashboard() {
 
 const [organizations, setOrganizations] = useState([]);
 
-  const [orgForm, setOrgForm] = useState({
+const [orgForm, setOrgForm] = useState({
   name: "",
   location: "",
   email: "",
@@ -80,7 +80,7 @@ const fetchOrganizations = async () => {
   }
 };
 
-const groupApplicationsByOrganization = () => {
+const groupApplicationsByStudent = () => {
   const grouped = {};
 
   applications.forEach((app) => {
@@ -108,7 +108,9 @@ const groupApplicationsByOrganization = () => {
   }
 };
 
-const[pacementFormData, setPlacementFormData] = useState({
+const [activePlacementForm, setActivePlacementForm] = useState(null);
+
+const[placementFormData, setPlacementFormData] = useState({
   start_date: '',
   end_date:'',
 });
@@ -234,6 +236,8 @@ useEffect(() => {
   fetchSupervisors();
   fetchOrganizations();
   fetchCriteria();
+
+
 }, []);
 
   return (
@@ -654,7 +658,31 @@ useEffect(() => {
           });
           alert("Placement created!");
 
+          // 🔥 close form after saving
+          setActivePlacementForm(null);
 
+          fetchPlacements();
+        } catch (error) {
+            console.log(error.response?.data);
+
+            if (error.response?.data?.student) {
+               alert("This student already has a placement!");
+            } else {
+              alert("Failed to create placement");
+            }
+          }
+      }}
+    >
+      Save Placement
+    </button>
+
+  </div>
+)}
+        </div>
+      ))}
+    </div>
+  ))
+)}
       
 
 
