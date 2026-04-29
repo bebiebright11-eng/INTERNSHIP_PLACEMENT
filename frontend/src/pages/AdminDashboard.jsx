@@ -629,6 +629,18 @@ useEffect(() => {
         })
       }
     />
+    {/* END DATE */}
+    <input
+      type="date"
+      value={placementFormData.end_date}
+      onChange={(e) =>
+        setPlacementFormData({
+          ...placementFormData,
+          end_date: e.target.value,
+        })
+      }
+    />
+
 
       
 
