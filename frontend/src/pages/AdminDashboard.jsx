@@ -614,6 +614,22 @@ useEffect(() => {
   )
 )}
 
+{/* 🔥 INLINE PLACEMENT FORM */}
+{activePlacementForm === app.id && (
+  <div style={{ marginTop: "10px", padding: "10px", border: "1px solid blue" }}>
+    
+    {/* START DATE */}
+    <input
+      type="date"
+      value={placementFormData.start_date}
+      onChange={(e) =>
+        setPlacementFormData({
+          ...placementFormData,
+          start_date: e.target.value,
+        })
+      }
+    />
+
       
 
 
