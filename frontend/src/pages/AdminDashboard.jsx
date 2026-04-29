@@ -640,6 +640,19 @@ useEffect(() => {
         })
       }
     />
+    <br /><br />
+
+    {/* SAVE BUTTON */}
+    <button
+      onClick={async () => {
+        try {
+          await API.post("internships/placements/", {
+            student: app.student,
+            organization: app.organization,
+            start_date: placementFormData.start_date,
+            end_date: placementFormData.end_date,
+          });
+          alert("Placement created!");
 
 
       
