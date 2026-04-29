@@ -7,16 +7,23 @@ function WorkplaceDashboard() {
   const [scores, setScores] = useState({});
 
   // 1. Fetch Placements
+  // 🔹 Fetch students assigned to this workplace supervisor
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      const userId = parseInt(localStorage.getItem("user_id"));
-      const filtered = res.data.filter((p) => p.workplace_supervisor === userId);
+
+      // filter only workplace supervisor students
+      const filtered = res.data.filter(
+        (p) => p.workplace_supervisor === parseInt(localStorage.getItem("user_id"))
+      );
+
       setPlacements(filtered);
     } catch (error) {
-      console.error("Error fetching placements:", error);
+      console.log(error);
     }
   };
 
