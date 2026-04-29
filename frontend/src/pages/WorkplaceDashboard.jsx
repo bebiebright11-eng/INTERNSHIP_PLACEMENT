@@ -27,15 +27,21 @@ function WorkplaceDashboard() {
     }
   };
 
+
+
   // 2. Fetch Criteria
+  // 🔹 Fetch evaluation criteria
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/evaluationcriteria/", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      const res = await API.get("supervision/criteria/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      setCriteria(res.data);
+
+      setCriteria(res.data.filter(c => c.is_active)); // Only fetch active criterias
     } catch (error) {
-      console.error("Error fetching criteria:", error);
+      console.log(error);
     }
   };
 
