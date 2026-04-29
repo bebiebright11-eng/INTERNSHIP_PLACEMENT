@@ -654,7 +654,26 @@ useEffect(() => {
           });
           alert("Placement created!");
 
+          // 🔥 close form after saving
+          setActivePlacementForm(null);
 
+          fetchPlacements();
+        } catch (error) {
+            console.log(error.response?.data);
+
+            if (error.response?.data?.student) {
+               alert("This student already has a placement!");
+            } else {
+              alert("Failed to create placement");
+            }
+          }
+      }}
+    >
+      Save Placement
+    </button>
+
+  </div>
+)}
       
 
 
