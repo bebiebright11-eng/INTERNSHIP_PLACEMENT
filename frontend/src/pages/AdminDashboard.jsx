@@ -1,153 +1,77 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState, useRef } from "react";
 import API from "../api";
 
 function AdminDashboard() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [applications, setApplications] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
+  const [organizations, setOrganizations] = useState([]);
 
-const [organizations, setOrganizations] = useState([]);
-
-const [orgForm, setOrgForm] = useState({
-  name: "",
-  location: "",
-  email: "",
-  phone: "",
-  description: "",
-  website: "",
-});
-
-const [editingOrg, setEditingOrg] = useState(null);
-const [editForm, setEditForm] = useState({
-  name: "",
-  location: "",
-  email: "",
-  phone: "",
-  description: "",
-  website: "",
-});
-const startEdit = (org) => {
-  setEditingOrg(org.id);
-  setEditForm({
-    name: org.name,
-    location: org.location,
-    email: org.email,
-    phone: org.phone,
-    description: org.description,
-    website: org.website,
+  const [orgForm, setOrgForm] = useState({
+    name: "",
+    location: "",
+    email: "",
+    phone: "",
+    description: "",
+    website: "",
   });
-};
-const saveEdit = async (id) => {
-  try {
-    const res = await API.patch(`organizations/${id}/`, editForm);
 
-    // update UI instantly
-    setOrganizations((prev) =>
-      prev.map((org) => (org.id === id ? res.data : org))
-    );
+  const [editingOrg, setEditingOrg] = useState(null);
 
-    setEditingOrg(null);
-    alert("Organization updated!");
-  } catch (err) {
-    console.log(err.response?.data);
-    alert("Update failed");
-  }
-};
-
-const deleteOrganization = async (id) => {
-  const confirmDelete = window.confirm("Delete this organization?");
-  if (!confirmDelete) return;
-
-  try {
-    await API.delete(`organizations/${id}/`);
-
-    // remove from UI instantly
-    setOrganizations((prev) => prev.filter((org) => org.id !== id));
-
-    alert("Deleted!");
-  } catch (err) {
-    console.log(err);
-    alert("Delete failed");
-  }
-};
-
-const fetchOrganizations = async () => {
-  try {
-    const res = await API.get("internships/organizations/");
-    setOrganizations(res.data);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const groupApplicationsByStudent = () => {
-  const grouped = {};
-
-  applications.forEach((app) => {
-    const student = app.student_name;
-
-    if (!grouped[student]) {
-      grouped[student] = [];
-    }
-    grouped[student].push(app);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    location: "",
+    email: "",
+    phone: "",
+    description: "",
+    website: "",
   });
-  return grouped;
 
-}
+  const [activePlacementForm, setActivePlacementForm] = useState(null);
 
+  const [placementFormData, setPlacementFormData] = useState({
+    start_date: "",
+    end_date: "",
+  });
+
+  const [selectedSupervisors, setSelectedSupervisors] = useState({});
+  const [showDropdown, setShowDropdown] = useState({});
+  const [savedRows, setSavedRows] = useState({});
+  const [criteria, setCriteria] = useState([]);
+  const [newCriteria, setNewCriteria] = useState({
+    name: "",
+    max_score: "",
+  });
+
+  const menuRef = useRef(null);
+
+  // ---------------- CLICK OUTSIDE MENU ----------------
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  // ---------------- FETCH FUNCTIONS ----------------
   const fetchApplications = async () => {
-   try {
-    const res = await API.get("internships/applications/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    setApplications(res.data);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const [activePlacementForm, setActivePlacementForm] = useState(null);
-
-const[placementFormData, setPlacementFormData] = useState({
-  start_date: '',
-  end_date:'',
-});
-
-const[selectedSupervisors, setSelectedSupervisors]  = useState({});
-
-const[showDropdown, setShowDropdown] = useState({});
-
-const[savedRows,setSavedRows] =useState({});
-const[criteria, setcriteria] =useState([]);
-const[newCriteria, setNewCriteria] = useState({
-  name: '',
-  max_score: '',
-});
-
-
-const updateStatus = async (id, status) => {
     try {
-      await API.patch(
-        `internships/applications/${id}/`,
-        { status: status },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      alert("Updated successfully!");
-      fetchApplications(); // refresh data
-
+      const res = await API.get("internships/applications/");
+      setApplications(res.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-const fetchPlacements = async () => {
+  const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/");
       setPlacements(res.data);
@@ -156,94 +80,222 @@ const fetchPlacements = async () => {
     }
   };
 
-
-const fetchSupervisors = async () => {
+  const fetchSupervisors = async () => {
     try {
       const res = await API.get("accounts/users/");
       setSupervisors(res.data);
     } catch (error) {
       console.log(error);
     }
-  };  
+  };
 
-const handleSupervisorChange = (placementId, type, value) => {  
-  setSelectedSupervisors((prev) => ({ 
-    ...prev,
-    [placementId]: {
-      ...prev[placementId],
-      [type]: value,
-    },
-  }));
-};  
+  const fetchOrganizations = async () => {
+    try {
+      const res = await API.get("organizations/");
+      setOrganizations(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-const assignSupervisors = async (placementId, workplaceId, academicId) => {
-  try {
-    await API.patch(`internships/placements/${placementId}/`, {
-      workplace_supervisor: workplaceId,
-      academic_supervisor: academicId,
+  const fetchCriteria = async () => {
+    try {
+      const res = await API.get("supervision/criteria/");
+      console.log("CRITERIA:", res.data);
+      setCriteria(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ---------------- GROUPING ----------------
+  const groupApplicationsByStudent = () => {
+    const grouped = {};
+
+    applications.forEach((app) => {
+      const student = app.student_name;
+
+      if (!grouped[student]) {
+        grouped[student] = [];
+      }
+
+      grouped[student].push(app);
     });
 
-    alert("Supervisors assigned!");
-    fetchPlacements(); // refresh placements
+    return grouped;
+  };
 
-  } catch (error) {
-    console.log(error);
-    alert("Failed to assign supervisors");
-  }
-};
-
+  // ---------------- ORGANIZATION ACTIONS ----------------
   const createOrganization = async () => {
-  if (!orgForm.name || !orgForm.location) {
-    alert("Name and location are required");
-    return;
-  }
+    if (!orgForm.name || !orgForm.location) {
+      alert("Name and location are required");
+      return;
+    }
 
-  try {
-    const res = await API.post("organizations/", orgForm);
+    try {
+      const res = await API.post("organizations/", orgForm);
 
-    setOrganizations((prev) => [...prev, res.data]);
+      setOrganizations((prev) => [...prev, res.data]);
 
-    // reset form
-    setOrgForm({
-      name: "",
-      location: "",
-      email: "",
-      phone: "",
-      description: "",
-      website: "",
+      setOrgForm({
+        name: "",
+        location: "",
+        email: "",
+        phone: "",
+        description: "",
+        website: "",
+      });
+
+      alert("Organization created!");
+    } catch (err) {
+      console.log(err.response?.data);
+      alert("Failed to create organization");
+    }
+  };
+
+  const startEdit = (org) => {
+    setEditingOrg(org.id);
+    setEditForm({
+      name: org.name,
+      location: org.location,
+      email: org.email,
+      phone: org.phone,
+      description: org.description,
+      website: org.website,
     });
+  };
 
-    alert("Organization created!");
-  } catch (err) {
-    console.log(err.response?.data);
-    alert("Failed to create organization");
-  }
-};
+  const saveEdit = async (id) => {
+    try {
+      const res = await API.patch(`organizations/${id}/`, editForm);
 
-const fetchCriteria = async () => {
-  try {
-    const res = await API.get("supervision/criteria/");
-    console.log("CRITERIA:", res.data); // 🔥 DEBUG
-    setCriteria(res.data);
-  } catch (err) {
-    console.log(err);
-  }
-};
+      setOrganizations((prev) =>
+        prev.map((org) => (org.id === id ? res.data : org))
+      );
 
-useEffect(() => {
-  fetchApplications();
-  fetchPlacements();
-  fetchSupervisors();
-  fetchOrganizations();
-  fetchCriteria();
+      setEditingOrg(null);
+      alert("Organization updated!");
+    } catch (err) {
+      console.log(err.response?.data);
+      alert("Update failed");
+    }
+  };
+
+  const deleteOrganization = async (id) => {
+    const confirmDelete = window.confirm("Delete this organization?");
+    if (!confirmDelete) return;
+
+    try {
+      await API.delete(`organizations/${id}/`);
+
+      setOrganizations((prev) =>
+        prev.filter((org) => org.id !== id)
+      );
+
+      alert("Deleted!");
+    } catch (err) {
+      console.log(err);
+      alert("Delete failed");
+    }
+  };
+
+  // ---------------- APPLICATION STATUS ----------------
+  const updateStatus = async (id, status) => {
+    try {
+      await API.patch(`internships/applications/${id}/`, { status });
+
+      alert("Updated successfully!");
+      fetchApplications();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ---------------- SUPERVISORS ----------------
+  const handleSupervisorChange = (placementId, type, value) => {
+    setSelectedSupervisors((prev) => ({
+      ...prev,
+      [placementId]: {
+        ...prev[placementId],
+        [type]: value,
+      },
+    }));
+  };
+
+  const assignSupervisors = async (placementId, workplaceId, academicId) => {
+    try {
+      await API.patch(`internships/placements/${placementId}/`, {
+        workplace_supervisor: workplaceId,
+        academic_supervisor: academicId,
+      });
+
+      alert("Supervisors assigned!");
+      fetchPlacements();
+    } catch (error) {
+      console.log(error);
+      alert("Failed to assign supervisors");
+    }
+  };
+
+  // ---------------- LOAD DATA ON MOUNT ----------------
+  useEffect(() => {
+    fetchApplications();
+    fetchPlacements();
+    fetchSupervisors();
+    fetchOrganizations();
+    fetchCriteria();
+  }, []);
 
 
-}, []);
+return (
+  <div>
+    {/* MENU */}
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={() => setMenuOpen(!menuOpen)}
+        style={{
+          fontSize: "22px",
+          padding: "8px 12px",
+          borderRadius: "6px",
+          cursor: "pointer",
+          border: "2px solid black",
+          background: "white"
+        }}
+      >
+        ☰
+      </button>
 
-  return (
+      <span style={{ marginLeft: "10px", fontWeight: "bold" }}>Menu</span>
+
+      {menuOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50px",
+            left: "0",
+            width: "250px",
+            background: "#fff",
+            borderRadius: "12px",
+            padding: "20px",
+            border: "2px solid #ff6b6b",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            zIndex: 1000
+          }}
+        >
+          <p style={menuItem}>🏠 Home</p>
+          <p style={menuItem}>🏢 Organizations</p>
+          <p style={menuItem}>📄 Applications</p>
+          <p style={menuItem}>🎓 Placements</p>
+          <p style={menuItem}>📊 Criteria</p>
+        </div>
+      )}
+    </div>
+
+    {/* DASHBOARD CONTENT */}
     <div>
       <h1>Admin Dashboard</h1>
 
+      {/* ⬇️ KEEP EVERYTHING ELSE EXACTLY AS YOU WROTE IT BELOW */}
 
       <h2>Organization</h2>
 <div
@@ -871,7 +923,8 @@ useEffect(() => {
   )}
 
     </div>    
-  );
+  </div>
+);
 }
 
 export default AdminDashboard;
