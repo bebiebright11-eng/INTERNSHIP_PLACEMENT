@@ -239,6 +239,68 @@ useEffect(() => {
   return (
     <div>
       <h1>Admin Dashboard</h1>
+
+
+      <h2>Organization</h2>
+<div
+  style={{
+    border: "1px solid #ccc",
+    padding: "15px",
+    marginBottom: "20px",
+    borderRadius: "8px",
+    background: "#f9f9f9",
+    maxWidth: "500px"
+  }}
+>
+  <h3>Add Organization</h3>    
+
+  <input
+    type="text"
+    placeholder="Name"
+    value={orgForm.name}
+    onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type ='text'
+    placeholder="Location"
+    value={orgForm.location}
+    onChange={(e) => setOrgForm({ ...orgForm, location: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type="email"
+    placeholder="Email"
+    value={orgForm.email}
+    onChange={(e) => setOrgForm({ ...orgForm, email: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type="text"
+    placeholder="Phone"
+    value={orgForm.phone}
+    onChange={(e) => setOrgForm({ ...orgForm, phone: e.target.value })}
+  />
+  <br /><br />
+
+  <textarea
+    placeholder="Description"
+    value={orgForm.description}
+    onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
+  />
+  <br /><br />
+
+  <input
+    type='text'
+    placeholder ='website'
+    value={orgForm.website}
+    onChange={(e) => setOrgForm({...orgForm,website: e.target.value})}
+  />
+  <br /><br />  
+
       <h2>Applications</h2>
 
       {applications.length === 0 ? (
