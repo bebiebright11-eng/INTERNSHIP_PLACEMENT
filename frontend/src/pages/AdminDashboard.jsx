@@ -120,7 +120,7 @@ const[selectedSupervisors, setSelectedSupervisors]  = useState({});
 const[showDropdown, setShowDropdown] = useState({});
 
 const[savedRows,setSavedRows] =useState({});
-const[criteria, setcriteria] =useState({});
+const[criteria, setcriteria] =useState([]);
 const[newCriteria, setNewCriteria] = useState({
   name: '',
   max_score: '',
@@ -305,7 +305,7 @@ useEffect(() => {
   />
   <br /><br />  
 
-  <button onClick ={createOrganisation}>
+  <button onClick ={createOrganization}>
     Create Organiztion
   </button>
 </div>
