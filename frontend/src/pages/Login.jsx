@@ -55,7 +55,8 @@ function Login() {
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
-          type="text"
+          type="password"
+          name="password"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -64,13 +65,16 @@ function Login() {
         <br /><br />
         <input
           type="password"
+          name="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         <br /><br />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={!username || !password}>
+          Login
+        </button>
       </form>
     </div>
   );

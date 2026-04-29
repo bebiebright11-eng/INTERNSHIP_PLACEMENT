@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.db import models
 from django.conf import settings
 
@@ -32,6 +34,11 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.student} → {self.organization} ({self.status})"
     
+
+        #added to prevent duplicate applications
+    class Meta:
+        unique_together = ['student', 'organization']
+    
 class Placement(models.Model):
 
     student = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -55,11 +62,31 @@ class Placement(models.Model):
 
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=(('active', 'Active'), ('completed', 'Completed')),
-        default='active'
-    )
+    @property
+    def status(self):
+        today = timezone.now().date()
+
+        if not self.start_date:
+            return "not_started"
+
+        if self.start_date > today:
+            return "not_started"
+
+        if self.start_date <= today and (not self.end_date or today <= self.end_date):
+            return "active"
+
+        if self.end_date and today > self.end_date:
+            return "completed"
+        
+
+    @property
+    def is_fully_assigned(self):
+        return (
+            self.start_date is not None and
+            self.end_date is not None and
+            self.workplace_supervisor is not None and
+            self.academic_supervisor is not None
+        )
 
     def __str__(self):
         return f"{self.student} Placement"
