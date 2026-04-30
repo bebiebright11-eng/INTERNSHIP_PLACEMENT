@@ -1,153 +1,84 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState, useRef } from "react";
 import API from "../api";
 
 function AdminDashboard() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeView, setActiveView] = useState('home');
+  
   const [applications, setApplications] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
+  const [organizations, setOrganizations] = useState([]);
 
-const [organizations, setOrganizations] = useState([]);
+  const handleMenuClick = (view) => {
+  setActiveView(view);
+  setMenuOpen(false);
+};
 
-const [orgForm, setOrgForm] = useState({
-  name: "",
-  location: "",
-  email: "",
-  phone: "",
-  description: "",
-  website: "",
-});
-
-const [editingOrg, setEditingOrg] = useState(null);
-const [editForm, setEditForm] = useState({
-  name: "",
-  location: "",
-  email: "",
-  phone: "",
-  description: "",
-  website: "",
-});
-const startEdit = (org) => {
-  setEditingOrg(org.id);
-  setEditForm({
-    name: org.name,
-    location: org.location,
-    email: org.email,
-    phone: org.phone,
-    description: org.description,
-    website: org.website,
+  const [orgForm, setOrgForm] = useState({
+    name: "",
+    location: "",
+    email: "",
+    phone: "",
+    description: "",
+    website: "",
   });
-};
-const saveEdit = async (id) => {
-  try {
-    const res = await API.patch(`organizations/${id}/`, editForm);
 
-    // update UI instantly
-    setOrganizations((prev) =>
-      prev.map((org) => (org.id === id ? res.data : org))
-    );
+  const [editingOrg, setEditingOrg] = useState(null);
 
-    setEditingOrg(null);
-    alert("Organization updated!");
-  } catch (err) {
-    console.log(err.response?.data);
-    alert("Update failed");
-  }
-};
-
-const deleteOrganization = async (id) => {
-  const confirmDelete = window.confirm("Delete this organization?");
-  if (!confirmDelete) return;
-
-  try {
-    await API.delete(`organizations/${id}/`);
-
-    // remove from UI instantly
-    setOrganizations((prev) => prev.filter((org) => org.id !== id));
-
-    alert("Deleted!");
-  } catch (err) {
-    console.log(err);
-    alert("Delete failed");
-  }
-};
-
-const fetchOrganizations = async () => {
-  try {
-    const res = await API.get("internships/organizations/");
-    setOrganizations(res.data);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const groupApplicationsByStudent = () => {
-  const grouped = {};
-
-  applications.forEach((app) => {
-    const student = app.student_name;
-
-    if (!grouped[student]) {
-      grouped[student] = [];
-    }
-    grouped[student].push(app);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    location: "",
+    email: "",
+    phone: "",
+    description: "",
+    website: "",
   });
-  return grouped;
 
-}
+  const [activePlacementForm, setActivePlacementForm] = useState(null);
+
+  const [placementFormData, setPlacementFormData] = useState({
+    start_date: "",
+    end_date: "",
+  });
+
+  const [selectedSupervisors, setSelectedSupervisors] = useState({});
+  const [showDropdown, setShowDropdown] = useState({});
+  const [savedRows, setSavedRows] = useState({});
+  const [criteria, setCriteria] = useState([]);
+  const [newCriteria, setNewCriteria] = useState({
+    name: "",
+    max_score: "",
+  });
+
+  const menuRef = useRef(null);
+
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
 
   const fetchApplications = async () => {
-   try {
-    const res = await API.get("internships/applications/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    setApplications(res.data);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const [activePlacementForm, setActivePlacementForm] = useState(null);
-
-const[placementFormData, setPlacementFormData] = useState({
-  start_date: '',
-  end_date:'',
-});
-
-const[selectedSupervisors, setSelectedSupervisors]  = useState({});
-
-const[showDropdown, setShowDropdown] = useState({});
-
-const[savedRows,setSavedRows] =useState({});
-const[criteria, setcriteria] =useState({});
-const[newCriteria, setNewCriteria] = useState({
-  name: '',
-  max_score: '',
-});
-
-
-const updateStatus = async (id, status) => {
     try {
-      await API.patch(
-        `internships/applications/${id}/`,
-        { status: status },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      alert("Updated successfully!");
-      fetchApplications(); // refresh data
-
+      const res = await API.get("internships/applications/");
+      setApplications(res.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-const fetchPlacements = async () => {
+  const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/");
       setPlacements(res.data);
@@ -156,722 +87,951 @@ const fetchPlacements = async () => {
     }
   };
 
-
-const fetchSupervisors = async () => {
+  const fetchSupervisors = async () => {
     try {
       const res = await API.get("accounts/users/");
       setSupervisors(res.data);
     } catch (error) {
       console.log(error);
     }
-  };  
+  };
 
-const handleSupervisorChange = (placementId, type, value) => {  
-  setSelectedSupervisors((prev) => ({ 
-    ...prev,
-    [placementId]: {
-      ...prev[placementId],
-      [type]: value,
-    },
-  }));
-};  
+  const fetchOrganizations = async () => {
+    try {
+      const res = await API.get("organizations/");
+      setOrganizations(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-const assignSupervisors = async (placementId, workplaceId, academicId) => {
-  try {
-    await API.patch(`internships/placements/${placementId}/`, {
-      workplace_supervisor: workplaceId,
-      academic_supervisor: academicId,
+  const fetchCriteria = async () => {
+    try {
+      const res = await API.get("supervision/criteria/");
+      console.log("CRITERIA:", res.data);
+      setCriteria(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  
+  const groupApplicationsByStudent = () => {
+    const grouped = {};
+
+    applications.forEach((app) => {
+      const student = app.student_name;
+
+      if (!grouped[student]) {
+        grouped[student] = [];
+      }
+
+      grouped[student].push(app);
     });
 
-    alert("Supervisors assigned!");
-    fetchPlacements(); // refresh placements
+    return grouped;
+  };
 
-  } catch (error) {
-    console.log(error);
-    alert("Failed to assign supervisors");
-  }
-};
-
+  
   const createOrganization = async () => {
-  if (!orgForm.name || !orgForm.location) {
-    alert("Name and location are required");
-    return;
-  }
+    if (!orgForm.name || !orgForm.location) {
+      alert("Name and location are required");
+      return;
+    }
 
-  try {
-    const res = await API.post("organizations/", orgForm);
+    try {
+      const res = await API.post("organizations/", orgForm);
 
-    setOrganizations((prev) => [...prev, res.data]);
+      setOrganizations((prev) => [...prev, res.data]);
 
-    // reset form
-    setOrgForm({
-      name: "",
-      location: "",
-      email: "",
-      phone: "",
-      description: "",
-      website: "",
+      setOrgForm({
+        name: "",
+        location: "",
+        email: "",
+        phone: "",
+        description: "",
+        website: "",
+      });
+
+      alert("Organization created!");
+    } catch (err) {
+      console.log(err.response?.data);
+      alert("Failed to create organization");
+    }
+  };
+
+  const startEdit = (org) => {
+    setEditingOrg(org.id);
+    setEditForm({
+      name: org.name,
+      location: org.location,
+      email: org.email,
+      phone: org.phone,
+      description: org.description,
+      website: org.website,
     });
+  };
 
-    alert("Organization created!");
-  } catch (err) {
-    console.log(err.response?.data);
-    alert("Failed to create organization");
-  }
+  const saveEdit = async (id) => {
+    try {
+      const res = await API.patch(`organizations/${id}/`, editForm);
+
+      setOrganizations((prev) =>
+        prev.map((org) => (org.id === id ? res.data : org))
+      );
+
+      setEditingOrg(null);
+      alert("Organization updated!");
+    } catch (err) {
+      console.log(err.response?.data);
+      alert("Update failed");
+    }
+  };
+
+  const deleteOrganization = async (id) => {
+    const confirmDelete = window.confirm("Delete this organization?");
+    if (!confirmDelete) return;
+
+    try {
+      await API.delete(`organizations/${id}/`);
+
+      setOrganizations((prev) =>
+        prev.filter((org) => org.id !== id)
+      );
+
+      alert("Deleted!");
+    } catch (err) {
+      console.log(err);
+      alert("Delete failed");
+    }
+  };
+
+  
+  const updateStatus = async (id, status) => {
+    try {
+      await API.patch(`internships/applications/${id}/`, { status });
+
+      alert("Updated successfully!");
+      fetchApplications();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  
+  const handleSupervisorChange = (placementId, type, value) => {
+    setSelectedSupervisors((prev) => ({
+      ...prev,
+      [placementId]: {
+        ...prev[placementId],
+        [type]: value,
+      },
+    }));
+  };
+
+  const assignSupervisors = async (placementId, workplaceId, academicId) => {
+    try {
+      await API.patch(`internships/placements/${placementId}/`, {
+        workplace_supervisor: workplaceId,
+        academic_supervisor: academicId,
+      });
+
+      alert("Supervisors assigned!");
+      fetchPlacements();
+    } catch (error) {
+      console.log(error);
+      alert("Failed to assign supervisors");
+    }
+  };
+
+  // ---------------- LOAD DATA ON MOUNT ----------------
+  useEffect(() => {
+    fetchApplications();
+    fetchPlacements();
+    fetchSupervisors();
+    fetchOrganizations();
+    fetchCriteria();
+  }, []);
+
+  const menuItemStyle = {
+  padding: "20px",
+  cursor: "pointer",
+  borderBottom: "1px solid #eee"
+};
+  const statsCard = {
+  background: "#f7c7c7",
+  padding: "10px",
+  borderRadius: "10px",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  textAlign: "center",
+  border: "1px solid #eee",
+  borderTop: "5px solid #480303"
 };
 
-const fetchCriteria = async () => {
-  try {
-    const res = await API.get("supervision/criteria/");
-    console.log("CRITERIA:", res.data); // 🔥 DEBUG
-    setCriteria(res.data);
-  } catch (err) {
-    console.log(err);
-  }
-};
 
-useEffect(() => {
-  fetchApplications();
-  fetchPlacements();
-  fetchSupervisors();
-  fetchOrganizations();
-  fetchCriteria();
+return (
+  <div>
+    {/* MENU */}
+    <div style={{ display: 'flex' }}>
+      <button
+        onClick={() => setMenuOpen(!menuOpen)}
+        style={{
+          fontsize : '24px',
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+
+        }}
+      >
+        ☰ menu
+      </button>
 
 
-}, []);
+      {menuOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50px",
+            left: "0",
+            width: "250px",
+            background: "#efdfb9",
+            borderRadius: "12px",
+            padding: "20px",
+            border: "2px solid #ff6b6b",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            zIndex: 1000
+          }}
+        >
+          <h3 style={{ textAlign: "center" }}>Menu</h3>
 
-  return (
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("home")}
+      >
+        🏠 Home
+      </div>
+
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("organizations")}
+      >
+        🏢 Organizations
+      </div>
+
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("applications")}
+      >
+        📝 My Applications
+      </div>
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("placements")}
+      >
+        📍 Placements
+      </div>
+
+     
+
+      
+
+    </div>
+      )}
+    </div>
+
+    {/* DASHBOARD CONTENT */}
     <div>
       <h1>Admin Dashboard</h1>
 
+      {/* ⬇️ KEEP EVERYTHING ELSE EXACTLY AS YOU WROTE IT BELOW */}
+{activeView === "home" && ( 
 
-      <h2>Organization</h2>
-<div
-  style={{
-    border: "1px solid #ccc",
-    padding: "15px",
-    marginBottom: "20px",
-    borderRadius: "8px",
-    background: "#f9f9f9",
-    maxWidth: "500px"
-  }}
->
-  <h3>Add Organization</h3>    
+  <> 
+        <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      gap: "20px",
+      marginBottom: "30px"
+    }}
+  >
+    {/* Organizations */}
+    <div style={statsCard}>
+      <h3>🏢 Organizations</h3>
+      <h1>{organizations.length}</h1>
+    </div>
 
-  <input
-    type="text"
-    placeholder="Name"
-    value={orgForm.name}
-    onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
-  />
-  <br /><br />
+    {/* Applications */}
+    <div style={statsCard}>
+      <h3>📝 Applications</h3>
+      <h1>{applications.length}</h1>
+    </div>
 
-  <input
-    type ='text'
-    placeholder="Location"
-    value={orgForm.location}
-    onChange={(e) => setOrgForm({ ...orgForm, location: e.target.value })}
-  />
-  <br /><br />
-
-  <input
-    type="email"
-    placeholder="Email"
-    value={orgForm.email}
-    onChange={(e) => setOrgForm({ ...orgForm, email: e.target.value })}
-  />
-  <br /><br />
-
-  <input
-    type="text"
-    placeholder="Phone"
-    value={orgForm.phone}
-    onChange={(e) => setOrgForm({ ...orgForm, phone: e.target.value })}
-  />
-  <br /><br />
-
-  <textarea
-    placeholder="Description"
-    value={orgForm.description}
-    onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
-  />
-  <br /><br />
-
-  <input
-    type='text'
-    placeholder ='website'
-    value={orgForm.website}
-    onChange={(e) => setOrgForm({...orgForm,website: e.target.value})}
-  />
-  <br /><br />  
-
-  <button onClick ={createOrganisation}>
-    Create Organiztion
-  </button>
-</div>
-  
-
-<h3>Existing Organizations</h3>
-{organizations.length === 0 ? (
-  <p>No organizations yet</p>
-) : (
-  organizations.map((org) => (
+    {/* Active Placements */}
+    <div style={statsCard}>
+      <h3>📍 Active Placements</h3>
+      <h1>
+        {
+          placements.filter((p) => p.is_fully_assigned).length
+        }
+      </h1>
+    </div>
+  </div>   
+        <h2>Organization</h2>
     <div
-      key={org.id}
       style={{
-        border: "1px solid #ddd",
-        padding: "10px",
-        marginBottom: "10px",
-        borderRadius: "6px",
-        background: "#fff",
+        border: "1px solid #140961",
+        padding: "15px",
+        marginBottom: "20px",
+        borderRadius: "8px",
+        background: "#d4f4f4",
+        maxWidth: "500px"
       }}
     >
-      {editingOrg === org.id ? (
-        <>
-          <input
-            value={editForm.name}
-            onChange={(e) =>
-              setEditForm({ ...editForm, name: e.target.value })
-            }
-          />
-          <br />
+      <h3>Add Organization</h3>    
 
-          <input
-            value={editForm.location}
-            onChange={(e) =>
-              setEditForm({ ...editForm, location: e.target.value })
-            }
-          />
-          <br />
+      <input
+        type="text"
+        placeholder="Name"
+        value={orgForm.name}
+        onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
+      />
+      <br /><br />
 
-          <input
-            value={editForm.email}
-            onChange={(e) =>
-              setEditForm({ ...editForm, email: e.target.value })
-            }
-          />
-          <br />
+      <input
+        type ='text'
+        placeholder="Location"
+        value={orgForm.location}
+        onChange={(e) => setOrgForm({ ...orgForm, location: e.target.value })}
+      />
+      <br /><br />
 
-          <input
-            value={editForm.phone}
-            onChange={(e) =>
-              setEditForm({ ...editForm, phone: e.target.value })
-            }
-          />
-          <br />
+      <input
+        type="email"
+        placeholder="Email"
+        value={orgForm.email}
+        onChange={(e) => setOrgForm({ ...orgForm, email: e.target.value })}
+      />
+      <br /><br />
 
-          <textarea
-            value={editForm.description}
-            onChange={(e) =>
-              setEditForm({ ...editForm, description: e.target.value })
-            }
-          />
-          <br />
+      <input
+        type="text"
+        placeholder="Phone"
+        value={orgForm.phone}
+        onChange={(e) => setOrgForm({ ...orgForm, phone: e.target.value })}
+      />
+      <br /><br />
 
-          <input
-            value={editForm.website}
-            onChange={(e) =>
-              setEditForm({ ...editForm, website: e.target.value })
-            }
-          />
-          <br /><br />
+      <textarea
+        placeholder="Description"
+        value={orgForm.description}
+        onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
+      />
+      <br /><br />
 
-          <button onClick={() => saveEdit(org.id)}>Save</button>
-          <button onClick={() => setEditingOrg(null)}>Cancel</button>
-        </>
-      ) : (
-        <>
-          <p><strong>{org.name}</strong></p>
-          <p>{org.location}</p>
-          <p>{org.email}</p>
-          <p>{org.phone}</p>
-          <p>{org.description}</p>
-          <p>{org.website}</p>
+      <input
+        type='text'
+        placeholder ='website'
+        value={orgForm.website}
+        onChange={(e) => setOrgForm({...orgForm,website: e.target.value})}
+      />
+      <br /><br />  
 
-          <button onClick={() => startEdit(org)}>Edit</button>
-          <button onClick={() => deleteOrganization(org.id)}>
-            Delete
-          </button>
-        </>
-      )}
+      <button onClick ={createOrganization}>
+        Create Organization
+      </button>
     </div>
-  ))
-)}
+  
 
-<h2>Global Evaluation Criteria (Admin only)</h2>
+ 
+  <h2>Global Evaluation Criteria (Admin only)</h2>
 
-<table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginleft: "30px" }}>
-  <thead>
-    <tr>
-      <th>Criteria</th>
-      <th>Max Score</th>
-      <th>Score</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
+  <table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginleft: "30px" }}>
+    <thead>
+      <tr>
+        <th>Criteria</th>
+        <th>Max Score</th>
+        <th>Score</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
 
-  <tbody>
-    {criteria.map((c) => (
-      <tr key={c.id}>
+    <tbody>
+      {criteria.map((c) => (
+        <tr key={c.id}>
+          <td>
+            <input
+              type="text"
+              value={c.name}
+              onChange={(e) => {
+                const updated = criteria.map((item) =>
+                  item.id === c.id ? { ...item, name: e.target.value } : item
+                );
+                setCriteria(updated);
+              }}
+            />
+          </td>
+
+          <td>
+            <input
+              type="number"
+              value={c.max_score}
+              onChange={(e) => {
+                const updated = criteria.map((item) =>
+                  item.id === c.id
+                    ? { ...item, max_score: e.target.value }
+                    : item
+                );
+                setCriteria(updated);
+              }}
+            />
+          </td>
+
+          {/* 🔥 Score column (Admin optional / future use) */}
+          <td>
+            <input type="number" placeholder="-" disabled />
+          </td>
+
+          <td>
+  <button
+    onClick={async () => {
+      try {
+        await API.patch(`supervision/criteria/${c.id}/`, {
+          name: c.name,
+          max_score: Number(c.max_score),
+        });
+
+        setSavedRows((prev) => ({
+          ...prev,
+          [c.id]: true,
+        }));
+
+      } catch {
+        alert("Update failed");
+      }
+    }}
+  >
+    {savedRows[c.id] ? "Saved ✅" : "Save"}
+  </button>
+    <button
+    onClick={async () => {
+      try {
+        await API.delete(`supervision/criteria/${c.id}/`);
+
+        // ✅ remove instantly from UI
+        setCriteria((prev) => prev.filter((item) => item.id !== c.id));
+
+      } catch {
+        alert("Delete failed");
+      }
+    }}
+  >
+    Delete
+  </button>
+
+
+          </td>
+        </tr>
+      ))}
+
+      {/* 🔥 ADD NEW ROW */}
+      <tr>
         <td>
           <input
             type="text"
-            value={c.name}
-            onChange={(e) => {
-              const updated = criteria.map((item) =>
-                item.id === c.id ? { ...item, name: e.target.value } : item
-              );
-              setCriteria(updated);
-            }}
+            placeholder="New Criteria"
+            value={newCriteria.name}
+            onChange={(e) =>
+              setNewCriteria({ ...newCriteria, name: e.target.value })
+            }
           />
         </td>
 
         <td>
           <input
             type="number"
-            value={c.max_score}
-            onChange={(e) => {
-              const updated = criteria.map((item) =>
-                item.id === c.id
-                  ? { ...item, max_score: e.target.value }
-                  : item
-              );
-              setCriteria(updated);
-            }}
+            placeholder="Max"
+            value={newCriteria.max_score}
+            onChange={(e) =>
+              setNewCriteria({ ...newCriteria, max_score: e.target.value })
+            }
           />
         </td>
 
-        {/* 🔥 Score column (Admin optional / future use) */}
-        <td>
-          <input type="number" placeholder="-" disabled />
-        </td>
+        <td>-</td>  
 
         <td>
-<button
-  onClick={async () => {
-    try {
-      await API.patch(`supervision/criteria/${c.id}/`, {
-        name: c.name,
-        max_score: Number(c.max_score),
-      });
-
-      setSavedRows((prev) => ({
-        ...prev,
-        [c.id]: true,
-      }));
-
-    } catch {
-      alert("Update failed");
-    }
-  }}
->
-  {savedRows[c.id] ? "Saved ✅" : "Save"}
-</button>
   <button
-  onClick={async () => {
-    try {
-      await API.delete(`supervision/criteria/${c.id}/`);
+    onClick={async () => {
+      if (!newCriteria.name || !newCriteria.max_score) {
+        alert("Please fill all fields");
+        return;
+      }
 
-      // ✅ remove instantly from UI
-      setCriteria((prev) => prev.filter((item) => item.id !== c.id));
+      // 🚨 LIMIT CHECK
+      if (criteria.length >= 6) {
+        const confirmAdd = window.confirm(
+          "You have reached 6 criteria. Do you want to add another?"
+        );
 
-    } catch {
-      alert("Delete failed");
-    }
-  }}
->
-  Delete
-</button>
+        if (!confirmAdd) return;
+      }
 
+      try {
+        const res = await API.post("supervision/criteria/", {
+          name: newCriteria.name,
+          max_score: Number(newCriteria.max_score),
+        });
+
+        // ✅ add instantly to UI
+        setCriteria((prev) => [...prev, res.data]);
+
+        setNewCriteria({ name: "", max_score: "" });
+
+      } catch (err) {
+        console.log(err.response?.data);
+        alert("Failed to create criteria");
+      }
+    }}
+  >
+    Add
+  </button>
 
         </td>
       </tr>
-    ))}
+    </tbody>
+  </table>
+  </>
+)}
+{activeView === "organizations" && (
+  <>
+ <h3>Existing Organizations</h3>
+  {organizations.length === 0 ? (
+    <p>No organizations yet</p>
+  ) : (
+    organizations.map((org) => (
+      <div
+        key={org.id}
+        style={{
+          border: "1px solid #ddd",
+          padding: "10px",
+          marginBottom: "10px",
+          borderRadius: "6px",
+          background: "#fff",
+        }}
+      >
+        {editingOrg === org.id ? (
+          <>
+            <input
+              value={editForm.name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, name: e.target.value })
+              }
+            />
+            <br />
 
-    {/* 🔥 ADD NEW ROW */}
-    <tr>
-      <td>
-        <input
-          type="text"
-          placeholder="New Criteria"
-          value={newCriteria.name}
-          onChange={(e) =>
-            setNewCriteria({ ...newCriteria, name: e.target.value })
-          }
-        />
-      </td>
+            <input
+              value={editForm.location}
+              onChange={(e) =>
+                setEditForm({ ...editForm, location: e.target.value })
+              }
+            />
+            <br />
 
-      <td>
-        <input
-          type="number"
-          placeholder="Max"
-          value={newCriteria.max_score}
-          onChange={(e) =>
-            setNewCriteria({ ...newCriteria, max_score: e.target.value })
-          }
-        />
-      </td>
+            <input
+              value={editForm.email}
+              onChange={(e) =>
+                setEditForm({ ...editForm, email: e.target.value })
+              }
+            />
+            <br />
 
-      <td>-</td>
+            <input
+              value={editForm.phone}
+              onChange={(e) =>
+                setEditForm({ ...editForm, phone: e.target.value })
+              }
+            />
+            <br />
 
-      <td>
-<button
-  onClick={async () => {
-    if (!newCriteria.name || !newCriteria.max_score) {
-      alert("Please fill all fields");
-      return;
-    }
+            <textarea
+              value={editForm.description}
+              onChange={(e) =>
+                setEditForm({ ...editForm, description: e.target.value })
+              }
+            />
+            <br />
 
-    // 🚨 LIMIT CHECK
-    if (criteria.length >= 6) {
-      const confirmAdd = window.confirm(
-        "You have reached 6 criteria. Do you want to add another?"
-      );
+            <input
+              value={editForm.website}
+              onChange={(e) =>
+                setEditForm({ ...editForm, website: e.target.value })
+              }
+            />
+            <br /><br />
 
-      if (!confirmAdd) return;
-    }
+            <button onClick={() => saveEdit(org.id)}>Save</button>
+            <button onClick={() => setEditingOrg(null)}>Cancel</button>
+          </>
+        ) : (
+          <>
+            <p><strong>{org.name}</strong></p>
+            <p>{org.location}</p>
+            <p>{org.email}</p>
+            <p>{org.phone}</p>
+            <p>{org.description}</p>
+            <p>{org.website}</p>
 
-    try {
-      const res = await API.post("supervision/criteria/", {
-        name: newCriteria.name,
-        max_score: Number(newCriteria.max_score),
-      });
+            <button onClick={() => startEdit(org)}>Edit</button>
+            <button onClick={() => deleteOrganization(org.id)}>
+              Delete
+            </button>
+          </>
+        )}
+      </div>
+    ))
+  )}
+  </>
+)}
 
-      // ✅ add instantly to UI
-      setCriteria((prev) => [...prev, res.data]);
 
-      setNewCriteria({ name: "", max_score: "" });
 
-    } catch (err) {
-      console.log(err.response?.data);
-      alert("Failed to create criteria");
-    }
-  }}
->
-  Add
-</button>
-
-      </td>
-    </tr>
-  </tbody>
-</table>  
 
    
+{activeView === "applications" && (
+  <>
 
-      <h2>Applications</h2>
+        <h2>Applications</h2>
 
-{applications.length === 0 ? (
-  <p>No applications yet</p>
-) : (
-  Object.entries(groupApplicationsByStudent()).map(([student, apps]) => (
-    <div
-      key={student}
-      style={{ border: "2px solid black", margin: "15px", padding: "10px" }}
-    >
-      
-      {/* 🔥 STUDENT NAME */}
-      <h3>Student: {student}</h3>
-
-      {/* 🔥 APPLICATIONS UNDER THAT STUDENT */}
-      {apps.map((app) => (
-        <div
-          key={app.id}
-          style={{
-            marginLeft: "20px",
-            borderTop: "1px solid gray",
-            padding: "5px",
-          }}
-        >
-          <p><strong>Organization:</strong> {app.organization_name}</p>
-          <p><strong>Status:</strong> {app.status}</p>
-
-          {app.status === "pending" && (
-            <>
-              <button onClick={() => updateStatus(app.id, "approved")}>
-                Approve
-              </button>
-
-              <button onClick={() => updateStatus(app.id, "rejected")}>
-                Reject
-              </button>
-            </>
-          )}
-
-{/* 🔥 SHOW BUTTON ONLY IF APPROVED */}
-{app.status === "approved" && (
-  placements.some((p) => p.student === app.student) ? (
-    <p style={{ color: "green", fontWeight: "bold" }}>
-      ✅ Placement Created
-    </p>
+  {applications.length === 0 ? (
+    <p>No applications yet</p>
   ) : (
-    <button
-      onClick={() => {
-        setActivePlacementForm(app.id);
-        setPlacementFormData({
-          start_date: "",
-          end_date: "",
-        });
-      }}
-    >
-      Create Placement
-    </button>
-  )
-)}
+    Object.entries(groupApplicationsByStudent()).map(([student, apps]) => (
+      <div
+        key={student}
+        style={{ border: "2px solid black", margin: "15px", padding: "10px" }}
+      >
+        
+        {/* 🔥 STUDENT NAME */}
+        <h3>Student: {student}</h3>
 
-{/* 🔥 INLINE PLACEMENT FORM */}
-{activePlacementForm === app.id && (
-  <div style={{ marginTop: "10px", padding: "10px", border: "1px solid blue" }}>
-    
-    {/* START DATE */}
-    <input
-      type="date"
-      value={placementFormData.start_date}
-      onChange={(e) =>
-        setPlacementFormData({
-          ...placementFormData,
-          start_date: e.target.value,
-        })
-      }
-    />
-    {/* END DATE */}
-    <input
-      type="date"
-      value={placementFormData.end_date}
-      onChange={(e) =>
-        setPlacementFormData({
-          ...placementFormData,
-          end_date: e.target.value,
-        })
-      }
-    />
-    <br /><br />
+        {/* 🔥 APPLICATIONS UNDER THAT STUDENT */}
+        {apps.map((app) => (
+          <div
+            key={app.id}
+            style={{
+              marginLeft: "20px",
+              borderTop: "1px solid gray",
+              padding: "5px",
+            }}
+          >
+            <p><strong>Organization:</strong> {app.organization_name}</p>
+            <p><strong>Status:</strong> {app.status}</p>
 
-    {/* SAVE BUTTON */}
-    <button
-      onClick={async () => {
-        try {
-          await API.post("internships/placements/", {
-            student: app.student,
-            organization: app.organization,
-            start_date: placementFormData.start_date,
-            end_date: placementFormData.end_date,
-          });
-          alert("Placement created!");
+            {app.status === "pending" && (
+              <>
+                <button onClick={() => updateStatus(app.id, "approved")}>
+                  Approve
+                </button>
 
-          // 🔥 close form after saving
-          setActivePlacementForm(null);
+                <button onClick={() => updateStatus(app.id, "rejected")}>
+                  Reject
+                </button>
+              </>
+            )}
+            
 
-          fetchPlacements();
-        } catch (error) {
-            console.log(error.response?.data);
+          
 
-            if (error.response?.data?.student) {
-               alert("This student already has a placement!");
-            } else {
-              alert("Failed to create placement");
-            }
-          }
-      }}
-    >
-      Save Placement
-    </button>
-
-  </div>
-)}
-        </div>
-      ))}
-    </div>
-  ))
-)}
-      
-
-
-
-        <h2>Placements</h2>
-
-    {placements.length === 0 ? (
-      <p>No placements yet</p>
-    ) : (
-      placements.map((p) => {
-        // 🔥 filter supervisors per placement
-      const workplaceSupervisors = supervisors.filter(
-        (u) => u.role === "workplace" && u.organization === p.organization
-      );
-
-      const academicSupervisors = supervisors.filter(
-        (u) => u.role === "academic"
-      );
-      return(
-        <div key={p.id}>
-  <p><strong>Student:</strong> {p.student_name}</p>
-  <p><strong>Organization:</strong> {p.organization_name}</p>
-  <p><strong>Start Date:</strong> {p.start_date || "Not set"}</p>
-  <p><strong>End Date:</strong> {p.end_date || "Not set"}</p>
-
-  {/* ✅ SHOW FINAL STATE */}
-  {p.is_fully_assigned ? (
-    <>
-      <p><strong>Status:</strong> {p.status}</p>
-
-      <p><strong>Workplace Supervisor:</strong> {p.workplace_supervisor_name}</p>
-      <p><strong>Academic Supervisor:</strong> {p.academic_supervisor_name}</p>
-
+  {/* 🔥 SHOW BUTTON ONLY IF APPROVED */}
+  {app.status === "approved" && (
+    placements.some((p) => p.student === app.student) ? (
       <p style={{ color: "green", fontWeight: "bold" }}>
-        ✅ Placement Confirmed
+        ✅ Placement Created
       </p>
-    </>
-  ) : (
-    <>
-      {/* 🔧 EDIT MODE (ONLY BEFORE ASSIGNMENT) */}
-
-      <br />
-
-      <input
-        type="date"
-        defaultValue={p.start_date || ""}
-        onBlur={async (e) => {
-          try {
-            await API.patch(`internships/placements/${p.id}/`, {
-              start_date: e.target.value,
-            });
-            fetchPlacements();
-          } catch (err) {
-            alert("Failed to update start date");
-          }
+    ) : (
+      <button
+        onClick={() => {
+          setActivePlacementForm(app.id);
+          setPlacementFormData({
+            start_date: "",
+            end_date: "",
+          });
         }}
-      />
-
-      <br /><br />
-
-      <input
-        type="date"
-        defaultValue={p.end_date || ""}
-        onBlur={async (e) => {
-          try {
-            await API.patch(`internships/placements/${p.id}/`, {
-              end_date: e.target.value,
-            });
-            fetchPlacements();
-          } catch (err) {
-            alert("Failed to update end date");
-          }
-        }}
-      />
-
-      <br /><br />
-
-      {/* 🔍 WORKPLACE SEARCH */}
-<input
-  type="text"
-  placeholder="Search workplace supervisor"
-  value={selectedSupervisors[p.id]?.workplace_search || ""}
-  onFocus={() =>
-    setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
-  }
-  onChange={(e) => {
-    handleSupervisorChange(p.id, "workplace_search", e.target.value);
-    setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
-  }}
-/>
-
-{/* ✅ DROPDOWN */}
-{showDropdown[p.id] && (
-  <div style={{
-    border: "1px solid #ccc",
-    maxHeight: "120px",
-    overflowY: "auto",
-    background: "#fff"
-  }}>
-    {workplaceSupervisors
-      .filter((u) => {
-        const search = selectedSupervisors[p.id]?.workplace_search || "";
-        return u.username.toLowerCase().includes(search.toLowerCase());
-      })
-      .map((u) => (
-        <div
-          key={u.id}
-          onClick={() => {
-            handleSupervisorChange(p.id, "workplace", u.id);
-            handleSupervisorChange(p.id, "workplace_search", u.username);
-
-            setShowDropdown((prev) => ({
-              ...prev,
-              [p.id]: false,
-            }));
-          }}
-          style={{ padding: "5px", cursor: "pointer" }}
-        >
-          {u.username}
-        </div>
-      ))}
-  </div>
-)}
-
-
-      <br /><br />
-
-      {/* 🔍 ACADEMIC SEARCH */}
-<input
-  type="text"
-  placeholder="Search academic supervisor"
-  value={selectedSupervisors[p.id]?.academic_search || ""}
-  onFocus={() =>
-    setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
-  }
-  onChange={(e) => {
-    handleSupervisorChange(p.id, "academic_search", e.target.value);
-    setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
-  }}
-/>
-
-{showDropdown[p.id] && (
-  <div style={{
-    border: "1px solid #ccc",
-    maxHeight: "120px",
-    overflowY: "auto",
-    background: "#fff"
-  }}>
-    {academicSupervisors
-      .filter((u) => {
-        const search = selectedSupervisors[p.id]?.academic_search || "";
-        return u.username.toLowerCase().includes(search.toLowerCase());
-      })
-      .map((u) => (
-        <div
-          key={u.id}
-          onClick={() => {
-            handleSupervisorChange(p.id, "academic", u.id);
-            handleSupervisorChange(p.id, "academic_search", u.username);
-
-            setShowDropdown((prev) => ({
-              ...prev,
-              [p.id]: false,
-            }));
-          }}
-          style={{ padding: "5px", cursor: "pointer" }}
-        >
-          {u.username}
-        </div>
-      ))}
-  </div>
-)}
-
-      <br /><br />
-
-      <button onClick={() => assignSupervisors(p.id)}>
-        Assign Supervisors
+      >
+        Create Placement
       </button>
-    </>
+    )
   )}
-</div>
+
+  {/* 🔥 INLINE PLACEMENT FORM */}
+  {activePlacementForm === app.id && (
+    <div style={{ marginTop: "10px", padding: "10px", border: "1px solid blue" }}>
+      
+      {/* START DATE */}
+      <input
+        type="date"
+        value={placementFormData.start_date}
+        onChange={(e) =>
+          setPlacementFormData({
+            ...placementFormData,
+            start_date: e.target.value,
+          })
+        }
+      />
+      {/* END DATE */}
+      <input
+        type="date"
+        value={placementFormData.end_date}
+        onChange={(e) =>
+          setPlacementFormData({
+            ...placementFormData,
+            end_date: e.target.value,
+          })
+        }
+      />
+      <br /><br />
+
+      {/* SAVE BUTTON */}
+      <button
+        onClick={async () => {
+          try {
+            await API.post("internships/placements/", {
+              student: app.student,
+              organization: app.organization,
+              start_date: placementFormData.start_date,
+              end_date: placementFormData.end_date,
+            });
+            alert("Placement created!");
+
+            // 🔥 close form after saving
+            setActivePlacementForm(null);
+
+            fetchPlacements();
+          } catch (error) {
+              console.log(error.response?.data);
+
+              if (error.response?.data?.student) {
+                alert("This student already has a placement!");
+              } else {
+                alert("Failed to create placement");
+              }
+            }
+        }}
+      >
+        Save Placement
+      </button>
+
+    </div>
+  )}
+          </div>
+        ))}
+      </div>
+    ))
+  )}
+  </>
+)}
+      
+
+
+{activeView === "placements" && ( 
+  <>
+          <h2>Placements</h2>
+
+      {placements.length === 0 ? (
+        <p>No placements yet</p>
+      ) : (
+        placements.map((p) => {
+          // 🔥 filter supervisors per placement
+        const workplaceSupervisors = supervisors.filter(
+          (u) => u.role === "workplace" && u.organization === p.organization
+        );
+
+        const academicSupervisors = supervisors.filter(
+          (u) => u.role === "academic"
+        );
+        return(
+          <div key={p.id}>
+    <p><strong>Student:</strong> {p.student_name}</p>
+    <p><strong>Organization:</strong> {p.organization_name}</p>
+    <p><strong>Start Date:</strong> {p.start_date || "Not set"}</p>
+    <p><strong>End Date:</strong> {p.end_date || "Not set"}</p>
+
+    {/* ✅ SHOW FINAL STATE */}
+    {p.is_fully_assigned ? (
+      <>
+        <p><strong>Status:</strong> {p.status}</p>
+
+        <p><strong>Workplace Supervisor:</strong> {p.workplace_supervisor_name}</p>
+        <p><strong>Academic Supervisor:</strong> {p.academic_supervisor_name}</p>
+
+        <p style={{ color: "green", fontWeight: "bold" }}>
+          ✅ Placement Confirmed
+        </p>
+      </>
+    ) : (
+      <>
+        {/* 🔧 EDIT MODE (ONLY BEFORE ASSIGNMENT) */}
+
+        <br />
+
+        <input
+          type="date"
+          defaultValue={p.start_date || ""}
+          onBlur={async (e) => {
+            try {
+              await API.patch(`internships/placements/${p.id}/`, {
+                start_date: e.target.value,
+              });
+              fetchPlacements();
+            } catch (err) {
+              alert("Failed to update start date");
+            }
+          }}
+        />
+
+        <br /><br />
+
+        <input
+          type="date"
+          defaultValue={p.end_date || ""}
+          onBlur={async (e) => {
+            try {
+              await API.patch(`internships/placements/${p.id}/`, {
+                end_date: e.target.value,
+              });
+              fetchPlacements();
+            } catch (err) {
+              alert("Failed to update end date");
+            }
+          }}
+        />
+ 
+        <br /><br />
+
+        {/* 🔍 WORKPLACE SEARCH */}
+  <input
+    type="text"
+    placeholder="Search workplace supervisor"
+    value={selectedSupervisors[p.id]?.workplace_search || ""}
+    onFocus={() =>
+      setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
+    }
+    onChange={(e) => {
+      handleSupervisorChange(p.id, "workplace_search", e.target.value);
+      setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
+    }}
+  />
+
+  {/* ✅ DROPDOWN */}
+  {showDropdown[p.id] && (
+    <div style={{
+      border: "1px solid #ccc",
+      maxHeight: "120px",
+      overflowY: "auto",
+      background: "#fff"
+    }}>
+      {workplaceSupervisors
+        .filter((u) => {
+          const search = selectedSupervisors[p.id]?.workplace_search || "";
+          return u.username.toLowerCase().includes(search.toLowerCase());
+        })
+        .map((u) => (
+          <div
+            key={u.id}
+            onClick={() => {
+              handleSupervisorChange(p.id, "workplace", u.id);
+              handleSupervisorChange(p.id, "workplace_search", u.username);
+
+              setShowDropdown((prev) => ({
+                ...prev,
+                [p.id]: false,
+              }));
+            }}
+            style={{ padding: "5px", cursor: "pointer" }}
+          >
+            {u.username}
+          </div>
+        ))}
+    </div>
+  )}
+
+
+        <br /><br />
+
+        {/* 🔍 ACADEMIC SEARCH */}
+  <input
+    type="text"
+    placeholder="Search academic supervisor"
+    value={selectedSupervisors[p.id]?.academic_search || ""}
+    onFocus={() =>
+      setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
+    }
+    onChange={(e) => {
+      handleSupervisorChange(p.id, "academic_search", e.target.value);
+      setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
+    }}
+  />
+
+  {showDropdown[p.id] && (
+    <div style={{
+      border: "1px solid #ccc",
+      maxHeight: "120px",
+      overflowY: "auto",
+      background: "#fff"
+    }}>
+      {academicSupervisors
+        .filter((u) => {
+          const search = selectedSupervisors[p.id]?.academic_search || "";
+          return u.username.toLowerCase().includes(search.toLowerCase());
+        })
+        .map((u) => (
+          <div
+            key={u.id}
+            onClick={() => {
+              handleSupervisorChange(p.id, "academic", u.id);
+              handleSupervisorChange(p.id, "academic_search", u.username);
+
+              setShowDropdown((prev) => ({
+                ...prev,
+                [p.id]: false,
+              }));
+            }}
+            style={{ padding: "5px", cursor: "pointer" }}
+          >
+            {u.username}
+          </div>
+        ))}
+    </div>
+  )}
+
+        <br /><br />
+
+        
+        <button
+          onClick={() =>
+            assignSupervisors(
+              p.id,
+              selectedSupervisors[p.id]?.workplace,
+              selectedSupervisors[p.id]?.academic
+            )
+          }
+        >
+          Assign Supervisors
+        </button>
+      </>
+    )}
+  </div>
         
 
-      );
-    })
-  )}
-
+        );
+      })
+    )}
+  </>  
+)}      
     </div>    
-  );
+  </div>
+);
 }
 
 export default AdminDashboard;

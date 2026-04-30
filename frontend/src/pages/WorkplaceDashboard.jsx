@@ -67,7 +67,7 @@ function WorkplaceDashboard() {
   const submitEvaluation = async (placementId) => {
     try {
       const criteriaScores = Object.entries(scores[placementId] || {}).map(
-        ([criteriaId, score]) => ({
+        ([criteriaId, score]) => ({ 
           criteria: parseInt(criteriaId),
           score: score,
         })
