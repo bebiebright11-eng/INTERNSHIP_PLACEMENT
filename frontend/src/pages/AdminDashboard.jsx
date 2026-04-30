@@ -254,9 +254,18 @@ function AdminDashboard() {
   }, []);
 
   const menuItemStyle = {
-  padding: "10px",
+  padding: "20px",
   cursor: "pointer",
   borderBottom: "1px solid #eee"
+};
+  const statsCard = {
+  background: "#f7c7c7",
+  padding: "10px",
+  borderRadius: "10px",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  textAlign: "center",
+  border: "1px solid #eee",
+  borderTop: "5px solid #480303"
 };
 
 
@@ -274,7 +283,7 @@ return (
 
         }}
       >
-        ☰
+        ☰ menu
       </button>
 
 
@@ -285,7 +294,7 @@ return (
             top: "50px",
             left: "0",
             width: "250px",
-            background: "#fff",
+            background: "#efdfb9",
             borderRadius: "12px",
             padding: "20px",
             border: "2px solid #ff6b6b",
@@ -322,19 +331,9 @@ return (
         📍 Placements
       </div>
 
-      <div
-        style={menuItemStyle}
-        onClick={() => setActiveView("evaluations")}
-      >
-        📊 My Evaluations
-      </div>
+     
 
-      <div
-        style={menuItemStyle}
-        onClick={() => setActiveView("logs")}
-      >
-        📘 Weekly Logs
-      </div>
+      
 
     </div>
       )}
@@ -347,15 +346,45 @@ return (
       {/* ⬇️ KEEP EVERYTHING ELSE EXACTLY AS YOU WROTE IT BELOW */}
 {activeView === "home" && ( 
 
-  <>    
+  <> 
+        <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      gap: "20px",
+      marginBottom: "30px"
+    }}
+  >
+    {/* Organizations */}
+    <div style={statsCard}>
+      <h3>🏢 Organizations</h3>
+      <h1>{organizations.length}</h1>
+    </div>
+
+    {/* Applications */}
+    <div style={statsCard}>
+      <h3>📝 Applications</h3>
+      <h1>{applications.length}</h1>
+    </div>
+
+    {/* Active Placements */}
+    <div style={statsCard}>
+      <h3>📍 Active Placements</h3>
+      <h1>
+        {
+          placements.filter((p) => p.is_fully_assigned).length
+        }
+      </h1>
+    </div>
+  </div>   
         <h2>Organization</h2>
     <div
       style={{
-        border: "1px solid #ccc",
+        border: "1px solid #140961",
         padding: "15px",
         marginBottom: "20px",
         borderRadius: "8px",
-        background: "#f9f9f9",
+        background: "#d4f4f4",
         maxWidth: "500px"
       }}
     >
@@ -414,93 +443,7 @@ return (
     </div>
   
 
-  <h3>Existing Organizations</h3>
-  {organizations.length === 0 ? (
-    <p>No organizations yet</p>
-  ) : (
-    organizations.map((org) => (
-      <div
-        key={org.id}
-        style={{
-          border: "1px solid #ddd",
-          padding: "10px",
-          marginBottom: "10px",
-          borderRadius: "6px",
-          background: "#fff",
-        }}
-      >
-        {editingOrg === org.id ? (
-          <>
-            <input
-              value={editForm.name}
-              onChange={(e) =>
-                setEditForm({ ...editForm, name: e.target.value })
-              }
-            />
-            <br />
-
-            <input
-              value={editForm.location}
-              onChange={(e) =>
-                setEditForm({ ...editForm, location: e.target.value })
-              }
-            />
-            <br />
-
-            <input
-              value={editForm.email}
-              onChange={(e) =>
-                setEditForm({ ...editForm, email: e.target.value })
-              }
-            />
-            <br />
-
-            <input
-              value={editForm.phone}
-              onChange={(e) =>
-                setEditForm({ ...editForm, phone: e.target.value })
-              }
-            />
-            <br />
-
-            <textarea
-              value={editForm.description}
-              onChange={(e) =>
-                setEditForm({ ...editForm, description: e.target.value })
-              }
-            />
-            <br />
-
-            <input
-              value={editForm.website}
-              onChange={(e) =>
-                setEditForm({ ...editForm, website: e.target.value })
-              }
-            />
-            <br /><br />
-
-            <button onClick={() => saveEdit(org.id)}>Save</button>
-            <button onClick={() => setEditingOrg(null)}>Cancel</button>
-          </>
-        ) : (
-          <>
-            <p><strong>{org.name}</strong></p>
-            <p>{org.location}</p>
-            <p>{org.email}</p>
-            <p>{org.phone}</p>
-            <p>{org.description}</p>
-            <p>{org.website}</p>
-
-            <button onClick={() => startEdit(org)}>Edit</button>
-            <button onClick={() => deleteOrganization(org.id)}>
-              Delete
-            </button>
-          </>
-        )}
-      </div>
-    ))
-  )}
-
+ 
   <h2>Global Evaluation Criteria (Admin only)</h2>
 
   <table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginleft: "30px" }}>
@@ -660,8 +603,96 @@ return (
   </table>
   </>
 )}
+{activeView === "organizations" && (
+  <>
+ <h3>Existing Organizations</h3>
+  {organizations.length === 0 ? (
+    <p>No organizations yet</p>
+  ) : (
+    organizations.map((org) => (
+      <div
+        key={org.id}
+        style={{
+          border: "1px solid #ddd",
+          padding: "10px",
+          marginBottom: "10px",
+          borderRadius: "6px",
+          background: "#fff",
+        }}
+      >
+        {editingOrg === org.id ? (
+          <>
+            <input
+              value={editForm.name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, name: e.target.value })
+              }
+            />
+            <br />
 
+            <input
+              value={editForm.location}
+              onChange={(e) =>
+                setEditForm({ ...editForm, location: e.target.value })
+              }
+            />
+            <br />
 
+            <input
+              value={editForm.email}
+              onChange={(e) =>
+                setEditForm({ ...editForm, email: e.target.value })
+              }
+            />
+            <br />
+
+            <input
+              value={editForm.phone}
+              onChange={(e) =>
+                setEditForm({ ...editForm, phone: e.target.value })
+              }
+            />
+            <br />
+
+            <textarea
+              value={editForm.description}
+              onChange={(e) =>
+                setEditForm({ ...editForm, description: e.target.value })
+              }
+            />
+            <br />
+
+            <input
+              value={editForm.website}
+              onChange={(e) =>
+                setEditForm({ ...editForm, website: e.target.value })
+              }
+            />
+            <br /><br />
+
+            <button onClick={() => saveEdit(org.id)}>Save</button>
+            <button onClick={() => setEditingOrg(null)}>Cancel</button>
+          </>
+        ) : (
+          <>
+            <p><strong>{org.name}</strong></p>
+            <p>{org.location}</p>
+            <p>{org.email}</p>
+            <p>{org.phone}</p>
+            <p>{org.description}</p>
+            <p>{org.website}</p>
+
+            <button onClick={() => startEdit(org)}>Edit</button>
+            <button onClick={() => deleteOrganization(org.id)}>
+              Delete
+            </button>
+          </>
+        )}
+      </div>
+    ))
+  )}
+  </>
+)}
 
 
 
@@ -875,7 +906,7 @@ return (
             }
           }}
         />
-
+ 
         <br /><br />
 
         {/* 🔍 WORKPLACE SEARCH */}
