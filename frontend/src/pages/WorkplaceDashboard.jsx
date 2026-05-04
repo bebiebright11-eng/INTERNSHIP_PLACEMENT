@@ -20,14 +20,18 @@ function WorkplaceDashboard() {
         },
       });
 
+      console.log("PLACEMENTS DATA:", res.data);
+
       // filter only workplace supervisor students
       const filtered = res.data.filter(
         (p) => p.workplace_supervisor === parseInt(localStorage.getItem("user_id"))
       );
 
+      console.log("FILTERED:", filtered);
+
       setPlacements(filtered);
     } catch (error) {
-      console.log(error);
+      console.log("PLACEMENT ERROR:", error);
     }
   };
 
@@ -43,9 +47,11 @@ function WorkplaceDashboard() {
         },
       });
 
+      console.log("CRITERIA:", res.data);
+
       setCriteria(res.data.filter(c => c.is_active)); // Only fetch active criterias
     } catch (error) {
-      console.log(error);
+      console.log("CRITERIA ERROR:", error);
     }
   };
 
