@@ -25,10 +25,9 @@ class CriteriaScoreSerializer(serializers.ModelSerializer):
     criteria = serializers.PrimaryKeyRelatedField(
         queryset=EvaluationCriteria.objects.all()
     )
-    
     class Meta:
         model = CriteriaScore
-        fields = ['id','criteria', 'criteria_name', 'score']
+        fields = ['id', 'criteria','criteria_name', 'score']
 
 
 class EvaluationSerializer(serializers.ModelSerializer):
