@@ -103,15 +103,17 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         user = request.user
-
-        # 🔥 ALLOW ONLY workplace supervisors
-        if user.role != "workplace":
+#allow both the academic and workplace supervisors
+        if user.role not in ["workplace", "academic"]:
             return Response(
-                {"error": "Only workplace supervisors can submit evaluations"},
+                {"error": "Unauthorized role"},
                 status=status.HTTP_403_FORBIDDEN
             )
 
         return super().create(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        user = self.request.user
 
     
 
