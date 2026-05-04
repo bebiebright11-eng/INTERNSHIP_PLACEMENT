@@ -80,12 +80,16 @@ function WorkplaceDashboard() {
       }
 
 
-
-      alert("Evaluation submitted successfully!");
-      setSubmittedEvaluations((prev) => ({
+// mark as submitted
+setSubmittedEvaluations((prev) => ({
   ...prev,
   [placementId]: true,
 }));
+
+// close the form
+setActiveEvaluation(null);
+
+alert("Evaluation submitted successfully!");
     } catch (error) {
       if (
   error.response?.data?.non_field_errors &&
