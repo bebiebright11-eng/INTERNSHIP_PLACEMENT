@@ -206,25 +206,7 @@ alert("Evaluation submitted successfully!");
 
                 </div>
               )} 
-              {submittedEvaluations[p.id] && (
-  <div style={{ marginTop: "10px" }}>
-    <p style={{ color: "green", fontWeight: "bold" }}>
-      ✅ Evaluation Submitted
-    </p>
-
-    <button
-      onClick={() => {
-        setSubmittedEvaluations((prev) => ({
-          ...prev,
-          [p.id]: false,
-        }));
-        setActiveEvaluation(p.id);
-      }}
-    >
-      Edit Evaluation
-    </button>
-  </div>
-)}
+             
             </div>
           ))}
         </div>
