@@ -201,7 +201,8 @@ const logScore = countedLogs * 2.5;
     }))
   }
 />
-
+<h4>Final Score</h4>
+<p>{finalScore} / 100</p>
 
 
 
