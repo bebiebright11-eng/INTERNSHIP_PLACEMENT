@@ -79,27 +79,31 @@ function WorkplaceDashboard() {
         return;
       }
 
-      await API.post(
-        "supervision/evaluations/",
-        {
-          placement: placementId,
-          supervisor_type: "workplace",
-          comments: "Workplace evaluation submitted",
-          criteria_scores: criteriaScores,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
 
-      alert("Evaluation submitted successfully!");
-      setSubmittedEvaluations((prev) => ({
+// mark as submitted
+setSubmittedEvaluations((prev) => ({
   ...prev,
   [placementId]: true,
 }));
+
+// close the form
+setActiveEvaluation(null);
+
+alert("Evaluation submitted successfully!");
     } catch (error) {
-      console.error("BACKEND ERROR:", error.response?.data);
-      alert("Failed to submit: " + JSON.stringify(error.response?.data));
+      if (
+  error.response?.data?.non_field_errors &&
+  error.response.data.non_field_errors[0].includes("unique")
+) {
+  alert("Already submitted. You can edit next.");
+
+  setSubmittedEvaluations((prev) => ({
+    ...prev,
+    [placementId]: true,
+  }));
+
+  return;
+}
     }
   };
 
@@ -127,15 +131,25 @@ function WorkplaceDashboard() {
       ✅ Evaluation Submitted
     </p>
 
-    <button onClick={() => setActiveEvaluation(p.id)}>
-      Edit Evaluation
-    </button>
+    <button
+  onClick={() => {
+    setSubmittedEvaluations((prev) => ({
+      ...prev,
+      [p.id]: false,
+    }));
+    setActiveEvaluation(p.id);
+  }}
+>
+  Edit Evaluation
+</button>
   </>
 )}
 
 
+
+
               {/* ✅ SHOW FORM ONLY WHEN CLICKED */}
-              {activeEvaluation === p.id && (
+              {activeEvaluation === p.id && !submittedEvaluations[p.id] &&(
                 <div style={{ marginTop: "10px" }}>
 
                   {/* TABLE */}
