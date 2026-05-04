@@ -131,11 +131,21 @@ alert("Evaluation submitted successfully!");
       ✅ Evaluation Submitted
     </p>
 
-    <button onClick={() => setActiveEvaluation(p.id)}>
-      Edit Evaluation
-    </button>
+    <button
+  onClick={() => {
+    setSubmittedEvaluations((prev) => ({
+      ...prev,
+      [p.id]: false,
+    }));
+    setActiveEvaluation(p.id);
+  }}
+>
+  Edit Evaluation
+</button>
   </>
 )}
+
+
 
 
               {/* ✅ SHOW FORM ONLY WHEN CLICKED */}
