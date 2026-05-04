@@ -7,7 +7,7 @@ function AcademicDashboard() {
   const [evaluations, setEvaluations] = useState([]);
   const [scores, setScores] = useState({});
   const [logs, setLogs] = useState({});
-  
+
   // --- Data Fetching Functions ---
 
   const fetchPlacements = async () => {
@@ -56,8 +56,30 @@ function AcademicDashboard() {
     }
   };
 
-  // --- Event Handlers ---
+  // --- Event Handlers --- 
+  
+  const fetchLogs = async () => {
+  try {
+    const res = await API.get("logs/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
+    const grouped = {};
+
+    res.data.forEach((log) => {
+      if (!grouped[log.placement]) {
+        grouped[log.placement] = [];
+      }
+      grouped[log.placement].push(log);
+    });
+
+    setLogs(grouped);
+  } catch (error) {
+    console.log(error);
+  }
+};
   const handleScoreChange = (placementId, criteriaId, value) => {
     setScores((prev) => ({
       ...prev,
