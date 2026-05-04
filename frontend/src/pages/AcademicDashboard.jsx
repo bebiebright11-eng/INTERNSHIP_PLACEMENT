@@ -151,8 +151,8 @@ const logScore = countedLogs * 2.5;
 
           return (
             <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
-              <h3>Student: {p.student}</h3>
-              <p>Organization: {p.organization}</p>
+              <h3>Student: {p.student_name}</h3>
+              <p>Organization: {p.organization_name}</p>
 
               <h4>Workplace Evaluation</h4>
               {workplaceEval ? (
