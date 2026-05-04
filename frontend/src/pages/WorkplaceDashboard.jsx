@@ -79,18 +79,7 @@ function WorkplaceDashboard() {
         return;
       }
 
-      await API.post(
-        "supervision/evaluations/",
-        {
-          placement: placementId,
-          supervisor_type: "workplace",
-          comments: "Workplace evaluation submitted",
-          criteria_scores: criteriaScores,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+
 
       alert("Evaluation submitted successfully!");
       setSubmittedEvaluations((prev) => ({
@@ -98,8 +87,19 @@ function WorkplaceDashboard() {
   [placementId]: true,
 }));
     } catch (error) {
-      console.error("BACKEND ERROR:", error.response?.data);
-      alert("Failed to submit: " + JSON.stringify(error.response?.data));
+      if (
+  error.response?.data?.non_field_errors &&
+  error.response.data.non_field_errors[0].includes("unique")
+) {
+  alert("Already submitted. You can edit next.");
+
+  setSubmittedEvaluations((prev) => ({
+    ...prev,
+    [placementId]: true,
+  }));
+
+  return;
+}
     }
   };
 
