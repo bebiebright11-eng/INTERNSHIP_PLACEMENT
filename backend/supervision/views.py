@@ -32,7 +32,7 @@ class WeeklyLogViewSet(viewsets.ModelViewSet):
                 placement__academic_supervisor=user
            )
 
-    #  🚫 Everyone else sees nothing
+    #   Everyone else sees nothing
         return WeeklyLog.objects.none()      
     
 
@@ -90,20 +90,55 @@ class EvaluationViewSet(viewsets.ModelViewSet):
     
     #  Workplace creates evaluation (criteria scoring)
         # 🔒 Prevent duplicate evaluation per supervisor type
-        exists = Evaluation.objects.filter(
-            placement=serializer.validated_data['placement'],
-            supervisor=user,
-            supervisor_type=serializer.validated_data['supervisor_type']
-        ).exists()
+        placement = serializer.validated_data['placement']
+        supervisor_type = serializer.validated_data['supervisor_type']
 
-        if exists:
-            raise PermissionDenied("Evaluation already exists for this type")
+        existing = Evaluation.objects.filter(
+            placement=placement,
+            supervisor=user,
+            supervisor_type=supervisor_type
+        ).first()
+
+        if existing:
+    # 🔄 Instead of blocking → update it
+            serializer.instance = existing
+            serializer.save()
+        else:
+            serializer.save(supervisor=user)
+        
 
         serializer.save(supervisor=user)
 
     def create(self, request, *args, **kwargs):
         user = request.user
-#allow both the academic and workplace supervisors
+
+        # 🔥 ALLOW ONLY workplace supervisors
+        if user.role != "workplace":
+            return Response(
+                {"error": "Only workplace supervisors can submit evaluations"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().create(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+
+    # ❌ Students cannot create
+        if user.role == "student":
+            return Response(
+                {"error": "Students cannot submit evaluations"},
+                status=status.HTTP_403_FORBIDDEN
+        )
+
+    # ❌ Admin cannot create
+        if user.role == "admin":
+            return Response(
+                {"error": "Admin cannot submit evaluations"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+    # ✅ Allow BOTH workplace & academic
         if user.role not in ["workplace", "academic"]:
             return Response(
                 {"error": "Unauthorized role"},
@@ -111,11 +146,6 @@ class EvaluationViewSet(viewsets.ModelViewSet):
             )
 
         return super().create(request, *args, **kwargs)
-
-    def perform_update(self, serializer):
-        user = self.request.user
-
-    
 
     def perform_update(self, serializer):
         user = self.request.user
