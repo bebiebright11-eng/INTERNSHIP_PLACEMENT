@@ -24,7 +24,7 @@ class CriteriaScoreSerializer(serializers.ModelSerializer):
     criteria_name = serializers.CharField(source='criteria.name', read_only=True)
     class Meta:
         model = CriteriaScore
-        fields = ['id', 'criteria_name', 'score']
+        fields = ['id','criteria', 'criteria_name', 'score']
 
 
 class EvaluationSerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
     supervisor_name = serializers.CharField(source='supervisor.username', read_only=True)
     
     # This grabs the "Readable Name" from your choices (e.g., 'Workplace Supervisor')
-    supervisor_type = serializers.CharField(source='get_supervisor_type_display', read_only=True)
+    supervisor_type = serializers.CharField()
     #  ADD THIS LINE
     supervisor = serializers.HiddenField(default=serializers.CurrentUserDefault())
     criteria_scores = CriteriaScoreSerializer(many=True)
@@ -48,6 +48,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
             'placement',
             'supervisor',
             'supervisor_type',
+            'supervisor_type_display',
             'score',
             'comments',
             'final_grade',
