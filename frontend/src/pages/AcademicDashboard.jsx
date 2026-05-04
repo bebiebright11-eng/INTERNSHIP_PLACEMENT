@@ -57,7 +57,7 @@ function AcademicDashboard() {
   };
 
   // --- Event Handlers --- 
-  
+
   const fetchLogs = async () => {
   try {
     const res = await API.get("logs/", {
@@ -127,6 +127,7 @@ function AcademicDashboard() {
     fetchPlacements();
     fetchCriteria();
     fetchEvaluations();
+    fetchLogs();
   }, []);
 
   // --- Main Render ---
@@ -139,14 +140,19 @@ function AcademicDashboard() {
         <p>No students assigned</p>
       ) : (
         placements.map((p) => {
+const studentLogs = logs[p.id] || [];
+const logCount = studentLogs.length;
+
+const countedLogs = Math.min(logCount, 8);
+const logScore = countedLogs * 2.5;
           const workplaceEval = evaluations.find(
             (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
           );
 
           return (
             <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
-              <h3>Student: {p.student}</h3>
-              <p>Organization: {p.organization}</p>
+              <h3>Student: {p.student_name}</h3>
+              <p>Organization: {p.organization_name}</p>
 
               <h4>Workplace Evaluation</h4>
               {workplaceEval ? (
@@ -158,20 +164,34 @@ function AcademicDashboard() {
                 <p>No workplace evaluation yet</p>
               )}
 
-              <h4>Academic Evaluation</h4>
-              {criteria.map((c) => (
-                <div key={c.id}>
-                  <label>
-                    {c.name} (Max: {c.max_score})
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max={c.max_score}
-                    onChange={(e) => handleScoreChange(p.id, c.id, e.target.value)}
-                  />
-                </div>
-              ))}
+<h4>Weekly Logs</h4>
+
+<p>Total Logs Submitted: {logCount}</p>
+<p>Logs Counted (Max 8): {countedLogs}</p>
+<p>Log Score: {logScore} / 20</p>
+
+<ul>
+  {studentLogs.map((log) => (
+    <li key={log.id}>
+      Week {log.week}: {log.description}
+    </li>
+  ))}
+</ul>
+
+<h4>Academic Supervisor Marks</h4>
+
+<input
+  type="number"
+  min="0"
+  max="20"
+  placeholder="Enter marks out of 20"
+  onChange={(e) =>
+    setScores((prev) => ({
+      ...prev,
+      [p.id]: parseInt(e.target.value),
+    }))
+  }
+/>
               <br />
 
               <button onClick={() => submitEvaluation(p.id)}>
