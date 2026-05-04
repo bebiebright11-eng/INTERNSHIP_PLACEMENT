@@ -272,7 +272,7 @@ function AdminDashboard() {
 return (
   <div>
     {/* MENU */}
-    <div style={{ display: 'flex' }}>
+    <div ref ={menuRef}style={{ display: 'flex',position:"relative" }}>
       <button
         onClick={() => setMenuOpen(!menuOpen)}
         style={{
@@ -306,27 +306,27 @@ return (
 
       <div
         style={menuItemStyle}
-        onClick={() => setActiveView("home")}
+        onClick={() => handleMenuClick("home")}
       >
         🏠 Home
       </div>
 
       <div
         style={menuItemStyle}
-        onClick={() => setActiveView("organizations")}
+        onClick={() => handleMenuClick("organizations")}
       >
         🏢 Organizations
       </div>
 
       <div
         style={menuItemStyle}
-        onClick={() => setActiveView("applications")}
+        onClick={() => handleMenuClick("applications")}
       >
         📝 My Applications
       </div>
       <div
         style={menuItemStyle}
-        onClick={() => setActiveView("placements")}
+        onClick={() => handleMenuClick("placements")}
       >
         📍 Placements
       </div>
