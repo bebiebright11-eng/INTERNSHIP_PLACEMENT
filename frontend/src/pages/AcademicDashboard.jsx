@@ -140,6 +140,11 @@ function AcademicDashboard() {
         <p>No students assigned</p>
       ) : (
         placements.map((p) => {
+const studentLogs = logs[p.id] || [];
+const logCount = studentLogs.length;
+
+const countedLogs = Math.min(logCount, 8);
+const logScore = countedLogs * 2.5;
           const workplaceEval = evaluations.find(
             (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
           );
