@@ -8,6 +8,7 @@ function WorkplaceDashboard() {
   const [activeEvaluation, setActiveEvaluation] = useState(null);
   const [comments, setComments] = useState({});
   const [submittedEvaluations, setSubmittedEvaluations] = useState({});
+  const [savedEvaluations, setSavedEvaluations] = useState({});
 
   // 1. Fetch Placements
   // 🔹 Fetch students assigned to this workplace supervisor
@@ -19,14 +20,18 @@ function WorkplaceDashboard() {
         },
       });
 
+      console.log("PLACEMENTS DATA:", res.data);
+
       // filter only workplace supervisor students
       const filtered = res.data.filter(
         (p) => p.workplace_supervisor === parseInt(localStorage.getItem("user_id"))
       );
 
+      console.log("FILTERED:", filtered);
+
       setPlacements(filtered);
     } catch (error) {
-      console.log(error);
+      console.log("PLACEMENT ERROR:", error);
     }
   };
 
@@ -42,9 +47,11 @@ function WorkplaceDashboard() {
         },
       });
 
+      console.log("CRITERIA:", res.data);
+
       setCriteria(res.data.filter(c => c.is_active)); // Only fetch active criterias
     } catch (error) {
-      console.log(error);
+      console.log("CRITERIA ERROR:", error);
     }
   };
 
@@ -78,6 +85,15 @@ function WorkplaceDashboard() {
         alert("Please enter scores before submitting.");
         return;
       }
+
+ // ✅ SAVE LOCALLY
+    setSavedEvaluations((prev) => ({
+      ...prev,
+      [placementId]: {
+        scores: scores[placementId],
+        comments: comments[placementId],
+      },
+    }));
 
 
 // mark as submitted
@@ -130,6 +146,7 @@ alert("Evaluation submitted successfully!");
     <p style={{ color: "green", fontWeight: "bold" }}>
       ✅ Evaluation Submitted
     </p>
+  
 
     <button
   onClick={() => {
@@ -137,6 +154,21 @@ alert("Evaluation submitted successfully!");
       ...prev,
       [p.id]: false,
     }));
+
+    // ✅ LOAD PREVIOUS DATA
+    const saved = savedEvaluations[p.id];
+    if (saved) {
+      setScores((prev) => ({
+        ...prev,
+        [p.id]: saved.scores,
+      }));
+
+      setComments((prev) => ({
+        ...prev,
+        [p.id]: saved.comments,
+      }));
+    }
+
     setActiveEvaluation(p.id);
   }}
 >
@@ -205,7 +237,8 @@ alert("Evaluation submitted successfully!");
                   </button>
 
                 </div>
-              )}  
+              )} 
+             
             </div>
           ))}
         </div>
