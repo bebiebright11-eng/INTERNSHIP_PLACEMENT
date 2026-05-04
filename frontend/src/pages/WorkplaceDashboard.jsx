@@ -140,6 +140,7 @@ alert("Evaluation submitted successfully!");
     <p style={{ color: "green", fontWeight: "bold" }}>
       ✅ Evaluation Submitted
     </p>
+  
 
     <button
   onClick={() => {
@@ -147,6 +148,21 @@ alert("Evaluation submitted successfully!");
       ...prev,
       [p.id]: false,
     }));
+
+    // ✅ LOAD PREVIOUS DATA
+    const saved = savedEvaluations[p.id];
+    if (saved) {
+      setScores((prev) => ({
+        ...prev,
+        [p.id]: saved.scores,
+      }));
+
+      setComments((prev) => ({
+        ...prev,
+        [p.id]: saved.comments,
+      }));
+    }
+
     setActiveEvaluation(p.id);
   }}
 >
