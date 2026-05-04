@@ -90,36 +90,26 @@ function AcademicDashboard() {
     }));
   };
 
-  const submitEvaluation = async (placementId) => {
-    try {
-      const criteriaScores = Object.entries(scores[placementId] || {}).map(
-        ([criteriaId, score]) => ({
-          criteria: parseInt(criteriaId),
-          score: score,
-        })
-      );
-
-      await API.post(
-        "supervision/evaluations/",
-        {
-          placement: placementId,
-          supervisor_type: "academic",
-          comments: "Final academic evaluation",
-          criteria_scores: criteriaScores,
+const submitEvaluation = async (placementId) => {
+  try {
+    await API.post(
+      "supervision/final-evaluation/",
+      {
+        placement: placementId,
+        academic_score: scores[placementId],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      }
+    );
 
-      alert("Final Evaluation submitted!");
-    } catch (error) {
-      console.log(error.response?.data);
-      alert(JSON.stringify(error.response?.data));
-    }
-  };
+    alert("Final evaluation submitted!");
+  } catch (error) {
+    console.log(error.response?.data);
+  }
+};
 
   // --- Lifecycle ---
 
