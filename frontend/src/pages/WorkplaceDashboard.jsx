@@ -7,6 +7,7 @@ function WorkplaceDashboard() {
   const [scores, setScores] = useState({});
   const [activeEvaluation, setActiveEvaluation] = useState(null);
   const [comments, setComments] = useState({});
+  const [submittedEvaluations, setSubmittedEvaluations] = useState({});
 
   // 1. Fetch Placements
   // 🔹 Fetch students assigned to this workplace supervisor
