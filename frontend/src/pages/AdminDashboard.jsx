@@ -98,7 +98,7 @@ function AdminDashboard() {
 
   const fetchOrganizations = async () => {
     try {
-      const res = await API.get("organizations/");
+      const res = await API.get("internships/organization/");
       setOrganizations(res.data);
     } catch (error) {
       console.log(error);
@@ -140,7 +140,7 @@ function AdminDashboard() {
     }
 
     try {
-      const res = await API.post("organizations/", orgForm);
+      const res = await API.post("internships/organizations/", orgForm);
 
       setOrganizations((prev) => [...prev, res.data]);
 
@@ -878,10 +878,10 @@ return (
                 width: "100%",
                 maxWidth: "600px",
                 margin: "0 auto 20px",
-                border: "1px solid #ddd",
+                border: "1px solid #05072c",
                 padding: "15px",
                 borderRadius: "10px",
-                background: "#fff",
+                background: "#b8bfe179",
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                 textAlign: "left",
               }}
