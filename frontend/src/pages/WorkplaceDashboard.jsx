@@ -139,7 +139,7 @@ alert("Evaluation submitted successfully!");
 
 
               {/* ✅ SHOW FORM ONLY WHEN CLICKED */}
-              {activeEvaluation === p.id && (
+              {activeEvaluation === p.id && !submittedEvaluations[p.id] &&(
                 <div style={{ marginTop: "10px" }}>
 
                   {/* TABLE */}
