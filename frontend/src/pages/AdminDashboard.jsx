@@ -272,7 +272,7 @@ function AdminDashboard() {
 return (
   <div>
     {/* MENU */}
-    <div style={{ display: 'flex' }}>
+    <div ref ={menuRef}style={{ display: 'flex',position:"relative" }}>
       <button
         onClick={() => setMenuOpen(!menuOpen)}
         style={{
