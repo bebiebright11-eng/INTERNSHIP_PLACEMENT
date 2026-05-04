@@ -145,6 +145,12 @@ const logCount = studentLogs.length;
 
 const countedLogs = Math.min(logCount, 8);
 const logScore = countedLogs * 2.5;
+
+const workplaceScore = workplaceEval?.score || 0;
+const academicScore = scores[p.id] || 0;
+
+const finalScore = workplaceScore + logScore + academicScore;
+
           const workplaceEval = evaluations.find(
             (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
           );
