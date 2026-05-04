@@ -80,6 +80,15 @@ function WorkplaceDashboard() {
         return;
       }
 
+ // ✅ SAVE LOCALLY
+    setSavedEvaluations((prev) => ({
+      ...prev,
+      [placementId]: {
+        scores: scores[placementId],
+        comments: comments[placementId],
+      },
+    }));
+
 
 // mark as submitted
 setSubmittedEvaluations((prev) => ({
