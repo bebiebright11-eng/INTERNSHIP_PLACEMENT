@@ -57,7 +57,7 @@ function AcademicDashboard() {
   };
 
   // --- Event Handlers --- 
-  
+
   const fetchLogs = async () => {
   try {
     const res = await API.get("logs/", {
@@ -127,6 +127,7 @@ function AcademicDashboard() {
     fetchPlacements();
     fetchCriteria();
     fetchEvaluations();
+    fetchLogs();
   }, []);
 
   // --- Main Render ---
