@@ -93,6 +93,10 @@ function WorkplaceDashboard() {
       );
 
       alert("Evaluation submitted successfully!");
+      setSubmittedEvaluations((prev) => ({
+  ...prev,
+  [placementId]: true,
+}));
     } catch (error) {
       console.error("BACKEND ERROR:", error.response?.data);
       alert("Failed to submit: " + JSON.stringify(error.response?.data));
