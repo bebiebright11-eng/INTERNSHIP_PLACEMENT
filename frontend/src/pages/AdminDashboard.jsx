@@ -267,16 +267,24 @@ function AdminDashboard() {
   border: "1px solid #eee",
   borderTop: "5px solid #480303"
 };
+  const dropdownStyle = {
+  border: "1px solid #1e0707",
+  maxHeight: "120px",
+  overflowY: "auto",
+  background: "#e5bc91",
+  position: "absolute",
+  zIndex: 1000,
+}; 
 
 
 return (
   <div>
     {/* MENU */}
-    <div ref ={menuRef}style={{ display: 'flex',position:"relative" }}>
+    <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
       <button
         onClick={() => setMenuOpen(!menuOpen)}
         style={{
-          fontsize : '24px',
+          fontSize : '24px',
           background: "none",
           border: "none",
           cursor: "pointer",
@@ -446,7 +454,7 @@ return (
  
   <h2>Global Evaluation Criteria (Admin only)</h2>
 
-  <table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginleft: "30px" }}>
+  <table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginLeft: "30px" }}>
     <thead>
       <tr>
         <th>Criteria</th>
@@ -834,201 +842,230 @@ return (
       
 
 
-{activeView === "placements" && ( 
+{activeView === "placements" && (
   <>
-          <h2>Placements</h2>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "100%",
+        textAlign: "center",
+      }}
+    >
+      <h2>Placements</h2>
 
       {placements.length === 0 ? (
         <p>No placements yet</p>
       ) : (
         placements.map((p) => {
-          // 🔥 filter supervisors per placement
-        const workplaceSupervisors = supervisors.filter(
-          (u) => u.role === "workplace" && u.organization === p.organization
-        );
 
-        const academicSupervisors = supervisors.filter(
-          (u) => u.role === "academic"
-        );
-        return(
-          <div key={p.id}>
-    <p><strong>Student:</strong> {p.student_name}</p>
-    <p><strong>Organization:</strong> {p.organization_name}</p>
-    <p><strong>Start Date:</strong> {p.start_date || "Not set"}</p>
-    <p><strong>End Date:</strong> {p.end_date || "Not set"}</p>
+          // 🔥 FILTER SUPERVISORS (IMPORTANT — KEEP THIS)
+          const workplaceSupervisors = supervisors.filter(
+            (u) =>
+              u.role === "workplace" &&
+              u.organization === p.organization
+          );
 
-    {/* ✅ SHOW FINAL STATE */}
-    {p.is_fully_assigned ? (
-      <>
-        <p><strong>Status:</strong> {p.status}</p>
+          const academicSupervisors = supervisors.filter(
+            (u) => u.role === "academic"
+          );
 
-        <p><strong>Workplace Supervisor:</strong> {p.workplace_supervisor_name}</p>
-        <p><strong>Academic Supervisor:</strong> {p.academic_supervisor_name}</p>
+          return (
+            <div
+              key={p.id}
+              style={{
+                width: "100%",
+                maxWidth: "600px",
+                margin: "0 auto 20px",
+                border: "1px solid #ddd",
+                padding: "15px",
+                borderRadius: "10px",
+                background: "#fff",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                textAlign: "left",
+              }}
+            >
+              <p><strong>Student:</strong> {p.student_name}</p>
+              <p><strong>Organization:</strong> {p.organization_name}</p>
+              <p><strong>Start Date:</strong> {p.start_date || "Not set"}</p>
+              <p><strong>End Date:</strong> {p.end_date || "Not set"}</p>
 
-        <p style={{ color: "green", fontWeight: "bold" }}>
-          ✅ Placement Confirmed
-        </p>
-      </>
-    ) : (
-      <>
-        {/* 🔧 EDIT MODE (ONLY BEFORE ASSIGNMENT) */}
+              {/* ✅ IF FULLY ASSIGNED */}
+              {p.is_fully_assigned ? (
+                <>
+                  <p><strong>Status:</strong> {p.status}</p>
+                  <p><strong>Workplace Supervisor:</strong> {p.workplace_supervisor_name}</p>
+                  <p><strong>Academic Supervisor:</strong> {p.academic_supervisor_name}</p>
 
-        <br />
+                  <p style={{ color: "green", fontWeight: "bold" }}>
+                    ✅ Placement Confirmed
+                  </p>
+                </>
+              ) : (
+                <>
+                  {/* 🔧 DATE FIELDS */}
+                  <input
+                    type="date"
+                    defaultValue={p.start_date || ""}
+                    onBlur={async (e) => {
+                      await API.patch(`internships/placements/${p.id}/`, {
+                        start_date: e.target.value,
+                      });
+                      fetchPlacements();
+                    }}
+                  />
 
-        <input
-          type="date"
-          defaultValue={p.start_date || ""}
-          onBlur={async (e) => {
-            try {
-              await API.patch(`internships/placements/${p.id}/`, {
-                start_date: e.target.value,
-              });
-              fetchPlacements();
-            } catch (err) {
-              alert("Failed to update start date");
-            }
-          }}
-        />
+                  <br /><br />
 
-        <br /><br />
+                  <input
+                    type="date"
+                    defaultValue={p.end_date || ""}
+                    onBlur={async (e) => {
+                      await API.patch(`internships/placements/${p.id}/`, {
+                        end_date: e.target.value,
+                      });
+                      fetchPlacements();
+                    }}
+                  />
 
-        <input
-          type="date"
-          defaultValue={p.end_date || ""}
-          onBlur={async (e) => {
-            try {
-              await API.patch(`internships/placements/${p.id}/`, {
-                end_date: e.target.value,
-              });
-              fetchPlacements();
-            } catch (err) {
-              alert("Failed to update end date");
-            }
-          }}
-        />
- 
-        <br /><br />
+                  <br /><br />
 
-        {/* 🔍 WORKPLACE SEARCH */}
-  <input
-    type="text"
-    placeholder="Search workplace supervisor"
-    value={selectedSupervisors[p.id]?.workplace_search || ""}
-    onFocus={() =>
-      setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
-    }
-    onChange={(e) => {
-      handleSupervisorChange(p.id, "workplace_search", e.target.value);
-      setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
-    }}
-  />
+                  {/* 🔍 WORKPLACE SEARCH */}
+                  <input
+                    type="text"
+                    placeholder="Search workplace supervisor"
+                    value={selectedSupervisors[p.id]?.workplace_search || ""}
+                    onFocus={() =>
+                      setShowDropdown((prev) => ({
+                        ...prev,
+                        [p.id]: "workplace",
+                      }))
+                    }
+                    onChange={(e) => {
+                      handleSupervisorChange(p.id, "workplace_search", e.target.value);
+                      setShowDropdown((prev) => ({
+                        ...prev,
+                        [p.id]: "workplace",
+                      }));
+                    }}
+                  />
 
-  {/* ✅ DROPDOWN */}
-  {showDropdown[p.id] && (
-    <div style={{
-      border: "1px solid #ccc",
-      maxHeight: "120px",
-      overflowY: "auto",
-      background: "#fff"
-    }}>
-      {workplaceSupervisors
-        .filter((u) => {
-          const search = selectedSupervisors[p.id]?.workplace_search || "";
-          return u.username.toLowerCase().includes(search.toLowerCase());
+                  {showDropdown[p.id] === "workplace" && (
+                    <div style={dropdownStyle}>
+                      {workplaceSupervisors
+                        .filter((u) =>
+                          u.username
+                            .toLowerCase()
+                            .includes(
+                              (selectedSupervisors[p.id]?.workplace_search || "")
+                                .toLowerCase()
+                            )
+                        )
+                        .map((u) => (
+                          <div
+                            key={u.id}
+                            onClick={() => {
+                              handleSupervisorChange(p.id, "workplace", u.id);
+                              handleSupervisorChange(
+                                p.id,
+                                "workplace_search",
+                                u.username
+                              );
+
+                              setShowDropdown((prev) => ({
+                                ...prev,
+                                [p.id]: null,
+                              }));
+                            }}
+                            style={{ padding: "5px", cursor: "pointer" }}
+                          >
+                            {u.username}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
+                  <br /><br />
+
+                  {/* 🔍 ACADEMIC SEARCH */}
+                  <input
+                    type="text"
+                    placeholder="Search academic supervisor"
+                    value={selectedSupervisors[p.id]?.academic_search || ""}
+                    onFocus={() =>
+                      setShowDropdown((prev) => ({
+                        ...prev,
+                        [p.id]: "academic",
+                      }))
+                    }
+                    onChange={(e) => {
+                      handleSupervisorChange(p.id, "academic_search", e.target.value);
+                      setShowDropdown((prev) => ({
+                        ...prev,
+                        [p.id]: "academic",
+                      }));
+                    }}
+                  />
+
+                  {showDropdown[p.id] === "academic" && (
+                    <div style={dropdownStyle}>
+                      {academicSupervisors
+                        .filter((u) =>
+                          u.username
+                            .toLowerCase()
+                            .includes(
+                              (selectedSupervisors[p.id]?.academic_search || "")
+                                .toLowerCase()
+                            )
+                        )
+                        .map((u) => (
+                          <div
+                            key={u.id}
+                            onClick={() => {
+                              handleSupervisorChange(p.id, "academic", u.id);
+                              handleSupervisorChange(
+                                p.id,
+                                "academic_search",
+                                u.username
+                              );
+
+                              setShowDropdown((prev) => ({
+                                ...prev,
+                                [p.id]: null,
+                              }));
+                            }}
+                            style={{ padding: "5px", cursor: "pointer" }}
+                          >
+                            {u.username}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
+                  <br /><br />
+
+                  <button
+                    onClick={() =>
+                      assignSupervisors(
+                        p.id,
+                        selectedSupervisors[p.id]?.workplace,
+                        selectedSupervisors[p.id]?.academic
+                      )
+                    }
+                  >
+                    Assign Supervisors
+                  </button>
+                </>
+              )}
+            </div>
+          );
         })
-        .map((u) => (
-          <div
-            key={u.id}
-            onClick={() => {
-              handleSupervisorChange(p.id, "workplace", u.id);
-              handleSupervisorChange(p.id, "workplace_search", u.username);
-
-              setShowDropdown((prev) => ({
-                ...prev,
-                [p.id]: false,
-              }));
-            }}
-            style={{ padding: "5px", cursor: "pointer" }}
-          >
-            {u.username}
-          </div>
-        ))}
+      )}
     </div>
-  )}
-
-
-        <br /><br />
-
-        {/* 🔍 ACADEMIC SEARCH */}
-  <input
-    type="text"
-    placeholder="Search academic supervisor"
-    value={selectedSupervisors[p.id]?.academic_search || ""}
-    onFocus={() =>
-      setShowDropdown((prev) => ({ ...prev, [p.id]: true }))
-    }
-    onChange={(e) => {
-      handleSupervisorChange(p.id, "academic_search", e.target.value);
-      setShowDropdown((prev) => ({ ...prev, [p.id]: true }));
-    }}
-  />
-
-  {showDropdown[p.id] && (
-    <div style={{
-      border: "1px solid #ccc",
-      maxHeight: "120px",
-      overflowY: "auto",
-      background: "#fff"
-    }}>
-      {academicSupervisors
-        .filter((u) => {
-          const search = selectedSupervisors[p.id]?.academic_search || "";
-          return u.username.toLowerCase().includes(search.toLowerCase());
-        })
-        .map((u) => (
-          <div
-            key={u.id}
-            onClick={() => {
-              handleSupervisorChange(p.id, "academic", u.id);
-              handleSupervisorChange(p.id, "academic_search", u.username);
-
-              setShowDropdown((prev) => ({
-                ...prev,
-                [p.id]: false,
-              }));
-            }}
-            style={{ padding: "5px", cursor: "pointer" }}
-          >
-            {u.username}
-          </div>
-        ))}
-    </div>
-  )}
-
-        <br /><br />
-
-        
-        <button
-          onClick={() =>
-            assignSupervisors(
-              p.id,
-              selectedSupervisors[p.id]?.workplace,
-              selectedSupervisors[p.id]?.academic
-            )
-          }
-        >
-          Assign Supervisors
-        </button>
-      </>
-    )}
-  </div>
-        
-
-        );
-      })
-    )}
-  </>  
-)}      
+  </>
+)}
+   
     </div>    
   </div>
 );
