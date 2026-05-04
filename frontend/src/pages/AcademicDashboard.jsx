@@ -146,14 +146,17 @@ const logCount = studentLogs.length;
 const countedLogs = Math.min(logCount, 8);
 const logScore = countedLogs * 2.5;
 
-const workplaceScore = workplaceEval?.score || 0;
-const academicScore = scores[p.id] || 0;
 
-const finalScore = workplaceScore + logScore + academicScore;
+
 
           const workplaceEval = evaluations.find(
             (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
           );
+
+            
+          const workplaceScore = workplaceEval?.score || 0;
+          const academicScore = scores[p.id] || 0;
+          const finalScore = workplaceScore + logScore + academicScore;
 
           return (
             <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
@@ -198,11 +201,15 @@ const finalScore = workplaceScore + logScore + academicScore;
     }))
   }
 />
+
+
+
+
               <br />
 
               <button onClick={() => submitEvaluation(p.id)}>
                 Submit Final Evaluation
-              </button>
+              </button> 
             </div>
           );
         })
