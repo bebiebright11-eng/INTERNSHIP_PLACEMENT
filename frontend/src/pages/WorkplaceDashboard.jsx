@@ -204,6 +204,7 @@ alert("Evaluation submitted successfully!");
                               type="number"
                               min="0"
                               max={c.max_score}
+                              value={scores[p.id]?.[c.id] || ""}
                               onChange={(e) =>
                                 handleScoreChange(p.id, c.id, e.target.value)
                               }
