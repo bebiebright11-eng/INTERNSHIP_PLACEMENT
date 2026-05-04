@@ -117,9 +117,22 @@ function WorkplaceDashboard() {
               <h3>Student: {p.student_name}</h3>
               <p><strong>Organization:</strong> {p.organization_name}</p>
               {/* ✅ BUTTON */}
-              <button onClick={() => setActiveEvaluation(p.id)}>
-  Add Evaluation
-              </button>
+{!submittedEvaluations[p.id] ? (
+  <button onClick={() => setActiveEvaluation(p.id)}>
+    Add Evaluation
+  </button>
+) : (
+  <>
+    <p style={{ color: "green", fontWeight: "bold" }}>
+      ✅ Evaluation Submitted
+    </p>
+
+    <button onClick={() => setActiveEvaluation(p.id)}>
+      Edit Evaluation
+    </button>
+  </>
+)}
+
 
               {/* ✅ SHOW FORM ONLY WHEN CLICKED */}
               {activeEvaluation === p.id && (
