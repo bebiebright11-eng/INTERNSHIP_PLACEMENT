@@ -178,20 +178,20 @@ const logScore = countedLogs * 2.5;
   ))}
 </ul>
 
-              <h4>Academic Evaluation</h4>
-              {criteria.map((c) => (
-                <div key={c.id}>
-                  <label>
-                    {c.name} (Max: {c.max_score})
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max={c.max_score}
-                    onChange={(e) => handleScoreChange(p.id, c.id, e.target.value)}
-                  />
-                </div>
-              ))}
+<h4>Academic Supervisor Marks</h4>
+
+<input
+  type="number"
+  min="0"
+  max="20"
+  placeholder="Enter marks out of 20"
+  onChange={(e) =>
+    setScores((prev) => ({
+      ...prev,
+      [p.id]: parseInt(e.target.value),
+    }))
+  }
+/>
               <br />
 
               <button onClick={() => submitEvaluation(p.id)}>
