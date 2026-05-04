@@ -61,11 +61,12 @@ function AcademicDashboard() {
 
   const fetchLogs = async () => {
   try {
-    const res = await API.get("logs/", {
+    const res = await API.get("supervision/weeklylogs/", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+
 
     const grouped = {};
 
