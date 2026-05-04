@@ -164,6 +164,20 @@ const logScore = countedLogs * 2.5;
                 <p>No workplace evaluation yet</p>
               )}
 
+<h4>Weekly Logs</h4>
+
+<p>Total Logs Submitted: {logCount}</p>
+<p>Logs Counted (Max 8): {countedLogs}</p>
+<p>Log Score: {logScore} / 20</p>
+
+<ul>
+  {studentLogs.map((log) => (
+    <li key={log.id}>
+      Week {log.week}: {log.description}
+    </li>
+  ))}
+</ul>
+
               <h4>Academic Evaluation</h4>
               {criteria.map((c) => (
                 <div key={c.id}>
