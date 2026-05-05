@@ -137,7 +137,7 @@ alert("Evaluation submitted successfully!");
     color: "#fff"
   }}>
     <div>
-      <h2 style={{ margin: 0 }}>Dashboard</h2>
+      <h1 style={{ margin: 0 }}>Workplace Supervisor Dashboard</h1>
       <small>Welcome User</small>
     </div>
 
