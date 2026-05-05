@@ -6,10 +6,13 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();  
 
   const handleLogin = async (e) => {
    if (e) e.preventDefault();
+   setLoading(true);
+   setError("");
 
    try{
     const res = await API.post("accounts/login/", {
@@ -27,16 +30,20 @@ function Login() {
     console.log("STORED:", localStorage.getItem("access"));
     
 
-    alert("SUCCESS: Logged in as " + res.data.role);
+
 
     const role = res.data.role.toLowerCase();
     if (role === "student") {
+      setLoading(false);
       navigate("/student");
     } else if (role === "admin") {
+      setLoading(false);
       navigate("/admin");
     } else if (role === "workplace") {
+      setLoading(false);
       navigate("/workplace");
     } else if (role === "academic") {
+      setLoading(false);
       navigate("/academic");
     } else {
       alert("Unknown role: " + role);
@@ -50,7 +57,7 @@ function Login() {
      } else {
        setError("Network error. Please try again.");
      }
-     console.log(error);
+     setLoading(false);
    }
     
   }; 
@@ -84,7 +91,9 @@ function Login() {
           required
         />
         <br /><br />
-<button type="submit">Login</button>
+<button type="submit" disabled={loading}>
+  {loading ? "Logging in..." : "Login"}
+</button>
 
 <p>
   Don't have an account?{" "}
