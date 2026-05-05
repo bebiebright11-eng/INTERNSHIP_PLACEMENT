@@ -9,6 +9,8 @@ function WorkplaceDashboard() {
   const [comments, setComments] = useState({});
   const [submittedEvaluations, setSubmittedEvaluations] = useState({});
   const [savedEvaluations, setSavedEvaluations] = useState({});
+  const [showMenu, setShowMenu] = useState(false);
+  const [activePage, setActivePage] = useState("home");
 
   // 1. Fetch Placements
   // 🔹 Fetch students assigned to this workplace supervisor
@@ -71,11 +73,11 @@ function WorkplaceDashboard() {
     }));
   };
 
-  // 4. Submit Evaluation
+   // 4. Submit Evaluation
   const submitEvaluation = async (placementId) => {
     try {
       const criteriaScores = Object.entries(scores[placementId] || {}).map(
-        ([criteriaId, score]) => ({ 
+        ([criteriaId, score]) => ({
           criteria: parseInt(criteriaId),
           score: score,
         })
@@ -86,21 +88,22 @@ function WorkplaceDashboard() {
         return;
       }
 
-setSavedEvaluations((prev) => ({
-  ...prev,
-  [placementId]: {
-    scores: scores[placementId],
-    comments: comments[placementId],
-  }
-}))
+     // ✅ SAVE LOCALLY
+    setSavedEvaluations((prev) => ({
+      ...prev,
+      [placementId]: {
+        scores: scores[placementId],
+        comments: comments[placementId],
+      },
+    }));
 
 // mark as submitted
 setSubmittedEvaluations((prev) => ({
   ...prev,
   [placementId]: true,
-}));
+})); 
 
-// close the form
+  // close the form
 setActiveEvaluation(null);
 
 alert("Evaluation submitted successfully!");
@@ -115,15 +118,45 @@ alert("Evaluation submitted successfully!");
     ...prev,
     [placementId]: true,
   }));
-
-  return;
+   return;
 }
     }
   };
 
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Workplace Supervisor Dashboard</h1>
+   <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
+
+  {/* 🔷 HEADER */}
+  <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "15px",
+    backgroundColor: "#2c3e50",
+    color: "#fff"
+  }}>
+    <div>
+      <h1 style={{ margin: 0 }}>Workplace Supervisor Dashboard</h1>
+      <small>Welcome User</small>
+    </div>
+
+    <button
+      onClick={() => setShowMenu(!showMenu)}
+      style={{
+        fontSize: "20px",
+        background: "none",
+        border: "none",
+        color: "#fff",
+        cursor: "pointer"
+      }}
+    >
+      ☰
+    </button>
+  </div>
+
+  {/* 🔷 CONTENT */}
+  <div style={{ padding: "20px" }}></div>
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
