@@ -156,7 +156,10 @@ alert("Evaluation submitted successfully!");
   </div>
 
   {/* 🔷 CONTENT */}
-  <div style={{ padding: "20px" }}></div>
+  
+  <div style={{display: "flex"}}>
+
+    <div style={{flex: 1, padding: "20px"}}>
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
@@ -185,6 +188,7 @@ alert("Evaluation submitted successfully!");
       ...prev,
       [p.id]: false,
     }));
+    
 
     // ✅ LOAD PREVIOUS DATA
     const saved = savedEvaluations[p.id];
@@ -275,6 +279,23 @@ alert("Evaluation submitted successfully!");
           ))}
         </div>
       )}
+        </div>
+
+  {/* SIDEBAR (CORRECT POSITION) */}
+  {showMenu && (
+    <div style={{
+      width: "200px",
+      backgroundColor: "#34495e",
+      color: "#fff",
+      padding: "15px"
+    }}>
+      <p onClick={() => setActivePage("home")}>Home</p>
+      <p onClick={() => setActivePage("students")}>My Students</p>
+      <p onClick={() => setActivePage("evaluations")}>My Evaluations</p>
+    </div>
+  )}
+
+</div>
     </div>
   );
 }
