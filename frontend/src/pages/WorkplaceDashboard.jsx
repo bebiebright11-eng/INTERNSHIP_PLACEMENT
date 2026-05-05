@@ -11,6 +11,9 @@ function WorkplaceDashboard() {
   const [savedEvaluations, setSavedEvaluations] = useState({});
   const [showMenu, setShowMenu] = useState(false);
   const [activePage, setActivePage] = useState("home");
+  const assignedCount = placements.length;
+  const evaluatedCount = Object.keys(submittedEvaluations).length;
+  const pendingCount = assignedCount - evaluatedCount;
 
   // 1. Fetch Placements
   // 🔹 Fetch students assigned to this workplace supervisor
@@ -123,6 +126,14 @@ alert("Evaluation submitted successfully!");
     }
   };
 
+  const renderHome = () => {
+  return (
+    <div>
+      <h2>Home</h2>
+    </div>
+  );
+};
+
 
   return (
    <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
@@ -172,6 +183,53 @@ alert("Evaluation submitted successfully!");
   <div style={{display: "flex"}}>
 
     <div style={{flex: 1, padding: "20px"}}>
+
+       {/* HOME DASHBOARD CARDS (STEP 3 GOES HERE) */}
+    {activePage === "home" && (
+      <div>
+
+        {/* SUMMARY CARDS */}
+        <div style={{
+          display: "flex",
+          gap: "15px",
+          marginBottom: "20px"
+        }}>
+
+          <div style={{
+            flex: 1,
+            padding: "15px",
+            background: "#fff",
+            borderRadius: "8px"
+          }}>
+            <h3>Assigned Students</h3>
+            <h2>{assignedCount}</h2>
+          </div>
+
+          <div style={{
+            flex: 1,
+            padding: "15px",
+            background: "#fff",
+            borderRadius: "8px"
+          }}>
+            <h3>Evaluated</h3>
+            <h2>{evaluatedCount}</h2>
+          </div>
+
+          <div style={{
+            flex: 1,
+            padding: "15px",
+            background: "#fff",
+            borderRadius: "8px"
+          }}>
+            <h3>Pending</h3>
+            <h2>{pendingCount}</h2>
+          </div>
+
+        </div>
+
+      </div>
+    )}
+
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
