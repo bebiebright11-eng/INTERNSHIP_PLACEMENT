@@ -140,7 +140,8 @@ alert("Evaluation submitted successfully!");
       <h1 style={{ margin: 0 }}>Workplace Supervisor Dashboard</h1>
       <small>Welcome User</small>
     </div>
-
+{/* MENU BUTTON MOVED BELOW TEXT */}
+  <div style={{ marginTop: "10px" }}>
     <button
       onClick={() => setShowMenu(!showMenu)}
       style={{
@@ -153,6 +154,8 @@ alert("Evaluation submitted successfully!");
     >
       ☰
     </button>
+  </div>
+
   </div>
 
   {/* 🔷 CONTENT */}
