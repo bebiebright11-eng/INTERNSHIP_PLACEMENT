@@ -1,14 +1,41 @@
 import { useState } from "react";
+import API from "../api";
+import { useNavigate } from "react-router-dom";
 
 function ActivateAccount() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+
+
+  const handleActivate = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await API.post("accounts/activate/", {
+      username: username,
+      password: password,
+    });
+
+    alert("Account activated successfully");
+
+    navigate("/login");
+
+  } catch (error) {
+    if (error.response) {
+      alert(JSON.stringify(error.response.data));
+    } else {
+      alert("Network error");
+    }
+  }
+};
 
   return (
     <div style={{ padding: "40px" }}>
       <h2>Activate Account</h2>
 
-      <form>
+      <form onSubmit={handleActivate}>
         <input
           type="text"
           placeholder="Enter Registration Number or Email"
