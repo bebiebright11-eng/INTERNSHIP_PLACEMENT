@@ -5,6 +5,7 @@ import API from "../api";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();  
 
   const handleLogin = async (e) => {
@@ -45,9 +46,9 @@ function Login() {
 
    } catch (error) {
      if (error.response) {
-       alert("DJANGO ERROR: " + JSON.stringify(error.response.data));
+       setError("Invalid credentials or account not activated");
      } else {
-       alert("NETWORK ERROR: 1. Restart Vite terminal. 2. Ensure Django is running.");
+       setError("Network error. Please try again.");
      }
      console.log(error);
    }
@@ -59,6 +60,11 @@ function Login() {
   return (
     <div style={{ padding: "40px" }}>
       <h2>Login</h2>
+{error && (
+  <p style={{ color: "red" }}>
+    {error}
+  </p>
+)}
       <form onSubmit={handleLogin}>
         <input
           type="text"
