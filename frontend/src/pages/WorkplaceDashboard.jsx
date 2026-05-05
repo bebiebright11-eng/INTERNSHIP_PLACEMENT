@@ -173,7 +173,7 @@ alert("Evaluation submitted successfully!");
       cursor: "pointer"
     }}
   >
-    ☰
+    ☰Menu
   </button>
 </div>
  
@@ -250,6 +250,17 @@ alert("Evaluation submitted successfully!");
     <p style={{ color: "green", fontWeight: "bold" }}>
       ✅ Evaluation Submitted
     </p>
+        {/* NOTES SECTION */}
+    <div style={{ marginTop: "30px" }}>
+      <h4>Important Notes</h4>
+      <textarea
+        placeholder="Write important notes..."
+        style={{ width: "100%", height: "100px" }}
+      />
+    </div>
+
+  
+
   
 
     <button
