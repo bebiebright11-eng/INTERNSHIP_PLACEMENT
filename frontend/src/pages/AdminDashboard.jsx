@@ -98,7 +98,7 @@ function AdminDashboard() {
 
   const fetchOrganizations = async () => {
     try {
-      const res = await API.get("internships/organization/");
+      const res = await API.get("internships/organizations/");
       setOrganizations(res.data);
     } catch (error) {
       console.log(error);
@@ -174,7 +174,7 @@ function AdminDashboard() {
 
   const saveEdit = async (id) => {
     try {
-      const res = await API.patch(`organizations/${id}/`, editForm);
+      const res = await API.patch(`internships/organizations/${id}/`, editForm);
 
       setOrganizations((prev) =>
         prev.map((org) => (org.id === id ? res.data : org))
@@ -193,7 +193,7 @@ function AdminDashboard() {
     if (!confirmDelete) return;
 
     try {
-      await API.delete(`organizations/${id}/`);
+      await API.delete(`internships/organizations/${id}/`);
 
       setOrganizations((prev) =>
         prev.filter((org) => org.id !== id)

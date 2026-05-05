@@ -16,9 +16,15 @@ function Login() {
       password: password,
     });
 
-    localStorage.setItem("token", res.data.access);
-    localStorage.setItem("role", res.data.role);
-    localStorage.setItem("user_id", res.data.user_id); 
+    console.log("FULL RESPONSE:", res.data);
+    console.log("ACCESS FIELD:", res.data.access);
+    console.log("TOKEN FIELD:", res.data.token);
+
+    localStorage.setItem("access", res.data.access);
+    
+
+    console.log("STORED:", localStorage.getItem("access"));
+    
 
     alert("SUCCESS: Logged in as " + res.data.role);
 
@@ -55,8 +61,8 @@ function Login() {
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
-          type="password"
-          name="password"
+          type="text"
+          name="username"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
