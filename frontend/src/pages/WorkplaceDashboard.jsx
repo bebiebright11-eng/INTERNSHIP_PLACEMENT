@@ -241,6 +241,7 @@ alert("Evaluation submitted successfully!");
               <h3>Student: {p.student_name}</h3>
               <p><strong>Organization:</strong> {p.organization_name}</p>
               {/* ✅ BUTTON */}
+              
 
 
 {!submittedEvaluations[p.id] ? (
@@ -261,14 +262,6 @@ alert("Evaluation submitted successfully!");
       [p.id]: false,
     }));
     
-    {/* ✅ NOTES SECTION (CORRECT POSITION) */}
-<div style={{ marginTop: "30px" }}>
-  <h4>Important Notes</h4>
-  <textarea
-    placeholder="Only assigned students should be evaluated..."
-    style={{ width: "100%", height: "100px" }}
-  />
-</div>
 
     // ✅ LOAD PREVIOUS DATA
     const saved = savedEvaluations[p.id];
