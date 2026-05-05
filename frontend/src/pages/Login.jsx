@@ -25,10 +25,9 @@ function Login() {
     console.log("TOKEN FIELD:", res.data.token);
 
     localStorage.setItem("access", res.data.access);
-    
-
     console.log("STORED:", localStorage.getItem("access"));
-    
+    localStorage.setItem("first_name", res.data.first_name);
+    localStorage.setItem("last_name", res.data.last_name);
 
 
 
