@@ -128,35 +128,44 @@ alert("Evaluation submitted successfully!");
    <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
 
   {/* 🔷 HEADER */}
-  <div style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px",
-    backgroundColor: "#2c3e50",
-    color: "#fff"
-  }}>
-    <div>
-      <h1 style={{ margin: 0 }}>Workplace Supervisor Dashboard</h1>
-      <small>Welcome User</small>
-    </div>
-{/* MENU BUTTON MOVED BELOW TEXT */}
-  <div style={{ marginTop: "10px" }}>
-    <button
-      onClick={() => setShowMenu(!showMenu)}
-      style={{
-        fontSize: "20px",
-        background: "none",
-        border: "none",
-        color: "#fff",
-        cursor: "pointer"
-      }}
-    >
-      ☰
-    </button>
-  </div>
+  {/* HEADER TITLE ONLY */}
+<div style={{
+  padding: "15px",
+  backgroundColor: "#2c3e50",
+  color: "#fff"
+}}>
+  <h1 style={{ margin: 0 }}>
+    Workplace Supervisor Dashboard
+  </h1>
+</div>
 
-  </div>
+{/* WELCOME ROW */}
+<div style={{
+  padding: "10px 15px",
+  backgroundColor: "#34495e",
+  color: "#fff"
+}}>
+  <small>Welcome User</small>
+</div>
+
+{/* MENU BUTTON ROW */}
+<div style={{
+  padding: "10px 15px",
+  backgroundColor: "#f4f6f8"
+}}>
+  <button
+    onClick={() => setShowMenu(!showMenu)}
+    style={{
+      fontSize: "26px",
+      background: "none",
+      border: "none",
+      cursor: "pointer"
+    }}
+  >
+    ☰
+  </button>
+</div>
+ 
 
   {/* 🔷 CONTENT */}
   
