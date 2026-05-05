@@ -12,6 +12,7 @@ function StudentDashboard() {
   const [organizations, setOrganizations] = useState([]);
   // NEW: Store student's placement
   const [placement, setPlacement] = useState(null);
+  const firstName = localStorage.getItem("first_name");
 
   const getReviewedLogsCount = () => {
     return logs.filter(log => log.status === "reviewed").length;
@@ -186,7 +187,7 @@ function StudentDashboard() {
       </h1>
 
       <h2 style={{textAlign: "center", marginBottom: "5px" }}>Student Dashboard</h2>
-      <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, Student</p>
+      <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, {firstName || "Student"} 👋</p>
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <button
