@@ -98,7 +98,7 @@ function AdminDashboard() {
 
   const fetchOrganizations = async () => {
     try {
-      const res = await API.get("organizations/");
+      const res = await API.get("internships/organizations/");
       setOrganizations(res.data);
     } catch (error) {
       console.log(error);
@@ -140,7 +140,7 @@ function AdminDashboard() {
     }
 
     try {
-      const res = await API.post("organizations/", orgForm);
+      const res = await API.post("internships/organizations/", orgForm);
 
       setOrganizations((prev) => [...prev, res.data]);
 
@@ -174,7 +174,7 @@ function AdminDashboard() {
 
   const saveEdit = async (id) => {
     try {
-      const res = await API.patch(`organizations/${id}/`, editForm);
+      const res = await API.patch(`internships/organizations/${id}/`, editForm);
 
       setOrganizations((prev) =>
         prev.map((org) => (org.id === id ? res.data : org))
@@ -193,7 +193,7 @@ function AdminDashboard() {
     if (!confirmDelete) return;
 
     try {
-      await API.delete(`organizations/${id}/`);
+      await API.delete(`internships/organizations/${id}/`);
 
       setOrganizations((prev) =>
         prev.filter((org) => org.id !== id)
@@ -878,10 +878,10 @@ return (
                 width: "100%",
                 maxWidth: "600px",
                 margin: "0 auto 20px",
-                border: "1px solid #ddd",
+                border: "1px solid #05072c",
                 padding: "15px",
                 borderRadius: "10px",
-                background: "#fff",
+                background: "#b8bfe179",
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                 textAlign: "left",
               }}
