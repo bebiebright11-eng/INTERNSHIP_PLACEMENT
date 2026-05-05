@@ -13,6 +13,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     phone_number = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(max_length=40, blank=True , null=True)
+    is_activated = models.BooleanField(default=False)
 
     organization = models.ForeignKey(
         'internships.Organization',
