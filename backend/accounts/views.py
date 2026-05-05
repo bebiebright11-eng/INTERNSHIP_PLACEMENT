@@ -16,10 +16,14 @@ class MyTokenObtainPairView(TokenObtainPairView):
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
 User = get_user_model()
 
 @api_view(['POST'])
+@authentication_classes([]) 
+@permission_classes([AllowAny])
 def activate_account(request):
     username = request.data.get("username")
     password = request.data.get("password")

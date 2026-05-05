@@ -16,6 +16,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
     def validate(self, attrs):
         data = super().validate(attrs)
+         #  Block login if not activated
+        if not self.user.is_activated:
+           raise serializers.ValidationError("Account not activated. Please activate first.")
+
+
         # Add the role to the visible JSON response for Postman/React
         data['role'] = self.user.role
              # 🔥 ADD THIS LINE

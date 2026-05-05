@@ -78,10 +78,18 @@ function Login() {
           required
         />
         <br /><br />
-        <button type="submit" disabled={!username || !password}>
-          Login
-        </button>
-      </form>
+<button type="submit">Login</button>
+
+<p>
+  Don't have an account?{" "}
+  <span 
+    onClick={() => navigate("/activate")} 
+    style={{ color: "blue", cursor: "pointer" }}
+  >
+    Activate here
+  </span>
+</p>
+</form>
     </div>
   );
 }
