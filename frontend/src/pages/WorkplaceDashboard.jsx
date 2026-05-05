@@ -102,7 +102,7 @@ function WorkplaceDashboard() {
       },
       {
         headers: {
-          Authorization: `Token ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
