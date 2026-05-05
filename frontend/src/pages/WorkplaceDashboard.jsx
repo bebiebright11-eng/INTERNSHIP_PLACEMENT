@@ -241,6 +241,9 @@ alert("Evaluation submitted successfully!");
               <h3>Student: {p.student_name}</h3>
               <p><strong>Organization:</strong> {p.organization_name}</p>
               {/* ✅ BUTTON */}
+              
+
+
 {!submittedEvaluations[p.id] ? (
   <button onClick={() => setActiveEvaluation(p.id)}>
     Add Evaluation
@@ -250,18 +253,7 @@ alert("Evaluation submitted successfully!");
     <p style={{ color: "green", fontWeight: "bold" }}>
       ✅ Evaluation Submitted
     </p>
-      {/* NOTES SECTION */}
-    <div style={{ marginTop: "30px" }}>
-      <h4>Important Notes</h4>
-      <textarea
-        placeholder="Write important notes..."
-        style={{ width: "100%", height: "100px" }}
-      />
-    </div>  
-
-  
-
-  
+     
 
     <button
   onClick={() => {
