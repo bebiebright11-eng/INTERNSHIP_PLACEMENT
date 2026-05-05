@@ -73,55 +73,59 @@ function WorkplaceDashboard() {
     }));
   };
 
-  // 4. Submit Evaluation
   const submitEvaluation = async (placementId) => {
-    try {
-      const criteriaScores = Object.entries(scores[placementId] || {}).map(
-        ([criteriaId, score]) => ({ 
-          criteria: parseInt(criteriaId),
-          score: score,
-        })
-      );
+  try {
+    const studentScores = scores[placementId];
 
-      if (criteriaScores.length === 0) {
-        alert("Please enter scores before submitting.");
-        return;
-      }
-
-setSavedEvaluations((prev) => ({
-  ...prev,
-  [placementId]: {
-    scores: scores[placementId],
-    comments: comments[placementId],
-  }
-}))
-
-// mark as submitted
-setSubmittedEvaluations((prev) => ({
-  ...prev,
-  [placementId]: true,
-}));
-
-// close the form
-setActiveEvaluation(null);
-
-alert("Evaluation submitted successfully!");
-    } catch (error) {
-      if (
-  error.response?.data?.non_field_errors &&
-  error.response.data.non_field_errors[0].includes("unique")
-) {
-  alert("Already submitted. You can edit next.");
-
-  setSubmittedEvaluations((prev) => ({
-    ...prev,
-    [placementId]: true,
-  }));
-
-  return;
-}
+    // ✅ ensure all fields filled
+    if (!studentScores || Object.keys(studentScores).length !== criteria.length) {
+      alert("Please fill all criteria");
+      return;
     }
-  };
+
+    // ✅ prepare data
+    const criteriaScores = Object.entries(studentScores).map(
+      ([criteriaId, score]) => ({
+        criteria: parseInt(criteriaId),
+        score: score,
+      })
+    );
+
+    // ✅ SEND TO BACKEND
+    await API.post(
+      "supervision/evaluations/",
+      {
+        placement: placementId,
+        supervisor_type: "workplace",
+        comments: comments[placementId] || "",
+        criteria_scores: criteriaScores,
+      },
+      {
+        headers: {
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    alert("Saved to database ✅");
+
+    // mark submitted
+    setSubmittedEvaluations((prev) => ({
+      ...prev,
+      [placementId]: true,
+    }));
+
+    // close form
+    setActiveEvaluation(null);
+
+  } catch (error) {
+    console.log(error.response?.data);
+    alert("Error saving");
+  }
+};
+  
+   
+
 
   return (
     <div style={{ padding: "20px" }}>
