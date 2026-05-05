@@ -125,8 +125,38 @@ alert("Evaluation submitted successfully!");
 
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Workplace Supervisor Dashboard</h1>
+   <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
+
+  {/* 🔷 HEADER */}
+  <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "15px",
+    backgroundColor: "#2c3e50",
+    color: "#fff"
+  }}>
+    <div>
+      <h2 style={{ margin: 0 }}>Dashboard</h2>
+      <small>Welcome User</small>
+    </div>
+
+    <button
+      onClick={() => setShowMenu(!showMenu)}
+      style={{
+        fontSize: "20px",
+        background: "none",
+        border: "none",
+        color: "#fff",
+        cursor: "pointer"
+      }}
+    >
+      ☰
+    </button>
+  </div>
+
+  {/* 🔷 CONTENT */}
+  <div style={{ padding: "20px" }}></div>
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
