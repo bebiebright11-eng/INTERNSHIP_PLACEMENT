@@ -11,6 +11,8 @@ import WorkplaceDashboard from "./pages/WorkplaceDashboard";
 import AcademicDashboard from "./pages/AcademicDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+localStorage.clear();
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Routes>

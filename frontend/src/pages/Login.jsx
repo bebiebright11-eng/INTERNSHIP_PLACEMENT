@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
 
@@ -14,9 +14,6 @@ function Login() {
    setLoading(true);
    setError("");
 
-   useEffect(() => {
-  localStorage.clear();
-}, []);
 
    try{
     const res = await API.post("accounts/login/", {
