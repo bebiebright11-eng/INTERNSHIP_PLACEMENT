@@ -474,6 +474,41 @@ return (
         Create Organization
       </button>
     </div>
+
+    <h3>Create User</h3>
+
+{message && <p>{message}</p>}
+
+<form onSubmit={handleCreateUser}>
+  <input
+    type="text"
+    placeholder="Registration Number / Email"
+    value={username}
+    onChange={(e) => setUsername(e.target.value)}
+    required
+  />
+  <br /><br />
+
+  <input
+    type="email"
+    placeholder="Email (for supervisors)"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+  />
+  <br /><br />
+
+  <select value={role} onChange={(e) => setRole(e.target.value)}>
+    <option value="student">Student</option>
+    <option value="admin">Admin</option>
+    <option value="workplace">Workplace Supervisor</option>
+    <option value="academic">Academic Supervisor</option>
+  </select>
+  <br /><br />
+
+  <button type="submit">Create User</button>
+</form>
+
+
   
 
  
