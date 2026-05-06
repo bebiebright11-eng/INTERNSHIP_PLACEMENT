@@ -73,41 +73,27 @@ class EvaluationViewSet(viewsets.ModelViewSet):
         return Evaluation.objects.none()
     
 
-    
-    
     def perform_create(self, serializer):
         user = self.request.user
 
-    #  Students cannot create
-        if user.role == 'student':
-            raise PermissionDenied("Students cannot create evaluations")
+        if user.role in ['student', 'admin']:
+            raise PermissionDenied("You cannot create evaluations")
 
-    #  Admin cannot create
-        if user.role == 'admin':
-            raise PermissionDenied("Admin cannot create evaluations")
-
-    
-    
-    #  Workplace creates evaluation (criteria scoring)
-        #  Prevent duplicate evaluation per supervisor type
         placement = serializer.validated_data['placement']
         supervisor_type = serializer.validated_data['supervisor_type']
 
         existing = Evaluation.objects.filter(
-            placement=placement,
-            supervisor=user,
-            supervisor_type=supervisor_type
+           placement=placement,
+           supervisor=user,
+           supervisor_type=supervisor_type
         ).first()
 
         if existing:
-    #  Instead of blocking → update it
             serializer.instance = existing
-            serializer.save()
-        else:
-            serializer.save(supervisor=user)
-        
 
         serializer.save(supervisor=user)
+    
+
 
 
 
