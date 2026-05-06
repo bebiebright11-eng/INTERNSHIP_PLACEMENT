@@ -184,7 +184,10 @@ const logScore = countedLogs * 2.5;
 <p>Log Score: {logScore} / 20</p>
 
 <ul>
-  {studentLogs.map((log) => (
+  {studentLogs
+  .sort((a, b) => a.week_number - b.week_number)
+  .slice(0, 8)
+  .map((log) => (
     <li key={log.id}>
       Week {log.week_number}: {log.tasks}
     </li>
