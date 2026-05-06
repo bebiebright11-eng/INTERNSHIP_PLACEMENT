@@ -42,7 +42,15 @@ class EvaluationSerializer(serializers.ModelSerializer):
     supervisor_type = serializers.CharField()
     #  ADD THIS LINE
     supervisor = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    criteria_scores = CriteriaScoreSerializer(many=True)
+     
+    supervisor_type_display = serializers.CharField(
+    source='get_supervisor_type_display',
+    read_only=True
+)
+    criteria_scores = CriteriaScoreSerializer(
+    many=True,
+    source='criteriascore_set'
+)
 
     class Meta:
         model = Evaluation
