@@ -226,33 +226,46 @@ alert("Evaluation submitted successfully!");
           </div>
 
         </div>
+         {/* STUDENTS LIST */}
+    {placements.length === 0 ? (
+      <p>No students assigned</p>
+    ) : (
+      <div>
+        <h4>Student Evaluations</h4>
+
+        {placements.map((p) => (
+          <div key={p.id} style={{
+            border: "1px solid #ccc",
+            margin: "10px 0",
+            padding: "15px",
+            borderRadius: "8px"
+          }}>
+             <h3>{p.student_name}</h3>
+            <p><strong>Organization:</strong> {p.organization_name}</p>
+
+            {!submittedEvaluations[p.id] ? (
+              <button onClick={() => setActiveEvaluation(p.id)}>
+                Add Evaluation
+              </button>
+            ) : (
+              <p style={{ color: "green" }}>✅ Evaluation Submitted</p>
+            )}
+          </div>
+        ))}
 
       </div>
     )}
+     {/* IMPORTANT NOTES */}
+    <div style={{ marginTop: "30px" }}>
+      <h4>Important Notes</h4>
+      <textarea
+        defaultValue="Only assigned students should be evaluated."
+        style={{ width: "100%", height: "100px" }}
+      />
+    </div>
 
-
-      {placements.length === 0 ? (
-        <p>No students assigned</p>
-      ) : (
-        <div>
-          <h4>Student Evaluations</h4>
-          {placements.map((p) => (
-            <div key={p.id} style={{ border: "1px solid #ccc", margin: "10px 0", padding: "15px", borderRadius: "8px" }}>
-              <h3>Student: {p.student_name}</h3>
-              <p><strong>Organization:</strong> {p.organization_name}</p>
-              {/* ✅ BUTTON */}
-              
-
-
-{!submittedEvaluations[p.id] ? (
-  <button onClick={() => setActiveEvaluation(p.id)}>
-    Add Evaluation
-  </button>
-) : (
-  <>
-    <p style={{ color: "green", fontWeight: "bold" }}>
-      ✅ Evaluation Submitted
-    </p>
+      </div>
+    )}
      
 
     <button
@@ -282,8 +295,8 @@ alert("Evaluation submitted successfully!");
 >
   Edit Evaluation
 </button>
-  </>
-)}
+  
+
 
 
 
@@ -349,10 +362,10 @@ alert("Evaluation submitted successfully!");
               )} 
              
             </div>
-          ))}
+          
         </div>
-      )}
-        </div>
+      
+        
 
   {/* SIDEBAR (CORRECT POSITION) */}
   {showMenu && (
@@ -369,7 +382,7 @@ alert("Evaluation submitted successfully!");
   )}
 
 </div>
-    </div>
+    
   );
 }
 
