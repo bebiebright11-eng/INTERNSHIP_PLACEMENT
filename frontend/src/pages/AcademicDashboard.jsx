@@ -42,19 +42,21 @@ function AcademicDashboard() {
     }
   };
 
-  const fetchEvaluations = async () => {
-    try {
-      const res = await API.get("supervision/evaluations/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+const fetchEvaluations = async () => {
+  try {
+    const res = await API.get("supervision/evaluations/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
-      setEvaluations(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    console.log("EVALUATIONS FROM BACKEND:", res.data); // 👈 ADD THIS
+
+    setEvaluations(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   // --- Event Handlers --- 
 
