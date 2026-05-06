@@ -49,7 +49,8 @@ class EvaluationSerializer(serializers.ModelSerializer):
 )
     criteria_scores = CriteriaScoreSerializer(
     many=True,
-    source='criteriascore_set'
+    source='criteriascore_set',
+    read_only=True
 )
 
     class Meta:
@@ -86,30 +87,12 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        criteria_data = validated_data.pop('criteria_scores', [])
         evaluation = Evaluation.objects.create(**validated_data)
 
-        total = 0
 
-    #  Workplace Supervisor → Criteria scoring (60)
-        if evaluation.supervisor_type == 'workplace':
-           for item in criteria_data:
-                score_obj = CriteriaScore(
-                   evaluation=evaluation,
-                   criteria=item['criteria'],
-                   score=item['score']
-                )
-
-                score_obj.full_clean()  # 🔥 VALIDATION
-                score_obj.save()
-
-
-                total += item['score']
-
-           evaluation.score = total  # out of 60
 
     #  Academic Supervisor → Manual score (20)
-        elif evaluation.supervisor_type == 'academic':
+        if evaluation.supervisor_type == 'academic':
             evaluation.score = validated_data.get('score', 0)
 
         #  ADD LOG SCORE
