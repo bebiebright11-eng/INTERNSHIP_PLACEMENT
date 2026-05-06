@@ -198,7 +198,7 @@ alert("Evaluation submitted successfully!");
           <div style={{
             flex: 1,
             padding: "15px",
-            background: "#fff",
+            background: "#df7cf8c9",
             borderRadius: "8px"
           }}>
             <h3>Assigned Students</h3>
@@ -208,7 +208,7 @@ alert("Evaluation submitted successfully!");
           <div style={{
             flex: 1,
             padding: "15px",
-            background: "#fff",
+            background: "#da81e6",
             borderRadius: "8px"
           }}>
             <h3>Evaluated</h3>
@@ -218,7 +218,7 @@ alert("Evaluation submitted successfully!");
           <div style={{
             flex: 1,
             padding: "15px",
-            background: "#fff",
+            background: "#e478e7",
             borderRadius: "8px"
           }}>
             <h3>Pending</h3>
