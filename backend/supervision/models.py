@@ -27,7 +27,7 @@ class WeeklyLog(models.Model):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
 
-    class meta:
+    class Meta:
         unique_together = ('placement', 'week_number')
 
     def __str__(self):
