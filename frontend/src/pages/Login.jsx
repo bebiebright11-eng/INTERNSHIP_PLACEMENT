@@ -6,37 +6,43 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();  
 
   const handleLogin = async (e) => {
    if (e) e.preventDefault();
+   setLoading(true);
+   setError("");
 
    try{
     const res = await API.post("accounts/login/", {
       username: username,
       password: password,
     });
+    console.log(res.data); 
 
     console.log("FULL RESPONSE:", res.data);
     console.log("ACCESS FIELD:", res.data.access);
-    console.log("TOKEN FIELD:", res.data.token);
+  
+    localStorage.setItem("role", res.data.role);
+    localStorage.setItem("token", res.data.access);
+    localStorage.setItem("first_name", res.data.first_name);
+    localStorage.setItem("last_name", res.data.last_name);
 
-    localStorage.setItem("access", res.data.access);
-    
 
-    console.log("STORED:", localStorage.getItem("access"));
-    
-
-    alert("SUCCESS: Logged in as " + res.data.role);
 
     const role = res.data.role.toLowerCase();
     if (role === "student") {
+      setLoading(false);
       navigate("/student");
     } else if (role === "admin") {
+      setLoading(false);
       navigate("/admin");
     } else if (role === "workplace") {
+      setLoading(false);
       navigate("/workplace");
     } else if (role === "academic") {
+      setLoading(false);
       navigate("/academic");
     } else {
       alert("Unknown role: " + role);
@@ -50,7 +56,7 @@ function Login() {
      } else {
        setError("Network error. Please try again.");
      }
-     console.log(error);
+     setLoading(false);
    }
     
   }; 
@@ -84,7 +90,9 @@ function Login() {
           required
         />
         <br /><br />
-<button type="submit">Login</button>
+<button type="submit" disabled={loading}>
+  {loading ? "Logging in..." : "Login"}
+</button>
 
 <p>
   Don't have an account?{" "}

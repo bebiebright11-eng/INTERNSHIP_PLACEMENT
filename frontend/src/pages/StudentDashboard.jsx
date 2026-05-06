@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 function StudentDashboard() {
@@ -12,6 +13,14 @@ function StudentDashboard() {
   const [organizations, setOrganizations] = useState([]);
   // NEW: Store student's placement
   const [placement, setPlacement] = useState(null);
+  const firstName = localStorage.getItem("first_name");
+  const navigate = useNavigate();
+
+
+  const handleLogout = () => {
+  localStorage.clear(); // remove everything
+  navigate("/"); // go to login
+};
 
   const getReviewedLogsCount = () => {
     return logs.filter(log => log.status === "reviewed").length;
@@ -185,8 +194,12 @@ function StudentDashboard() {
         INTERNSHIP  PLACEMENT  SYSTEM (ILES)
       </h1>
 
+      <button onClick={handleLogout}>
+  Logout
+</button>
+
       <h2 style={{textAlign: "center", marginBottom: "5px" }}>Student Dashboard</h2>
-      <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, Student</p>
+      <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, {firstName || "Student"} 👋</p>
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <button

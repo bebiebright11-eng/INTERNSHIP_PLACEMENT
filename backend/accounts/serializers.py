@@ -25,5 +25,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['role'] = self.user.role
              # 🔥 ADD THIS LINE
         data['user_id'] = self.user.id
+
+        data['first_name'] = self.user.first_name
+        data['last_name'] = self.user.last_name
+        
         return data
 
