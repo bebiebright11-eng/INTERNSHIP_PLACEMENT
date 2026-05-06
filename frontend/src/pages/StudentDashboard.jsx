@@ -110,7 +110,11 @@ function StudentDashboard() {
 
   const fetchOrganizations = async () => {
     try {
-      const res = await API.get("internships/organizations/");
+      const res = await API.get("internships/organizations/",{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+         },
+        });
       setOrganizations(res.data);
     } catch (error) {
       console.log(error);
@@ -136,28 +140,43 @@ function StudentDashboard() {
     }
   };
 
-  const fetchPlacement = async () => {
-    try {
-      const res = await API.get("internships/placements/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const myPlacement = res.data.find(
-        (p) => p.student === parseInt(localStorage.getItem("user_id"))
-      );
-      setPlacement(myPlacement || null);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const hasApplied = (orgId) => {
+  return applications.some(app => app.organization === orgId);
+};
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+const fetchPlacement = async () => {
+  try {
+    const res = await API.get("internships/placements/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
-  };
+
+    const userId = parseInt(localStorage.getItem("user_id"));
+
+    console.log("PLACEMENTS FROM BACKEND:", res.data);
+    console.log("MY USER ID:", userId);
+
+    const myPlacement = res.data.find(
+      (p) => p.student === userId || p.student?.id === userId
+    );
+
+    console.log("MATCHED:", myPlacement);
+
+    setPlacement(myPlacement || null);
+
+  } catch (error) {
+    console.log("Placement error:", error);
+  }
+};
+
+
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
 
   const submitLog = async (e) => {
     e.preventDefault();
@@ -537,11 +556,20 @@ function StudentDashboard() {
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
             <p style={{textAlign: "center"}}><strong>Name:</strong> {org.name}</p>
             <p style={{textAlign: "center"}}><strong>Location:</strong> {org.location}</p>
+            
             {placement ? (
-              <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>Already Placed</button>
-            ) : (
-              <button onClick={() => applyToOrganization(org.id)}>Apply</button>
-            )}
+  <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>
+    Already Placed
+  </button>
+) : hasApplied(org.id) ? (
+  <button disabled style={{ backgroundColor: "#edf0f5" }}>
+    Applied ✅
+  </button>
+) : (
+  <button onClick={() => applyToOrganization(org.id)}>
+    Apply
+  </button>
+)}
           </div>
         ))
       )}

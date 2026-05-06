@@ -24,6 +24,7 @@ function Login() {
     console.log("FULL RESPONSE:", res.data);
     console.log("ACCESS FIELD:", res.data.access);
   
+    localStorage.setItem("user_id", res.data.user?.id || res.data.id || res.data.user_id);
     localStorage.setItem("role", res.data.role);
     localStorage.setItem("token", res.data.access);
     localStorage.setItem("first_name", res.data.first_name);
