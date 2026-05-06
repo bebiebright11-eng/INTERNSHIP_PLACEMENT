@@ -109,6 +109,55 @@ function WorkplaceDashboard() {
     }
   };
 
+  const renderStudents = () => {
+  return (
+    <div>
+      <h2>My Students</h2>
+
+      {placements.length === 0 ? (
+        <p>No students assigned</p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {placements.map((p) => {
+              const isEvaluated = !!submittedEvaluations[p.id];
+
+              return (
+                <tr key={p.id}>
+                  <td>{p.student_name}</td>
+                  <td>{p.organization_name}</td>
+                  <td>{isEvaluated ? "Evaluated" : "Pending"}</td>
+                  <td>
+                    {isEvaluated ? (
+                      <button onClick={() => setSelectedPlacement(p)}>
+                        View
+                      </button>
+                    ) : (
+                      <button onClick={() => setActiveEvaluation(p.id)}>
+                        Evaluate
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+
+
   return (
     <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
       
