@@ -27,7 +27,13 @@ User = get_user_model()
 def activate_account(request):
     username = request.data.get("username")
     password = request.data.get("password")
+    first_name = request.data.get("first_name")
+    last_name = request.data.get("last_name")
 
+
+    if not username or not password or not first_name or not last_name:
+        return Response({"error": "All fields are required"}, status=400)
+    
     # 1. Check user exists
     try:
         user = User.objects.get(username=username)
@@ -38,8 +44,10 @@ def activate_account(request):
     if user.is_activated:
         return Response({"error": "Account already activated"}, status=400)
 
-    # 3. Set password
+    # Set password and names
     user.set_password(password)
+    user.first_name = first_name
+    user.last_name = last_name
     user.is_activated = True
     user.save()
 
