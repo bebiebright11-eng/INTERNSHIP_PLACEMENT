@@ -8,6 +8,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import WorkplaceDashboard from "./pages/WorkplaceDashboard";
 import AcademicDashboard from "./pages/AcademicDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -16,7 +17,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/login" element={<Login />} />
       <Route path="/activate" element={<ActivateAccount />} />
       <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/student" element={<StudentDashboard />} />
+      <Route 
+      path="/student" 
+      element={
+    <ProtectedRoute>
+      <StudentDashboard />
+    </ProtectedRoute>
+    } 
+   />
       <Route path="/workplace" element={<WorkplaceDashboard />} />
       <Route path="/academic" element={<AcademicDashboard />} />
     </Routes>

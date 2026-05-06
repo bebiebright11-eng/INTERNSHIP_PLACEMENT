@@ -19,13 +19,13 @@ function Login() {
       username: username,
       password: password,
     });
+    console.log(res.data); 
 
     console.log("FULL RESPONSE:", res.data);
     console.log("ACCESS FIELD:", res.data.access);
-    console.log("TOKEN FIELD:", res.data.token);
+  
 
-    localStorage.setItem("access", res.data.access);
-    console.log("STORED:", localStorage.getItem("access"));
+    localStorage.setItem("token", res.data.access);
     localStorage.setItem("first_name", res.data.first_name);
     localStorage.setItem("last_name", res.data.last_name);
 
