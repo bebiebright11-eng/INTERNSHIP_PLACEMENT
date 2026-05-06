@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 function ActivateAccount() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
 
 
@@ -16,6 +18,8 @@ function ActivateAccount() {
     const res = await API.post("accounts/activate/", {
       username: username,
       password: password,
+      first_name: firstName,
+      last_name: lastName
     });
 
     alert("Account activated successfully");
