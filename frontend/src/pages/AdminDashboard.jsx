@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import API from "../api";
+import { toast } from "react-toastify";
 
 function AdminDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -128,7 +129,7 @@ function AdminDashboard() {
       role,
     });
 
-    setMessage("User created successfully");
+     toast.success("User created successfully");
 
     // clear form
     setUsername("");
@@ -136,7 +137,7 @@ function AdminDashboard() {
     setRole("student");
 
   } catch (error) {
-    setMessage("Error creating user");
+    toast.error("Error creating user");
   }
 };
 
@@ -160,7 +161,7 @@ function AdminDashboard() {
   
   const createOrganization = async () => {
     if (!orgForm.name || !orgForm.location) {
-      alert("Name and location are required");
+      toast.warning("Name and location are required");
       return;
     }
 
@@ -178,10 +179,10 @@ function AdminDashboard() {
         website: "",
       });
 
-      alert("Organization created!");
+      toast.success("Organization created!");
     } catch (err) {
       console.log(err.response?.data);
-      alert("Failed to create organization");
+      toast.error("Failed to create organization");
     }
   };
 
@@ -206,10 +207,10 @@ function AdminDashboard() {
       );
 
       setEditingOrg(null);
-      alert("Organization updated!");
+      toast.success("Organization updated!");
     } catch (err) {
       console.log(err.response?.data);
-      alert("Update failed");
+      toast.error("Update failed");
     }
   };
 
@@ -224,10 +225,10 @@ function AdminDashboard() {
         prev.filter((org) => org.id !== id)
       );
 
-      alert("Deleted!");
+      toast.success("Organization deleted!");
     } catch (err) {
       console.log(err);
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   };
 
@@ -236,7 +237,7 @@ function AdminDashboard() {
     try {
       await API.patch(`internships/applications/${id}/`, { status });
 
-      alert("Updated successfully!");
+      toast.success("Updated successfully!");
       fetchApplications();
     } catch (error) {
       console.log(error);
@@ -261,11 +262,11 @@ function AdminDashboard() {
         academic_supervisor: academicId,
       });
 
-      alert("Supervisors assigned!");
+      toast.success("Supervisors assigned!");
       fetchPlacements();
     } catch (error) {
       console.log(error);
-      alert("Failed to assign supervisors");
+      toast.error("Failed to assign supervisors");
     }
   };
 
@@ -477,7 +478,7 @@ return (
 
     <h3>Create User</h3>
 
-{message && <p>{message}</p>}
+
 
 <form onSubmit={handleCreateUser}>
   <input
@@ -575,7 +576,7 @@ return (
         }));
 
       } catch {
-        alert("Update failed");
+        toast.error("Update failed");
       }
     }}
   >
@@ -590,7 +591,7 @@ return (
         setCriteria((prev) => prev.filter((item) => item.id !== c.id));
 
       } catch {
-        alert("Delete failed");
+        toast.error("Delete failed");
       }
     }}
   >
@@ -632,7 +633,7 @@ return (
   <button
     onClick={async () => {
       if (!newCriteria.name || !newCriteria.max_score) {
-        alert("Please fill all fields");
+        toast.warning("Please fill all fields");
         return;
       }
 
@@ -658,7 +659,7 @@ return (
 
       } catch (err) {
         console.log(err.response?.data);
-        alert("Failed to create criteria");
+        toast.error("Failed to create criteria");
       }
     }}
   >
@@ -870,7 +871,7 @@ return (
               start_date: placementFormData.start_date,
               end_date: placementFormData.end_date,
             });
-            alert("Placement created!");
+            toast.success("Placement created!");
 
             // 🔥 close form after saving
             setActivePlacementForm(null);
@@ -880,9 +881,9 @@ return (
               console.log(error.response?.data);
 
               if (error.response?.data?.student) {
-                alert("This student already has a placement!");
+                toast.warning("This student already has a placement!");
               } else {
-                alert("Failed to create placement");
+                toast.error("Failed to create placement");
               }
             }
         }}
