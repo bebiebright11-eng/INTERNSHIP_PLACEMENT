@@ -2,6 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Login from "./pages/Login";
 import PublicRoute from "./components/PublicRoute";
 import ActivateAccount from "./pages/ActivateAccount";
@@ -24,6 +28,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/workplace" element={<ProtectedRoute allowedRole="workplace"><WorkplaceDashboard /></ProtectedRoute>} />
       <Route path="/academic" element={<ProtectedRoute allowedRole="academic"><AcademicDashboard /></ProtectedRoute>} />
     </Routes>
+
+    <ToastContainer position="top-right" autoClose={3000} />
   </BrowserRouter>
 );
 
