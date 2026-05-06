@@ -57,19 +57,19 @@ class EvaluationViewSet(viewsets.ModelViewSet):
                placement__student=user
            )
 
-    # 👨‍🏫 Workplace → only evaluations they created
+    #  Workplace → only evaluations they created
         if user.role == 'workplace':
             return Evaluation.objects.filter(
                supervisor=user
             )
 
-    # 👨‍🏫 Academic → evaluations for their students
+    #  Academic → evaluations for their students
         if user.role == 'academic':
             return Evaluation.objects.filter(
                placement__academic_supervisor=user
            )
 
-    # 🚫 Admin → no direct access here
+    #  Admin → no direct access here
         return Evaluation.objects.none()
     
 
@@ -89,7 +89,7 @@ class EvaluationViewSet(viewsets.ModelViewSet):
     
     
     #  Workplace creates evaluation (criteria scoring)
-        # 🔒 Prevent duplicate evaluation per supervisor type
+        #  Prevent duplicate evaluation per supervisor type
         placement = serializer.validated_data['placement']
         supervisor_type = serializer.validated_data['supervisor_type']
 
@@ -100,7 +100,7 @@ class EvaluationViewSet(viewsets.ModelViewSet):
         ).first()
 
         if existing:
-    # 🔄 Instead of blocking → update it
+    #  Instead of blocking → update it
             serializer.instance = existing
             serializer.save()
         else:
@@ -109,17 +109,7 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
         serializer.save(supervisor=user)
 
-    def create(self, request, *args, **kwargs):
-        user = request.user
 
-        # 🔥 ALLOW ONLY workplace supervisors
-        if user.role != "workplace":
-            return Response(
-                {"error": "Only workplace supervisors can submit evaluations"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        return super().create(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         user = request.user
