@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import API from "../api";
 
 function StudentDashboard() {
@@ -11,15 +12,17 @@ function StudentDashboard() {
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
   const [organizations, setOrganizations] = useState([]);
+  const [notification, setNotification] = useState(null);
   // NEW: Store student's placement
   const [placement, setPlacement] = useState(null);
   const firstName = localStorage.getItem("first_name");
   const navigate = useNavigate();
 
 
-  const handleLogout = () => {
-  localStorage.clear(); // remove everything
-  navigate("/"); // go to login
+const handleLogout = () => {
+  localStorage.clear();
+  toast.success("Logged out successfully 👋");
+  navigate("/");
 };
 
   const getReviewedLogsCount = () => {
@@ -30,6 +33,16 @@ function StudentDashboard() {
     const reviewed = getReviewedLogsCount();
     return Math.min(reviewed * 2.5, 20);
   };
+
+
+  const showMessage = (text, type = "success") => {
+  setNotification({ text, type });
+
+  // auto-hide after 3 seconds
+  setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+};
 
 
   // NEW: store form inputs for weekly log
@@ -78,7 +91,7 @@ function StudentDashboard() {
       });
       setApplications(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load placement data ❌");
     }
   };
 
@@ -91,7 +104,7 @@ function StudentDashboard() {
       });
       setLogs(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load logs ❌");
     }
   };
 
@@ -104,7 +117,7 @@ function StudentDashboard() {
       });
       setEvaluations(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load evaluations ❌");
     }
   };
 
@@ -117,7 +130,7 @@ function StudentDashboard() {
         });
       setOrganizations(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load organizations ❌");
     }
   };
 
@@ -132,11 +145,11 @@ function StudentDashboard() {
           },
         }
       );
-      alert("Application submitted!");
+      toast.success("Application submitted successfully 🎉");
       fetchApplications();
     } catch (error) {
       console.log(error.response?.data);
-      alert("Failed to apply");
+      toast.error("Failed to apply ❌");
     }
   };
 
@@ -154,19 +167,22 @@ const fetchPlacement = async () => {
 
     const userId = parseInt(localStorage.getItem("user_id"));
 
-    console.log("PLACEMENTS FROM BACKEND:", res.data);
-    console.log("MY USER ID:", userId);
-
     const myPlacement = res.data.find(
       (p) => p.student === userId || p.student?.id === userId
     );
 
-    console.log("MATCHED:", myPlacement);
+    // ✅ SHOW TOAST (PUT HERE)
+    const shown = localStorage.getItem("placement_toast_shown");
+
+    if (myPlacement && !shown) {
+      toast.success(`🎉 You have been placed at ${myPlacement.organization_name}!`);
+      localStorage.setItem("placement_toast_shown", "true");
+    }
 
     setPlacement(myPlacement || null);
 
   } catch (error) {
-    console.log("Placement error:", error);
+    toast.error("Failed to load placement data ❌");
   }
 };
 
@@ -193,7 +209,7 @@ const handleChange = (e) => {
           },
         }
       );
-      alert("Weekly log submitted!");
+      toast.success("Weekly log submitted successfully ✅");
       setFormData({
         week_number: "",
         tasks: "",
@@ -202,8 +218,7 @@ const handleChange = (e) => {
       });
       fetchLogs();
     } catch (error) {
-      console.log(error.response?.data);
-      alert("Failed to submit log");
+      toast.error("Failed to submit log ❌");
     }
   };
 
@@ -272,6 +287,31 @@ const handleChange = (e) => {
           </div>
         </div>
       )}
+
+{notification && (
+  <div style={{
+    padding: "10px",
+    margin: "10px 0",
+    borderRadius: "6px",
+    textAlign: "center",
+    fontWeight: "bold",
+    backgroundColor:
+      notification.type === "success"
+        ? "#d4edda"
+        : notification.type === "error"
+        ? "#f8d7da"
+        : "#fff3cd",
+    color:
+      notification.type === "success"
+        ? "#155724"
+        : notification.type === "error"
+        ? "#721c24"
+        : "#856404"
+  }}>
+    {notification.text}
+  </div>
+)}
+
 
 
         {activeView === "home" && (
