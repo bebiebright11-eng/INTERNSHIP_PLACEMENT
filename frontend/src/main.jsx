@@ -16,10 +16,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/activate" element={<ActivateAccount />} />
-      <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/student" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
-      <Route path="/workplace" element={<ProtectedRoute><WorkplaceDashboard /></ProtectedRoute>} />
-      <Route path="/academic" element={<ProtectedRoute><AcademicDashboard /></ProtectedRoute>} />
+      <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/student" element={<ProtectedRoute allowedRole="student"><StudentDashboard /></ProtectedRoute>} />
+      <Route path="/workplace" element={<ProtectedRoute allowedRole="workplace"><WorkplaceDashboard /></ProtectedRoute>} />
+      <Route path="/academic" element={<ProtectedRoute allowedRole="academic"><AcademicDashboard /></ProtectedRoute>} />
     </Routes>
   </BrowserRouter>
 );
