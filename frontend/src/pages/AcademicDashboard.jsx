@@ -8,7 +8,6 @@ function AcademicDashboard() {
   const [scores, setScores] = useState({});
   const [logs, setLogs] = useState({});
 
-
   // --- Data Fetching Functions ---
 
   const fetchPlacements = async () => {

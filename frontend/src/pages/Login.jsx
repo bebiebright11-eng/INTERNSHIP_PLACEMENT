@@ -5,31 +5,46 @@ import API from "../api";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();  
 
   const handleLogin = async (e) => {
    if (e) e.preventDefault();
+   setLoading(true);
+   setError("");
+
 
    try{
     const res = await API.post("accounts/login/", {
       username: username,
       password: password,
     });
+    console.log(res.data); 
 
-    localStorage.setItem("token", res.data.access);
+    console.log("FULL RESPONSE:", res.data);
+    console.log("ACCESS FIELD:", res.data.access);
+  
+    localStorage.setItem("user_id", res.data.user?.id || res.data.id || res.data.user_id);
     localStorage.setItem("role", res.data.role);
-    localStorage.setItem("user_id", res.data.user_id); 
+    localStorage.setItem("token", res.data.access);
+    localStorage.setItem("first_name", res.data.first_name);
+    localStorage.setItem("last_name", res.data.last_name);
 
-    alert("SUCCESS: Logged in as " + res.data.role);
+
 
     const role = res.data.role.toLowerCase();
     if (role === "student") {
+      setLoading(false);
       navigate("/student");
     } else if (role === "admin") {
+      setLoading(false);
       navigate("/admin");
     } else if (role === "workplace") {
+      setLoading(false);
       navigate("/workplace");
     } else if (role === "academic") {
+      setLoading(false);
       navigate("/academic");
     } else {
       alert("Unknown role: " + role);
@@ -39,11 +54,11 @@ function Login() {
 
    } catch (error) {
      if (error.response) {
-       alert("DJANGO ERROR: " + JSON.stringify(error.response.data));
+       setError("Invalid credentials or account not activated");
      } else {
-       alert("NETWORK ERROR: 1. Restart Vite terminal. 2. Ensure Django is running.");
+       setError("Network error. Please try again.");
      }
-     console.log(error);
+     setLoading(false);
    }
     
   }; 
@@ -53,10 +68,15 @@ function Login() {
   return (
     <div style={{ padding: "40px" }}>
       <h2>Login</h2>
+{error && (
+  <p style={{ color: "red" }}>
+    {error}
+  </p>
+)}
       <form onSubmit={handleLogin}>
         <input
-          type="password"
-          name="password"
+          type="text"
+          name="username"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -72,10 +92,20 @@ function Login() {
           required
         />
         <br /><br />
-        <button type="submit" disabled={!username || !password}>
-          Login
-        </button>
-      </form>
+<button type="submit" disabled={loading}>
+  {loading ? "Logging in..." : "Login"}
+</button>
+
+<p>
+  Don't have an account?{" "}
+  <span 
+    onClick={() => navigate("/activate")} 
+    style={{ color: "blue", cursor: "pointer" }}
+  >
+    Activate here
+  </span>
+</p>
+</form>
     </div>
   );
 }
