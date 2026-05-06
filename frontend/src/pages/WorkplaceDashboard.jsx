@@ -338,6 +338,12 @@ function WorkplaceDashboard() {
               </div>
             </div>
           )}
+          {activePage === "students" && (
+  <div style={{ padding: "20px" }}>
+    {renderStudents()}
+  </div>
+)}
+
         </div>
 
         {/* 🔷 SIDEBAR */}
