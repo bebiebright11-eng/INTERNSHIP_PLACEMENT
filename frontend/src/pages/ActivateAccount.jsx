@@ -51,6 +51,24 @@ function ActivateAccount() {
         <br /><br />
 
         <input
+          type="text"
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+        <br /><br />
+
+        <input
+          type="text"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+        />
+        <br /><br />
+
+        <input
           type="password"
           placeholder="Create Password"
           value={password}
