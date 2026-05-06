@@ -42,7 +42,7 @@ function ActivateAccount() {
       <form onSubmit={handleActivate}>
         <input
           type="text"
-          placeholder="Enter Registration Number or Email"
+          placeholder="Enter Reg.No or Email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
