@@ -1,33 +1,56 @@
 from rest_framework.permissions import BasePermission
 
+
 class IsStudent(BasePermission):
     def has_permission(self, request, view):
-        return request.user.role == 'student'
-    
+        return (
+            request.user.is_authenticated and
+            getattr(request.user, "role", None) == "student"
+        )
+
 
 class IsWorkplaceSupervisor(BasePermission):
     def has_permission(self, request, view):
-        return request.user.role == 'workplace'
+        return (
+            request.user.is_authenticated and
+            getattr(request.user, "role", None) == "workplace"
+        )
 
 
 class IsAcademicSupervisor(BasePermission):
     def has_permission(self, request, view):
-        return request.user.role == 'academic'
-    
+        return (
+            request.user.is_authenticated and
+            getattr(request.user, "role", None) == "academic"
+        )
+
+
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        return request.user.role == 'admin'
-    
+        return (
+            request.user.is_authenticated and
+            getattr(request.user, "role", None) == "admin"
+        )
+
+
 class IsStudentOrAcademic(BasePermission):
     def has_permission(self, request, view):
-        return request.user.role in [
-            'student',
-            'academic',
-            'workplace'
-        ]
+        return (
+            request.user.is_authenticated and
+            getattr(request.user, "role", None) in [
+                "student",
+                "academic",
+                "workplace"
+            ]
+        )
+
+
 class IsEvaluator(BasePermission):
     def has_permission(self, request, view):
-        return request.user.role in [
-            'academic',
-            'workplace'
-        ]
+        return (
+            request.user.is_authenticated and
+            getattr(request.user, "role", None) in [
+                "academic",
+                "workplace"
+            ]
+        )

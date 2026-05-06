@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 
 function PublicRoute({ children }) {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("access");
   const role = localStorage.getItem("role");
   const location = useLocation();
 

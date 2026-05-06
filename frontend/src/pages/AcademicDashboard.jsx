@@ -7,7 +7,6 @@ function AcademicDashboard() {
   const [evaluations, setEvaluations] = useState([]);
   const [scores, setScores] = useState({});
   const [logs, setLogs] = useState({});
-  
 
   // --- Data Fetching Functions ---
 
@@ -155,15 +154,28 @@ const logScore = countedLogs * 2.5;
               <h3>Student: {p.student_name}</h3>
               <p>Organization: {p.organization_name}</p>
 
-              <h4>Workplace Evaluation</h4>
-              {workplaceEval ? (
-                <div>
-                  <p>Total Score: {workplaceEval.score}</p>
-                  <p>Comments: {workplaceEval.comments}</p>
-                </div>
-              ) : (
-                <p>No workplace evaluation yet</p>
-              )}
+
+<h4>Workplace Evaluation</h4>
+{workplaceEval ? (
+  <div>
+    <p><strong>Total Score:</strong> {workplaceEval.score} / 60</p>
+
+    {/* ✅ ADD CRITERIA BREAKDOWN */}
+    <h5>Criteria Breakdown</h5>
+    <ul>
+      {workplaceEval.criteria_scores?.map((item) => (
+        <li key={item.id}>
+          {item.criteria_name}: {item.score}
+        </li>
+      ))}
+    </ul>
+
+    <p><strong>Comments:</strong> {workplaceEval.comments}</p>
+  </div>
+) : (
+  <p>No workplace evaluation yet</p>
+)}
+
 
 <h4>Weekly Logs</h4>
 

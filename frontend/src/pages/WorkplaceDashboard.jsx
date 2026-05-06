@@ -11,6 +11,8 @@ function WorkplaceDashboard() {
   const [savedEvaluations, setSavedEvaluations] = useState({});
   const [showMenu, setShowMenu] = useState(false);
   const [activePage, setActivePage] = useState("home");
+  const [selectedPlacement, setSelectedPlacement] = useState(null);
+
 
   const firstName = localStorage.getItem("first_name");
   const lastName = localStorage.getItem("last_name");

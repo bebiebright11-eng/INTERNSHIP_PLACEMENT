@@ -1,18 +1,26 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/', // your Django backend
+  baseURL: "http://localhost:8000/api/",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access"); // check your key name
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
+// Attach token automatically to every request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default api;
