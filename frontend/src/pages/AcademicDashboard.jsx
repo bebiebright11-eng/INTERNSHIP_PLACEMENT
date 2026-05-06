@@ -186,7 +186,7 @@ const logScore = countedLogs * 2.5;
 <ul>
   {studentLogs.map((log) => (
     <li key={log.id}>
-      Week {log.week}: {log.description}
+      Week {log.week_number}: {log.tasks}
     </li>
   ))}
 </ul>
