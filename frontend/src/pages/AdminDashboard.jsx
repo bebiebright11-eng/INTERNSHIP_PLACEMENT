@@ -361,7 +361,7 @@ return (
         style={menuItemStyle}
         onClick={() => handleMenuClick("placements")}
       >
-        📍 Placements
+         Placements
       </div>
 
      
@@ -646,7 +646,8 @@ return (
       }
 
       try {
-        const res = await API.post("supervision/criteria/", {
+        const res = await API.post("supervision/criteria/", 
+          {
           name: newCriteria.name,
           max_score: Number(newCriteria.max_score),
         });
