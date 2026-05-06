@@ -9,6 +9,10 @@ function AdminDashboard() {
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [organizations, setOrganizations] = useState([]);
+  const [username, setUsername] = useState("");
+const [email, setEmail] = useState("");
+const [role, setRole] = useState("student");
+const [message, setMessage] = useState("");
 
   const handleMenuClick = (view) => {
   setActiveView(view);
