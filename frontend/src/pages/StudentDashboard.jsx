@@ -144,28 +144,39 @@ function StudentDashboard() {
   return applications.some(app => app.organization === orgId);
 };
 
-  const fetchPlacement = async () => {
-    try {
-      const res = await API.get("internships/placements/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const myPlacement = res.data.find(
-        (p) => p.student === parseInt(localStorage.getItem("user_id"))
-      );
-      setPlacement(myPlacement || null);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+const fetchPlacement = async () => {
+  try {
+    const res = await API.get("internships/placements/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
-  };
+
+    const userId = parseInt(localStorage.getItem("user_id"));
+
+    console.log("PLACEMENTS FROM BACKEND:", res.data);
+    console.log("MY USER ID:", userId);
+
+    const myPlacement = res.data.find(
+      (p) => p.student === userId || p.student?.id === userId
+    );
+
+    console.log("MATCHED:", myPlacement);
+
+    setPlacement(myPlacement || null);
+
+  } catch (error) {
+    console.log("Placement error:", error);
+  }
+};
+
+
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
 
   const submitLog = async (e) => {
     e.preventDefault();
