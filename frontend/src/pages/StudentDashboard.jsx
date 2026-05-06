@@ -110,7 +110,11 @@ function StudentDashboard() {
 
   const fetchOrganizations = async () => {
     try {
-      const res = await API.get("internships/organizations/");
+      const res = await API.get("internships/organizations/",{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+         },
+        });
       setOrganizations(res.data);
     } catch (error) {
       console.log(error);
@@ -135,6 +139,10 @@ function StudentDashboard() {
       alert("Failed to apply");
     }
   };
+
+  const hasApplied = (orgId) => {
+  return applications.some(app => app.organization === orgId);
+};
 
   const fetchPlacement = async () => {
     try {
@@ -537,11 +545,20 @@ function StudentDashboard() {
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
             <p style={{textAlign: "center"}}><strong>Name:</strong> {org.name}</p>
             <p style={{textAlign: "center"}}><strong>Location:</strong> {org.location}</p>
+            
             {placement ? (
-              <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>Already Placed</button>
-            ) : (
-              <button onClick={() => applyToOrganization(org.id)}>Apply</button>
-            )}
+  <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>
+    Already Placed
+  </button>
+) : hasApplied(org.id) ? (
+  <button disabled style={{ backgroundColor: "#edf0f5" }}>
+    Applied ✅
+  </button>
+) : (
+  <button onClick={() => applyToOrganization(org.id)}>
+    Apply
+  </button>
+)}
           </div>
         ))
       )}
