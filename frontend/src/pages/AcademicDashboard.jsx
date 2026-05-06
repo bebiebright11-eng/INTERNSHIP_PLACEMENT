@@ -186,12 +186,27 @@ const logScore = countedLogs * 2.5;
 <ul>
   {studentLogs
   .sort((a, b) => a.week_number - b.week_number)
-  .slice(0, 8)
-  .map((log) => (
+.map((log, index) => {
+
+  const isReviewed = index < 8;
+
+  return (
     <li key={log.id}>
       Week {log.week_number}: {log.tasks}
+
+      <br />
+
+      Status:
+      <span style={{
+        color: isReviewed ? "green" : "orange",
+        fontWeight: "bold",
+        marginLeft: "5px"
+      }}>
+        {isReviewed ? "Reviewed ✅" : "Pending ⏳"}
+      </span>
     </li>
-  ))}
+  );
+})}
 </ul>
 
 <h4>Academic Supervisor Marks</h4>
