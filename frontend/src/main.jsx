@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
+import PublicRoute from "./components/PublicRoute";
 import ActivateAccount from "./pages/ActivateAccount";
 import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -13,9 +14,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/login" element={<Login />} />
-      <Route path="/activate" element={<ActivateAccount />} />
+      <Route path="/activate" element={<PublicRoute><ActivateAccount /></PublicRoute>} />
       <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/student" element={<ProtectedRoute allowedRole="student"><StudentDashboard /></ProtectedRoute>} />
       <Route path="/workplace" element={<ProtectedRoute allowedRole="workplace"><WorkplaceDashboard /></ProtectedRoute>} />
