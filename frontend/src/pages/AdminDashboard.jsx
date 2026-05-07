@@ -422,9 +422,9 @@ return (
 
       <div
         style={menuItemStyle}
-        onclick={() => handleMenuClick("finalEvaluations")}
+        onClick={() => handleMenuClick("finalEvaluations")}
       >
-        🎓 Final Evaluations
+        🎓 Final Report
       </div>    
 
      
@@ -1233,19 +1233,20 @@ return (
             <tr>
               <th>Student</th>
               <th>Organization</th>
+              <th>name</th>
               <th>Workplace Supervisor</th>
               <th>Final Grade</th>
             </tr>
           </thead>
           <tbody>
-            {finalEvaluations.map((eval) => (
-              <tr key={eval.id}>
-                <td>{eval.student_name}</td>
-                <td>{eval.organization_name}</td>
-                <td>{eval.supervisor_name}</td>
+            {finalEvaluations.map((ev) => (
+              <tr key={ev.id}>
+                <td>{ev.student_name}</td>
+                <td>{ev.organization_name}</td>
+                <td>{ev.supervisor_name}</td>
                 <td>
                   <strong>
-                    {eval.final_grade}
+                    {ev.final_grade}
                   </strong>
                 </td>
               </tr>
