@@ -132,6 +132,61 @@ const submitEvaluation = async (placementId) => {
   }
 };
 
+  // --- Styles ---
+
+  const menuButtonStyle = {
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "12px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "15px",
+  };
+
+  const dropdownStyle = {
+    position: "absolute",
+    top: "60px",
+    right: "0",
+    backgroundColor: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+    width: "220px",
+    padding: "10px",
+    zIndex: 1000,
+  };
+
+  const dropdownItemStyle = {
+    padding: "12px",
+    cursor: "pointer",
+    borderRadius: "8px",
+    marginBottom: "5px",
+    fontWeight: "bold",
+    color: "#198754",
+    backgroundColor: "#f8f9fa",
+  };
+
+  const cardStyle = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    minWidth: "220px",
+    flex: "1",
+  };
+
+  const cardTitleStyle = {
+    color: "#666",
+    marginBottom: "10px",
+  };
+
+  const cardNumberStyle = {
+    fontSize: "30px",
+    fontWeight: "bold",
+    color: "#198754",
+  };
+
  const renderStudents = () => {
   return (
     <div>
@@ -379,34 +434,104 @@ const renderEvaluations = () => {
 };
 
 
-  return (
-    <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
-      
-      {/* 🔷 HEADER */}
-      <div style={{ padding: "15px", backgroundColor: "#2c3e50", color: "#fff" }}>
-        <h1 style={{ margin: 0 }}>Workplace Supervisor Dashboard</h1>
-      </div>
+return (
+  <div
+    style={{
+      padding: "30px",
+      backgroundColor: "#f4f6f9",
+      minHeight: "100vh",
+      fontFamily: "Arial",
+    }}
+  >
 
-      {/* 🔷 WELCOME */}
-      <div style={{ padding: "10px 15px", backgroundColor: "#34495e", color: "#fff" }}>
-        <small>Welcome {firstName || "user"}</small>
-      </div>
+    {/* HEADER */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+    position: "relative",
+  }}
+>
+  <div>
+    <h1
+      style={{
+        margin: 0,
+        color: "#198754",
+        fontSize: "38px",
+        fontWeight: "bold",
+      }}
+    >
+      INTERNSHIP PLACEMENT SYSTEM (ILES)
+    </h1>
 
-      {/* 🔷 MENU BUTTON */}
-      <div style={{ padding: "10px 15px" }}>
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          style={{
-            fontSize: "26px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
+    <h2
+      style={{
+        color: "#198754",
+        marginTop: "10px",
+        marginBottom: "5px",
+      }}
+    >
+      Workplace Supervisor Dashboard
+    </h2>
+
+    <p
+      style={{
+        color: "#666",
+        fontSize: "18px",
+        fontWeight: "bold",
+        marginTop: "0px",
+      }}
+    >
+      Welcome, {firstName || "Supervisor"} 👋
+    </p>
+  </div>
+
+  {/* MENU */}
+  <div style={{ position: "relative" }}>
+    <button
+      style={menuButtonStyle}
+      onClick={() => setShowMenu(!showMenu)}
+    >
+      ☰ Menu
+    </button>
+
+    {showMenu && (
+      <div style={dropdownStyle}>
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActivePage("home");
+            setShowMenu(false);
           }}
         >
-          ☰Menu
-        </button>
-      </div>
+          Home
+        </div>
 
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActivePage("students");
+            setShowMenu(false);
+          }}
+        >
+          My Students
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActivePage("evaluations");
+            setShowMenu(false);
+          }}
+        >
+          My Evaluations
+        </div>
+      </div>
+    )}
+  </div>
+</div>
       <div style={{ display: "flex" }}>
         
         {/* 🔷 MAIN CONTENT */}
@@ -572,21 +697,6 @@ const renderEvaluations = () => {
 
         </div>
 
-        {/* 🔷 SIDEBAR */}
-        {showMenu && (
-          <div
-            style={{
-              width: "200px",
-              backgroundColor: "#34495e",
-              color: "#fff",
-              padding: "15px",
-            }}
-          >
-            <p onClick={() => setActivePage("home")}>Home</p>
-            <p onClick={() => setActivePage("students")}>My Students</p>
-            <p onClick={() => setActivePage("evaluations")}>My Evaluations</p>
-          </div>
-        )}
       </div>
     </div>
   );
