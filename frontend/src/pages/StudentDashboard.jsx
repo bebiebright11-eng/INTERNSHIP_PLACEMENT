@@ -53,26 +53,6 @@ const handleLogout = () => {
     attendance_days: 5,
   });
 
-  const menuItemStyle = {
-    padding: "10px",
-    cursor: "pointer",
-    borderRadius: "5px",
-    marginBottom: "5px",
-    transition: "0.2s",
-  };
-
-  const cardStyle = {
-  flex: "1",
-  minWidth: "120px",   // reduced from 150+
-  maxWidth: "120px",   // prevents cards from stretching too big
-  background: "#ebc6eb",  // lighter background
-  padding: "10px",     // reduced padding
-  borderRadius: "8px",
-  border: "1px solid #e97407",
-  boxShadow: "0px 1px 4px hsla(0, 66%, 75%, 0.08)", // softer shadow
-  textAlign: "center",
-  fontSize: "14px"     // smaller text
-};
 
   useEffect(() => {
     fetchApplications();
@@ -222,71 +202,272 @@ const handleChange = (e) => {
     }
   };
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
-        INTERNSHIP  PLACEMENT  SYSTEM (ILES)
-      </h1>
+  const menuButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+};
 
-      <button onClick={handleLogout}>
-  Logout
-</button>
+const dropdownStyle = {
+  position: "absolute",
+  top: "55px",
+  right: "0",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+  width: "220px",
+  padding: "10px",
+  zIndex: 1000,
+};
 
-      <h2 style={{textAlign: "center", marginBottom: "5px" }}>Student Dashboard</h2>
-      <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, {firstName || "Student"} 👋</p>
+const dropdownItemStyle = {
+  padding: "12px",
+  cursor: "pointer",
+  borderRadius: "8px",
+  marginBottom: "5px",
+  fontWeight: "bold",
+  color: "#198754",
+  backgroundColor: "#f8f9fa",
+};
 
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{
-            fontSize: "22px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          ☰
-        </button>
-        <span
-          style={{ fontWeight: "bold", cursor: "pointer" }}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          Menu
-        </span>
-      </div>
+const cardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "20px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+  minWidth: "220px",
+  flex: "1",
+};
 
-      {/* --- MENU SECTION FIXED --- */}
-      {menuOpen && (
+const cardTitleStyle = {
+  color: "#666",
+  marginBottom: "10px",
+};
+
+const cardNumberStyle = {
+  fontSize: "30px",
+  fontWeight: "bold",
+  color: "#198754",
+};
+
+const sectionCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "25px",
+  marginBottom: "25px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+};
+
+const inputStyle = {
+  width: "80%",
+  padding: "12px",
+  marginBottom: "15px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  fontSize: "15px",
+};
+
+const textareaStyle = {
+  width: "80%",
+  minHeight: "120px",
+  padding: "12px",
+  marginBottom: "15px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  fontSize: "15px",
+  resize: "vertical",
+};
+
+const submitButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 25px",
+  borderRadius: "10px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  fontSize: "15px",
+};
+
+const logCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "20px",
+  marginBottom: "20px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+  borderLeft: "6px solid #198754",
+};
+
+
+return (
+  <div
+    style={{
+      padding: "30px",
+      backgroundColor: "#f4f6f9",
+      minHeight: "100vh",
+      fontFamily: "Arial",
+    }}
+  >
+
+ {/* HEADER */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+    position: "relative",
+  }}
+>
+  <div>
+    <h1
+      style={{
+        margin: 0,
+        color: "#198754",
+        fontSize: "38px",
+        fontWeight: "bold",
+      }}
+    >
+      INTERNSHIP PLACEMENT SYSTEM (ILES)
+    </h1>
+
+    <h2
+      style={{
+        color: "#198754",
+        marginTop: "10px",
+        marginBottom: "5px",
+      }}
+    >
+      Student Dashboard
+    </h2>
+
+    <p
+      style={{
+        color: "#666",
+        fontSize: "18px",
+        fontWeight: "bold",
+        marginTop: "0px",
+      }}
+    >
+      Welcome, {firstName || "Student"} 👋
+    </p>
+  </div>
+
+  {/* MENU */}
+  <div style={{ position: "relative" }}>
+    <button
+      style={menuButtonStyle}
+      onClick={() => setMenuOpen(!menuOpen)}
+    >
+      ☰ Menu
+    </button>
+
+    {menuOpen && (
+      <div style={dropdownStyle}>
         <div
-          style={{
-            position: "absolute",
-            marginTop: "10px",
-            background: "white",
-            border: "1px solid #f35f5f",
-            padding: "10px",
-            width: "250px",
-            boxShadow: "0px 2px 8px rgba(0,0,0,0.2)",
-            borderRadius: "8px",
-            zIndex: 999,
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("home");
+            setMenuOpen(false);
           }}
         >
-          <div style={menuItemStyle} onClick={() => setActiveView("home")}>
-            🏠 Home
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("organizations")}>
-            🏢 Organizations
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("applications")}>
-            📝 My Applications
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("evaluations")}>
-            📊 My Evaluations
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("logs")}>
-            📘 Weekly Logs
-          </div>
+          Home
         </div>
-      )}
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("organizations");
+            setMenuOpen(false);
+          }}
+        >
+          Organizations
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("applications");
+            setMenuOpen(false);
+          }}
+        >
+          Applications
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("evaluations");
+            setMenuOpen(false);
+          }}
+        >
+          Evaluations
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("logs");
+            setMenuOpen(false);
+          }}
+        >
+          Weekly Logs
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={handleLogout}
+        >
+          Logout
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+
+  <div style={{
+  display: "flex",
+  gap: "10px",
+  marginBottom: "15px",
+  flexWrap: "wrap",
+}}>
+  
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {logs.length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {applications.length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {applications.filter(a => a.status === "approved").length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
+    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
+       {evaluations.length}
+    </p>
+  </div>
+  </div>
+
+
 
 {notification && (
   <div style={{
@@ -317,44 +498,6 @@ const handleChange = (e) => {
         {activeView === "home" && (
           <>
 
-  <div style={{
-  display: "flex",
-  gap: "10px",
-  marginBottom: "15px",
-  flexWrap: "wrap",
-}}>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {logs.length}
-    </p>
-  </div>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.length}
-    </p>
-  </div>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       <p>{applications.filter(a=>a.status==="approved").length}</p>
-    </p>
-  </div>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
-    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
-       {evaluations.length}
-    </p>
-  </div>
-  </div>
-
-
-  
       {/* PLACEMENT STATUS SECTION */}
       <div style={{
         border: "2px solid #ee9714",
@@ -399,7 +542,8 @@ const handleChange = (e) => {
 
       {/* WEEKLY LOGS FORM */}
       <h2 style={{textAlign: "center"}}>Add Weekly Log</h2>
-      <form onSubmit={submitLog} style={{ textAlign: "center", border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
+      <div style={sectionCardStyle}>
+      <form onSubmit={submitLog} style={{ textAlign: "center" }}>
         <input
           type="number"
           name="week_number"
@@ -407,6 +551,7 @@ const handleChange = (e) => {
           value={formData.week_number}
           onChange={handleChange}
           required
+          style={inputStyle}
         />
         <br /><br />
         <textarea
@@ -415,6 +560,7 @@ const handleChange = (e) => {
           value={formData.tasks}
           onChange={handleChange}
           required
+          style={textareaStyle}
         />
         <br /><br />
         <textarea
@@ -422,6 +568,7 @@ const handleChange = (e) => {
           placeholder="Challenges faced"
           value={formData.challenges}
           onChange={handleChange}
+          style={textareaStyle}
         />
         <br /><br />
         <input
@@ -429,12 +576,22 @@ const handleChange = (e) => {
           name="attendance_days"
           value={formData.attendance_days}
           onChange={handleChange}
+          style={inputStyle}
         />
         <br /><br />
-        <button type="submit" disabled={!placement}>
+        <button
+  type="submit"
+  disabled={!placement}
+  style={{
+    ...submitButtonStyle,
+    backgroundColor: !placement ? "gray" : "#198754",
+    cursor: !placement ? "not-allowed" : "pointer",
+  }}
+>
           Submit Log
         </button>
       </form>
+      </div>
 
       <hr />
 
@@ -444,17 +601,35 @@ const handleChange = (e) => {
         <p style={{textAlign: "center"}}>No logs yet</p>
       ) : (
         logs.map((log) => (
-          <div key={log.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
-            <p style={{textAlign: "center"}}>Week: {log.week_number}</p>
-            <p style={{textAlign: "center"}}>Organization: {log.organization_name}</p>
-            <p style={{textAlign: "center"}}>Tasks: {log.tasks}</p>
-            <p style={{textAlign: "center"}}> Status: 
-  <span style={{
-    color: log.status === "reviewed" ? "green" : "orange",
-    fontWeight: "bold"
-  }}>
-    {log.status === "reviewed" ? "Reviewed ✅" : "Pending ⏳"}
-  </span></p>
+          <div key={log.id} style={logCardStyle}>
+            <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+             📅 Week {log.week_number}
+            </p>
+           <p>
+              <strong>🏢 Organization:</strong> {log.organization_name}
+            </p>
+            <p>
+               <strong>📝 Tasks:</strong> {log.tasks}
+            </p>
+<p>
+  <strong>Status:</strong>{" "}
+  <span
+    style={{
+      backgroundColor:
+        log.status === "reviewed" ? "#3bad56" : "#fff3cd",
+      color:
+        log.status === "reviewed" ? "#155724" : "#856404",
+      padding: "6px 12px",
+      borderRadius: "20px",
+      fontWeight: "bold",
+      display: "inline-block",
+    }}
+  >
+    {log.status === "reviewed"
+      ? "Reviewed ✅"
+      : "Pending ⏳"}
+  </span>
+</p>
           </div>
         ))
       )}
@@ -596,7 +771,7 @@ const handleChange = (e) => {
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
             <p style={{textAlign: "center"}}><strong>Name:</strong> {org.name}</p>
             <p style={{textAlign: "center"}}><strong>Location:</strong> {org.location}</p>
-            
+      
             {placement ? (
   <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>
     Already Placed
