@@ -225,23 +225,70 @@ const logScore = countedLogs * 2.5;
 
     {/* ✅ ADD CRITERIA BREAKDOWN */}
     <h5>Criteria Breakdown</h5>
-<table border="1" cellPadding="8">
-  <thead>
-    <tr>
-      <th>Criteria</th>
-      <th>Marks</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    {workplaceEval.criteria_scores?.map((item) => (
-      <tr key={item.id}>
-        <td>{item.criteria_name}</td>
-        <td>{item.score}</td>
+<div
+  style={{
+    marginTop: "15px",
+    borderRadius: "10px",
+    overflow: "hidden",
+    border: "1px solid #ddd",
+    width: "100%",
+    maxWidth: "500px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+  }}
+>
+  <table
+    style={{
+      width: "100%",
+      borderCollapse: "collapse",
+      fontFamily: "Arial"
+    }}
+  >
+    <thead>
+      <tr
+        style={{
+          backgroundColor: "#198754",
+          color: "white",
+          textAlign: "left"
+        }}
+      >
+        <th style={{ padding: "12px" }}>Criteria</th>
+        <th style={{ padding: "12px" }}>Marks</th>
       </tr>
-    ))}
-  </tbody>
-</table>
+    </thead>
+
+    <tbody>
+      {workplaceEval.criteria_scores?.map((item, index) => (
+        <tr
+          key={item.id}
+          style={{
+            backgroundColor:
+              index % 2 === 0 ? "#f8f9fa" : "white"
+          }}
+        >
+          <td
+            style={{
+              padding: "12px",
+              borderBottom: "1px solid #ddd"
+            }}
+          >
+            {item.criteria_name}
+          </td>
+
+          <td
+            style={{
+              padding: "12px",
+              borderBottom: "1px solid #ddd",
+              fontWeight: "bold",
+              color: "#198754"
+            }}
+          >
+            {item.score}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
 
     <p><strong>Comments:</strong> {workplaceEval.comments}</p>
   </div>
