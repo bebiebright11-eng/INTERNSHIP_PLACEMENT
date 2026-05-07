@@ -255,6 +255,54 @@ const cardNumberStyle = {
   color: "#198754",
 };
 
+const sectionCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "25px",
+  marginBottom: "25px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+};
+
+const inputStyle = {
+  width: "80%",
+  padding: "12px",
+  marginBottom: "15px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  fontSize: "15px",
+};
+
+const textareaStyle = {
+  width: "80%",
+  minHeight: "120px",
+  padding: "12px",
+  marginBottom: "15px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  fontSize: "15px",
+  resize: "vertical",
+};
+
+const submitButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 25px",
+  borderRadius: "10px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  fontSize: "15px",
+};
+
+const logCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "20px",
+  marginBottom: "20px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+  borderLeft: "6px solid #198754",
+};
+
 
 return (
   <div
@@ -494,7 +542,8 @@ return (
 
       {/* WEEKLY LOGS FORM */}
       <h2 style={{textAlign: "center"}}>Add Weekly Log</h2>
-      <form onSubmit={submitLog} style={{ textAlign: "center", border: "1px solid gray", padding: "10px", marginBottom: "20px" }}>
+      <div style={sectionCardStyle}>
+      <form onSubmit={submitLog} style={{ textAlign: "center" }}>
         <input
           type="number"
           name="week_number"
@@ -502,6 +551,7 @@ return (
           value={formData.week_number}
           onChange={handleChange}
           required
+          style={inputStyle}
         />
         <br /><br />
         <textarea
@@ -510,6 +560,7 @@ return (
           value={formData.tasks}
           onChange={handleChange}
           required
+          style={textareaStyle}
         />
         <br /><br />
         <textarea
@@ -517,6 +568,7 @@ return (
           placeholder="Challenges faced"
           value={formData.challenges}
           onChange={handleChange}
+          style={textareaStyle}
         />
         <br /><br />
         <input
@@ -524,12 +576,22 @@ return (
           name="attendance_days"
           value={formData.attendance_days}
           onChange={handleChange}
+          style={inputStyle}
         />
         <br /><br />
-        <button type="submit" disabled={!placement}>
+        <button
+  type="submit"
+  disabled={!placement}
+  style={{
+    ...submitButtonStyle,
+    backgroundColor: !placement ? "gray" : "#198754",
+    cursor: !placement ? "not-allowed" : "pointer",
+  }}
+>
           Submit Log
         </button>
       </form>
+      </div>
 
       <hr />
 
@@ -539,17 +601,35 @@ return (
         <p style={{textAlign: "center"}}>No logs yet</p>
       ) : (
         logs.map((log) => (
-          <div key={log.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
-            <p style={{textAlign: "center"}}>Week: {log.week_number}</p>
-            <p style={{textAlign: "center"}}>Organization: {log.organization_name}</p>
-            <p style={{textAlign: "center"}}>Tasks: {log.tasks}</p>
-            <p style={{textAlign: "center"}}> Status: 
-  <span style={{
-    color: log.status === "reviewed" ? "green" : "orange",
-    fontWeight: "bold"
-  }}>
-    {log.status === "reviewed" ? "Reviewed ✅" : "Pending ⏳"}
-  </span></p>
+          <div key={log.id} style={logCardStyle}>
+            <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+             📅 Week {log.week_number}
+            </p>
+           <p>
+              <strong>🏢 Organization:</strong> {log.organization_name}
+            </p>
+            <p>
+               <strong>📝 Tasks:</strong> {log.tasks}
+            </p>
+<p>
+  <strong>Status:</strong>{" "}
+  <span
+    style={{
+      backgroundColor:
+        log.status === "reviewed" ? "#3bad56" : "#fff3cd",
+      color:
+        log.status === "reviewed" ? "#155724" : "#856404",
+      padding: "6px 12px",
+      borderRadius: "20px",
+      fontWeight: "bold",
+      display: "inline-block",
+    }}
+  >
+    {log.status === "reviewed"
+      ? "Reviewed ✅"
+      : "Pending ⏳"}
+  </span>
+</p>
           </div>
         ))
       )}
