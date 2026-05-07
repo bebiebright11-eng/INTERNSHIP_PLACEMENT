@@ -537,26 +537,84 @@ return (
         {/* 🔷 MAIN CONTENT */}
         <div style={{ flex: 1, padding: "20px" }}>
 
+
+  {/* SUMMARY CARDS */}
+  <div
+    style={{
+      display: "flex",
+      gap: "20px",
+      marginBottom: "25px",
+      flexWrap: "wrap",
+    }}
+  >
+
+    <div
+      style={{
+        flex: 1,
+        minWidth: "220px",
+        background:
+          "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+        color: "white",
+        padding: "25px",
+        borderRadius: "18px",
+        boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+      }}
+    >
+      <h3 style={{ marginBottom: "10px" }}>
+        Assigned Students
+      </h3>
+
+      <h1 style={{ margin: 0 }}>
+        {assignedCount}
+      </h1>
+    </div>
+
+    <div
+      style={{
+        flex: 1,
+        minWidth: "220px",
+        background:
+          "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        color: "white",
+        padding: "25px",
+        borderRadius: "18px",
+        boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+      }}
+    >
+      <h3 style={{ marginBottom: "10px" }}>
+        Evaluated
+      </h3>
+
+      <h1 style={{ margin: 0 }}>
+        {evaluatedCount}
+      </h1>
+    </div>
+
+    <div
+      style={{
+        flex: 1,
+        minWidth: "220px",
+        background:
+          "linear-gradient(135deg, #f953c6 0%, #b91d73 100%)",
+        color: "white",
+        padding: "25px",
+        borderRadius: "18px",
+        boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+      }}
+    >
+      <h3 style={{ marginBottom: "10px" }}>
+        Pending
+      </h3>
+
+      <h1 style={{ margin: 0 }}>
+        {pendingCount}
+      </h1>
+    </div>
+
+  </div>
+
           {activePage === "home" && (
             <div>
-
-              {/* 🔷 SUMMARY CARDS */}
-              <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
-                <div style={{ flex: 1, padding: "15px", background: "#df7cf8c9" }}>
-                  <h3>Assigned Students</h3>
-                  <h2>{assignedCount}</h2>
-                </div>
-
-                <div style={{ flex: 1, padding: "15px", background: "#da81e6" }}>
-                  <h3>Evaluated</h3>
-                  <h2>{evaluatedCount}</h2>
-                </div>
-
-                <div style={{ flex: 1, padding: "15px", background: "#e478e7" }}>
-                  <h3>Pending</h3>
-                  <h2>{pendingCount}</h2>
-                </div>
-              </div>
 
               {/* 🔷 STUDENTS LIST */}
               {placements.length === 0 ? (
