@@ -101,6 +101,14 @@ const submitEvaluation = async (placementId) => {
       }
     );
 
+    setSavedEvaluations((prev) => ({
+  ...prev,
+  [placementId]: {
+    scores: scores[placementId],
+    comments: comments[placementId],
+  },
+}));
+
     alert("Evaluation submitted and saved to database!");
 
     setSubmittedEvaluations((prev) => ({
@@ -165,6 +173,48 @@ const submitEvaluation = async (placementId) => {
                       )}
                     </td>
                   </tr>
+                  {selectedPlacement?.id === p.id && (
+  <tr>
+    <td colSpan="4">
+
+      <div
+        style={{
+          background: "#f9f9f9",
+          padding: "15px",
+          marginTop: "10px",
+          borderRadius: "8px",
+        }}
+      >
+        <h4>Evaluation Details</h4>
+
+        <p>
+          <strong>Comments:</strong>{" "}
+          {savedEvaluations[p.id]?.comments || "No comments"}
+        </p>
+
+        <h5>Scores:</h5>
+
+        <ul>
+          {Object.entries(
+            savedEvaluations[p.id]?.scores || {}
+          ).map(([criteriaId, score]) => {
+            const criterion = criteria.find(
+              (c) => c.id === parseInt(criteriaId)
+            );
+
+            return (
+              <li key={criteriaId}>
+                {criterion?.name}: {score}
+              </li>
+            );
+          })}
+        </ul>
+
+      </div>
+
+    </td>
+  </tr>
+)}
 
                   {activeEvaluation === p.id &&
                     !submittedEvaluations[p.id] && (
@@ -241,6 +291,85 @@ const submitEvaluation = async (placementId) => {
             })}
           </tbody>
         </table>
+      )}
+    </div>
+  );
+};
+
+const renderEvaluations = () => {
+  const evaluated = placements.filter(
+    (p) => submittedEvaluations[p.id]
+  );
+
+  return (
+    <div>
+      <h2>My Evaluations</h2>
+
+      {evaluated.length === 0 ? (
+        <p>No evaluations submitted yet</p>
+      ) : (
+        <table style={{ width: "100%" }}>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {evaluated.map((p) => (
+              <tr key={p.id}>
+                <td>{p.student_name}</td>
+                <td>{p.organization_name}</td>
+                <td>Evaluated</td>
+
+                <td>
+                  <button onClick={() => setSelectedPlacement(p)}>
+                    View Evaluation
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* VIEW DETAILS SECTION */}
+      {selectedPlacement && (
+        <div style={{
+          marginTop: "20px",
+          padding: "15px",
+          background: "#f4f4f4",
+          borderRadius: "8px"
+        }}>
+          <h3>Evaluation Details</h3>
+
+          <p>
+            <strong>Comments:</strong>{" "}
+            {savedEvaluations[selectedPlacement.id]?.comments || "No comments"}
+          </p>
+
+          <h4>Scores</h4>
+
+          <ul>
+            {Object.entries(
+              savedEvaluations[selectedPlacement.id]?.scores || {}
+            ).map(([criteriaId, score]) => {
+              const c = criteria.find(
+                (x) => x.id === parseInt(criteriaId)
+              );
+
+              return (
+                <li key={criteriaId}>
+                  {c?.name}: {score}
+                </li>
+              );
+            })}
+          </ul>
+
+        </div>
       )}
     </div>
   );
@@ -430,6 +559,11 @@ const submitEvaluation = async (placementId) => {
           {activePage === "students" && (
   <div style={{ padding: "20px" }}>
     {renderStudents()}
+  </div>
+)}
+{activePage === "evaluations" && (
+  <div style={{ padding: "20px" }}>
+    {renderEvaluations()}
   </div>
 )}
 
