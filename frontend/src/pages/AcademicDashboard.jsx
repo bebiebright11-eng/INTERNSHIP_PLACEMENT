@@ -373,8 +373,8 @@ const academicEval = evaluations.find(
 
     </div>
 
-
-      {placements.length === 0 ? (
+{activePage === "home" && (
+  placements.length === 0 ? (
         <p>No students assigned</p>
       ) : (
         placements.map((p) => {
@@ -610,10 +610,14 @@ const logScore = countedLogs * 2.5;
 )}
 
 
+
             </div>
           );
         })
-      )}
+      )
+      )} 
+      
+    
     </div>
   );
 }
