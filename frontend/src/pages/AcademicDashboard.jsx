@@ -77,11 +77,10 @@ const cardNumberStyle = {
         },
       });
 
-      const filtered = res.data.filter(
-        (p) => p.academic_supervisor === parseInt(localStorage.getItem("user_id"))
-      );
+      console.log("PLACEMENTS:", res.data);
+      console.log("USER ID:", localStorage.getItem("user_id"));
 
-      setPlacements(filtered);
+      setPlacements(res.data);
     } catch (error) {
       console.log(error);
     }
