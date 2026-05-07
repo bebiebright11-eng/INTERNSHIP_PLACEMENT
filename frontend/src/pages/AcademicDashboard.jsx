@@ -9,9 +9,69 @@ function AcademicDashboard() {
   const [logs, setLogs] = useState({});
 
   const [editingPlacement, setEditingPlacement] = useState(null);
+  const [activePage, setActivePage] = useState("home");
+  const [showMenu, setShowMenu] = useState(false);
+  const [expandedStudent, setExpandedStudent] = useState(null);
+  const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
+const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
+const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
 
   // --- Data Fetching Functions ---
 
+
+
+  const menuButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px"
+};
+
+const dropdownStyle = {
+  position: "absolute",
+  top: "60px",
+  left: "0",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+  width: "220px",
+  padding: "10px",
+  zIndex: 1000
+};
+
+const dropdownItemStyle = {
+  padding: "12px",
+  cursor: "pointer",
+  borderRadius: "8px",
+  marginBottom: "5px",
+  fontWeight: "bold",
+  color: "#198754",
+  backgroundColor: "#f8f9fa"
+};
+
+const cardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "20px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+  minWidth: "220px",
+  flex: "1"
+};
+
+const cardTitleStyle = {
+  color: "#666",
+  marginBottom: "10px"
+};
+
+const cardNumberStyle = {
+  fontSize: "30px",
+  fontWeight: "bold",
+  color: "#198754"
+};
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/", {
@@ -20,11 +80,10 @@ function AcademicDashboard() {
         },
       });
 
-      const filtered = res.data.filter(
-        (p) => p.academic_supervisor === parseInt(localStorage.getItem("user_id"))
-      );
+      console.log("PLACEMENTS:", res.data);
+      console.log("USER ID:", localStorage.getItem("user_id"));
 
-      setPlacements(filtered);
+      setPlacements(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -176,18 +235,168 @@ const academicEval = evaluations.find(
   // --- Main Render ---
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Academic Supervisor Dashboard</h1>
+  <div
+    style={{
+      padding: "30px",
+      backgroundColor: "#f4f6f9",
+      minHeight: "100vh",
+      fontFamily: "Arial"
+    }}
+  >
 
-      {placements.length === 0 ? (
+    {/* HEADER */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "30px",
+        position: "relative"
+      }}
+    >
+
+      <div>
+        <h1
+          style={{
+            margin: 0,
+            color: "#198754"
+          }}
+        >
+          Academic Supervisor Dashboard
+        </h1>
+
+        <p
+          style={{
+            color: "#666",
+            marginTop: "10px"
+          }}
+        >
+          Welcome {localStorage.getItem("username")}
+        </p>
+      </div>
+
+      {/* MENU */}
+      <div style={{ position: "relative" }}>
+
+        <button
+          style={menuButtonStyle}
+          onClick={() => setShowMenu(!showMenu)}
+        >
+          ☰ Menu
+        </button>
+
+        {showMenu && (
+          <div style={dropdownStyle}>
+
+            <div
+              style={dropdownItemStyle}
+              onClick={() => {
+                setActivePage("home");
+                setShowMenu(false);
+              }}
+            >
+              Home
+            </div>
+
+            <div
+              style={dropdownItemStyle}
+              onClick={() => {
+                setActivePage("students");
+                setShowMenu(false);
+              }}
+            >
+              My Students
+            </div>
+
+            <div
+              style={dropdownItemStyle}
+              onClick={() => {
+                setActivePage("evaluations");
+                setShowMenu(false);
+              }}
+            >
+              Evaluations
+            </div>
+
+          </div>
+        )}
+
+      </div>
+
+    </div>
+
+    {/* SUMMARY CARDS */}
+    <div
+      style={{
+        display: "flex",
+        gap: "20px",
+        marginBottom: "30px",
+        flexWrap: "wrap"
+      }}
+    >
+
+      <div style={cardStyle}>
+        <h3 style={cardTitleStyle}>
+          Assigned Students
+        </h3>
+
+        <p style={cardNumberStyle}>
+          {placements.length}
+        </p>
+      </div>
+
+      <div style={cardStyle}>
+        <h3 style={cardTitleStyle}>
+          Evaluated Students
+        </h3>
+
+        <p style={cardNumberStyle}>
+          {
+            evaluations.filter(
+              (ev) => ev.supervisor_type === "academic"
+            ).length
+          }
+        </p>
+      </div>
+
+      <div style={cardStyle}>
+        <h3 style={cardTitleStyle}>
+          Pending Students
+        </h3>
+
+        <p style={cardNumberStyle}>
+          {
+            placements.length -
+            evaluations.filter(
+              (ev) => ev.supervisor_type === "academic"
+            ).length
+          }
+        </p>
+      </div>
+
+    </div>
+
+{activePage === "home" && (
+        <div>
+
+<h2
+  style={{
+    color: "#198754",
+    marginBottom: "20px"
+  }}
+>
+  Assigned Students
+</h2>
+
+{placements.length === 0 ? (
         <p>No students assigned</p>
       ) : (
         placements.map((p) => {
-const studentLogs = logs[p.id] || [];
-const logCount = studentLogs.length;
+  const studentLogs = logs[p.id] || [];
+  const logCount = studentLogs.length;
 
-const countedLogs = Math.min(logCount, 8);
-const logScore = countedLogs * 2.5;
+  const countedLogs = Math.min(logCount, 8);
+  const logScore = countedLogs * 2.5;
 
 
 
@@ -213,10 +422,91 @@ const logScore = countedLogs * 2.5;
 
 
           return (
-            <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
+            <div
+  key={p.id}
+  style={{
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    marginBottom: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+  }}
+>
               <h3>Student: {p.student_name}</h3>
               <p>Organization: {p.organization_name}</p>
 
+              <button
+  onClick={() =>
+    setExpandedStudent(
+      expandedStudent === p.id ? null : p.id
+    )
+  }
+  style={{
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "10px 18px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginTop: "10px",
+    fontWeight: "bold"
+  }}
+>
+  Evaluate Student
+</button>
+
+
+{expandedStudent === p.id && (
+<div style={{ marginTop: "20px" }}>
+
+  <div
+    style={{
+      display: "flex",
+      gap: "10px",
+      flexWrap: "wrap",
+      marginBottom: "20px"
+    }}
+  >
+
+    <button
+      onClick={() =>
+        setShowWorkplaceEval(
+          showWorkplaceEval === p.id ? null : p.id
+        )
+      }
+      style={menuButtonStyle}
+    >
+      View Workplace Evaluation
+    </button>
+
+    <button
+      onClick={() =>
+        setShowWeeklyLogs(
+          showWeeklyLogs === p.id ? null : p.id
+        )
+      }
+      style={menuButtonStyle}
+    >
+      View Weekly Logs
+    </button>
+
+    <button
+      onClick={() =>
+        setShowFinalEvaluation(
+          showFinalEvaluation === p.id ? null : p.id
+        )
+      }
+      style={menuButtonStyle}
+    >
+      Give Final Evaluation
+    </button>
+
+  </div>
+
+
+
+{showWorkplaceEval === p.id && (
+<div>
 
 <h4>Workplace Evaluation</h4>
 {workplaceEval ? (
@@ -293,9 +583,15 @@ const logScore = countedLogs * 2.5;
     <p><strong>Comments:</strong> {workplaceEval.comments}</p>
   </div>
 ) : (
-  <p>No workplace evaluation yet</p>
+<p>No workplace evaluation yet</p>
 )}
 
+</div>
+)}
+
+
+{showWeeklyLogs === p.id && (
+<div>
 
 <h4>Weekly Logs</h4>
 
@@ -328,6 +624,13 @@ const logScore = countedLogs * 2.5;
   );
 })}
 </ul>
+
+</div>
+)}
+
+
+{showFinalEvaluation === p.id && (
+<div>
 
 {(!academicEval || editingPlacement === p.id) ? (
   <div>
@@ -414,11 +717,21 @@ const logScore = countedLogs * 2.5;
   </div>
 )}
 
+</div>
+)}
 
-            </div>
-          );
+
+
+          </div>
+)}
+</div>
+);
         })
-      )}
+           )}
+    </div>
+)} 
+      
+    
     </div>
   );
 }
