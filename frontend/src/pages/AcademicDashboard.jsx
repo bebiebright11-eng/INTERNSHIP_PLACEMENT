@@ -218,12 +218,22 @@ const logScore = countedLogs * 2.5;
   min="0"
   max="20"
   placeholder="Enter marks out of 20"
-  onChange={(e) =>
+  value={scores[p.id] || ""}
+  onChange={(e) => {
+
+    let value = parseInt(e.target.value) || 0;
+
+    // ✅ Prevent below 0
+    if (value < 0) value = 0;
+
+    // ✅ Prevent above 20
+    if (value > 20) value = 20;
+
     setScores((prev) => ({
       ...prev,
-      [p.id]: parseInt(e.target.value),
-    }))
-  }
+      [p.id]: value,
+    }));
+  }}
 />
 <h4>Final Score</h4>
 <p>{finalScore} / 100</p>
