@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
-import API from "../api";
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -98,7 +97,7 @@ function AcademicDashboard() {
 
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/evaluationcriteria/", {
+      const res = await API.get("supervision/criteria/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -106,8 +105,12 @@ function AcademicDashboard() {
 
       setCriteria(res.data);
     } catch (error) {
+       console.log("CRITERIA ERROR:", error.response);
+  console.log("DATA:", error.response?.data);
+  console.log("STATUS:", error.response?.status);
+
+  toast.error("Failed to load criteria ❌");
      
-     toast.error("Failed to load criteria ❌");
 }
   };
 
