@@ -165,9 +165,16 @@ function AdminDashboard() {
       toast.warning("Name and location are required");
       return;
     }
+    const cleanedData = {
+      ...orgForm,
+      website: orgForm.website || null,
+      email: orgForm.email || null,
+      phone: orgForm.phone || null,
+      description: orgForm.description || null,
+    };
 
     try {
-      const res = await API.post("internships/organizations/", orgForm);
+      const res = await API.post("internships/organizations/", cleanedData);
 
       setOrganizations((prev) => [...prev, res.data]);
 
@@ -1232,8 +1239,8 @@ return (
           >
             <tr>
               <th>Student</th>
+              <th>Registration Number</th>
               <th>Organization</th>
-              <th>name</th>
               <th>Workplace Supervisor</th>
               <th>Final Grade</th>
             </tr>
@@ -1242,6 +1249,7 @@ return (
             {finalEvaluations.map((ev) => (
               <tr key={ev.id}>
                 <td>{ev.student_name}</td>
+                <td>{ev.student_registration_number}</td>
                 <td>{ev.organization_name}</td>
                 <td>{ev.supervisor_name}</td>
                 <td>
