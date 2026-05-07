@@ -173,6 +173,48 @@ const submitEvaluation = async (placementId) => {
                       )}
                     </td>
                   </tr>
+                  {selectedPlacement?.id === p.id && (
+  <tr>
+    <td colSpan="4">
+
+      <div
+        style={{
+          background: "#f9f9f9",
+          padding: "15px",
+          marginTop: "10px",
+          borderRadius: "8px",
+        }}
+      >
+        <h4>Evaluation Details</h4>
+
+        <p>
+          <strong>Comments:</strong>{" "}
+          {savedEvaluations[p.id]?.comments || "No comments"}
+        </p>
+
+        <h5>Scores:</h5>
+
+        <ul>
+          {Object.entries(
+            savedEvaluations[p.id]?.scores || {}
+          ).map(([criteriaId, score]) => {
+            const criterion = criteria.find(
+              (c) => c.id === parseInt(criteriaId)
+            );
+
+            return (
+              <li key={criteriaId}>
+                {criterion?.name}: {score}
+              </li>
+            );
+          })}
+        </ul>
+
+      </div>
+
+    </td>
+  </tr>
+)}
 
                   {activeEvaluation === p.id &&
                     !submittedEvaluations[p.id] && (
