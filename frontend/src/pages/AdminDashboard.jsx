@@ -1205,34 +1205,57 @@ return (
 )}
 {activeView === "finalEvaluations" && (
   <>
-  <h2>Final Student Evaluations</h2>
-  {finalEvaluations.length === 0 ? (
-    <p>No evaluations yet</p>
-  ) : (   
-    <table
-      border="1"
-      cellPadding="10"
-      style={{ marginTop: "20px", width: "100%", backgroundColor: "#f0f0f0", marginLeft: "30px",borderCollapse: "collapse" }}
+    <div
+      style={{
+        display:'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: '30px'
+      }}
     >
-      <thead
-        style={{ 
-          backgroundColor: "#480303",
-          color: "white", 
-          fontWeight: "bold"
-       }}
-      >
-        <tr>
-          <th>Student</th>
-          <th>Organization</th>
-          <th>Workplace Supervisor</th>
-          <th>Final Grade</th>
-        </tr>
-      </thead>
-    </table>
-
-
+      <h2>Final Student Evaluations</h2>
+      {finalEvaluations.length === 0 ? (
+        <p>No evaluations yet</p>
+      ) : (   
+        <table
+          border="1"
+          cellPadding="10"
+          style={{ marginTop: "20px", width: "100%", backgroundColor: "#f0f0f0", marginLeft: "30px",borderCollapse: "collapse" }}
+        >
+          <thead
+            style={{ 
+              backgroundColor: "#480303",
+              color: "white", 
+              fontWeight: "bold"
+          }}
+          >
+            <tr>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>Workplace Supervisor</th>
+              <th>Final Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {finalEvaluations.map((eval) => (
+              <tr key={eval.id}>
+                <td>{eval.student_name}</td>
+                <td>{eval.organization_name}</td>
+                <td>{eval.supervisor_name}</td>
+                <td>
+                  <strong>
+                    {eval.final_grade}
+                  </strong>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+  </div>
   </>
-
+)}
    
     </div>    
   </div>
