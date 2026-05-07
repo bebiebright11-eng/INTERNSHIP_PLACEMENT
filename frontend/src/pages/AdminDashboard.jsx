@@ -51,6 +51,7 @@ function AdminDashboard() {
   const [showDropdown, setShowDropdown] = useState({});
   const [savedRows, setSavedRows] = useState({});
   const [criteria, setCriteria] = useState([]);
+  const [finalEvaluations, setFinalEvaluations] = useState([]);
   const [newCriteria, setNewCriteria] = useState({
     name: "",
     max_score: "",
@@ -270,6 +271,22 @@ function AdminDashboard() {
     }
   };
 
+  const fetchFinalEvaluations = async () => {
+    try {
+
+      const res = await API.get("supervision/evaluations/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setFinalEvaluations(res.data);
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // ---------------- LOAD DATA ON MOUNT ----------------
   useEffect(() => {
     fetchApplications();
@@ -277,6 +294,7 @@ function AdminDashboard() {
     fetchSupervisors();
     fetchOrganizations();
     fetchCriteria();
+    fetchFinalEvaluations();
   }, []);
 
   const menuItemStyle = {
@@ -401,6 +419,13 @@ return (
       >
         📍 Placements
       </div>
+
+      <div
+        style={menuItemStyle}
+        onclick={() => handleMenuClick("finalEvaluations")}
+      >
+        🎓 Final Evaluations
+      </div>    
 
      
 
@@ -1176,6 +1201,59 @@ return (
         })
       )}
     </div>
+  </>
+)}
+{activeView === "finalEvaluations" && (
+  <>
+    <div
+      style={{
+        display:'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: '30px'
+      }}
+    >
+      <h2>Final Student Evaluations</h2>
+      {finalEvaluations.length === 0 ? (
+        <p>No evaluations yet</p>
+      ) : (   
+        <table
+          border="1"
+          cellPadding="10"
+          style={{ marginTop: "20px", width: "100%", backgroundColor: "#f0f0f0", marginLeft: "30px",borderCollapse: "collapse" }}
+        >
+          <thead
+            style={{ 
+              backgroundColor: "#480303",
+              color: "white", 
+              fontWeight: "bold"
+          }}
+          >
+            <tr>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>Workplace Supervisor</th>
+              <th>Final Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {finalEvaluations.map((eval) => (
+              <tr key={eval.id}>
+                <td>{eval.student_name}</td>
+                <td>{eval.organization_name}</td>
+                <td>{eval.supervisor_name}</td>
+                <td>
+                  <strong>
+                    {eval.final_grade}
+                  </strong>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+  </div>
   </>
 )}
    
