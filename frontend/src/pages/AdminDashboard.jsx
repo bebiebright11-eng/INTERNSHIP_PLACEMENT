@@ -165,9 +165,16 @@ function AdminDashboard() {
       toast.warning("Name and location are required");
       return;
     }
+    const cleanedData = {
+      ...orgForm,
+      website: orgForm.website || null,
+      email: orgForm.email || null,
+      phone: orgForm.phone || null,
+      description: orgForm.description || null,
+    };
 
     try {
-      const res = await API.post("internships/organizations/", orgForm);
+      const res = await API.post("internships/organizations/", cleanedData);
 
       setOrganizations((prev) => [...prev, res.data]);
 

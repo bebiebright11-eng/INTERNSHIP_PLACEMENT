@@ -8,10 +8,10 @@ User = settings.AUTH_USER_MODEL
 class Organization(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    contact_email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    description = models.TextField(blank=True)
-    website = models.URLField(blank=True)
+    contact_email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    website = models.URLField(blank=True,null =True)
 
     def __str__(self):
         return self.name
