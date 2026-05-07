@@ -74,45 +74,65 @@ function WorkplaceDashboard() {
   };
 
   // 🔹 Submit evaluation
-  const submitEvaluation = async (placementId) => {
-    try {
-      const criteriaScores = Object.entries(scores[placementId] || {}).map(
-        ([criteriaId, score]) => ({
-          criteria: parseInt(criteriaId),
-          score: score,
-        })
-      );
+const submitEvaluation = async (placementId) => {
+  try {
+    const criteriaScores = Object.entries(scores[placementId] || {}).map(
+      ([criteriaId, score]) => ({
+        criteria: parseInt(criteriaId),
+        score: score,
+      })
+    );
 
-      if (criteriaScores.length === 0) {
-        alert("Please enter scores before submitting.");
-        return;
-      }
-
-      // ✅ Save locally
-      setSavedEvaluations((prev) => ({
-        ...prev,
-        [placementId]: {
-          scores: scores[placementId],
-          comments: comments[placementId],
-        },
-      }));
-
-      // ✅ Mark submitted
-      setSubmittedEvaluations((prev) => ({
-        ...prev,
-        [placementId]: true,
-      }));
-
-      // ✅ Close form
-      setActiveEvaluation(null);
-
-      alert("Evaluation submitted successfully!");
-    } catch (error) {
-      console.log(error);
+    if (criteriaScores.length === 0) {
+      alert("Please enter scores before submitting.");
+      return;
     }
-  };
 
-  const renderStudents = () => {
+    await API.post(
+      "supervision/evaluations/",
+      {
+        placement: placementId,
+        supervisor_type: "workplace",
+        comments: comments[placementId] || "",
+        score: 0, // backend calculates real score
+        criteria_scores: criteriaScores,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    setSavedEvaluations((prev) => ({
+  ...prev,
+  [placementId]: {
+    scores: scores[placementId],
+    comments: comments[placementId],
+  },
+}));
+
+    alert("Evaluation submitted and saved to database!");
+
+    setSubmittedEvaluations((prev) => ({
+      ...prev,
+      [placementId]: true,
+    }));
+
+    setActiveEvaluation(null);
+
+  } catch (error) {
+    console.log("FULL ERROR:", error);
+
+  console.log("RESPONSE:", error.response);
+
+  console.log("DATA:", error.response?.data);
+
+  alert(JSON.stringify(error.response?.data));
+  }
+};
+
+ const renderStudents = () => {
   return (
     <div>
       <h2>My Students</h2>
@@ -120,7 +140,7 @@ function WorkplaceDashboard() {
       {placements.length === 0 ? (
         <p>No students assigned</p>
       ) : (
-        <table>
+        <table style={{ width: "100%" }}>
           <thead>
             <tr>
               <th>Student</th>
@@ -135,26 +155,224 @@ function WorkplaceDashboard() {
               const isEvaluated = !!submittedEvaluations[p.id];
 
               return (
-                <tr key={p.id}>
-                  <td>{p.student_name}</td>
-                  <td>{p.organization_name}</td>
-                  <td>{isEvaluated ? "Evaluated" : "Pending"}</td>
-                  <td>
-                    {isEvaluated ? (
-                      <button onClick={() => setSelectedPlacement(p)}>
-                        View
-                      </button>
-                    ) : (
-                      <button onClick={() => setActiveEvaluation(p.id)}>
-                        Evaluate
-                      </button>
+                <>
+                  <tr key={p.id}>
+                    <td>{p.student_name}</td>
+                    <td>{p.organization_name}</td>
+
+                    <td>
+                      {isEvaluated ? "Evaluated" : "Pending"}
+                    </td>
+
+                    <td>
+                      {isEvaluated ? (
+                        <button onClick={() => setSelectedPlacement(p)}>
+                          View
+                        </button>
+                      ) : (
+                        <button onClick={() => setActiveEvaluation(p.id)}>
+                          Evaluate
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                  {selectedPlacement?.id === p.id && (
+  <tr>
+    <td colSpan="4">
+
+      <div
+        style={{
+          background: "#f9f9f9",
+          padding: "15px",
+          marginTop: "10px",
+          borderRadius: "8px",
+        }}
+      >
+        <h4>Evaluation Details</h4>
+
+        <p>
+          <strong>Comments:</strong>{" "}
+          {savedEvaluations[p.id]?.comments || "No comments"}
+        </p>
+
+        <h5>Scores:</h5>
+
+        <ul>
+          {Object.entries(
+            savedEvaluations[p.id]?.scores || {}
+          ).map(([criteriaId, score]) => {
+            const criterion = criteria.find(
+              (c) => c.id === parseInt(criteriaId)
+            );
+
+            return (
+              <li key={criteriaId}>
+                {criterion?.name}: {score}
+              </li>
+            );
+          })}
+        </ul>
+
+      </div>
+
+    </td>
+  </tr>
+)}
+
+                  {activeEvaluation === p.id &&
+                    !submittedEvaluations[p.id] && (
+                      <tr>
+                        <td colSpan="4">
+
+                          <div style={{ marginTop: "10px" }}>
+
+                            <table style={{ width: "100%" }}>
+                              <thead>
+                                <tr>
+                                  <th>Criteria</th>
+                                  <th>Max</th>
+                                  <th>Score</th>
+                                </tr>
+                              </thead>
+
+                              <tbody>
+                                {criteria.map((c) => (
+                                  <tr key={c.id}>
+                                    <td>{c.name}</td>
+                                    <td>{c.max_score}</td>
+
+                                    <td>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max={c.max_score}
+                                        value={scores[p.id]?.[c.id] || ""}
+                                        onChange={(e) =>
+                                          handleScoreChange(
+                                            p.id,
+                                            c.id,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+
+                            <textarea
+                              placeholder="Write comments..."
+                              value={comments[p.id] || ""}
+                              onChange={(e) =>
+                                setComments((prev) => ({
+                                  ...prev,
+                                  [p.id]: e.target.value,
+                                }))
+                              }
+                              rows="4"
+                              style={{
+                                width: "100%",
+                                marginTop: "10px",
+                              }}
+                            />
+
+                            <button
+                              onClick={() => submitEvaluation(p.id)}
+                              style={{ marginTop: "10px" }}
+                            >
+                              Submit Evaluation
+                            </button>
+
+                          </div>
+
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                </tr>
+                </>
               );
             })}
           </tbody>
         </table>
+      )}
+    </div>
+  );
+};
+
+const renderEvaluations = () => {
+  const evaluated = placements.filter(
+    (p) => submittedEvaluations[p.id]
+  );
+
+  return (
+    <div>
+      <h2>My Evaluations</h2>
+
+      {evaluated.length === 0 ? (
+        <p>No evaluations submitted yet</p>
+      ) : (
+        <table style={{ width: "100%" }}>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {evaluated.map((p) => (
+              <tr key={p.id}>
+                <td>{p.student_name}</td>
+                <td>{p.organization_name}</td>
+                <td>Evaluated</td>
+
+                <td>
+                  <button onClick={() => setSelectedPlacement(p)}>
+                    View Evaluation
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* VIEW DETAILS SECTION */}
+      {selectedPlacement && (
+        <div style={{
+          marginTop: "20px",
+          padding: "15px",
+          background: "#f4f4f4",
+          borderRadius: "8px"
+        }}>
+          <h3>Evaluation Details</h3>
+
+          <p>
+            <strong>Comments:</strong>{" "}
+            {savedEvaluations[selectedPlacement.id]?.comments || "No comments"}
+          </p>
+
+          <h4>Scores</h4>
+
+          <ul>
+            {Object.entries(
+              savedEvaluations[selectedPlacement.id]?.scores || {}
+            ).map(([criteriaId, score]) => {
+              const c = criteria.find(
+                (x) => x.id === parseInt(criteriaId)
+              );
+
+              return (
+                <li key={criteriaId}>
+                  {c?.name}: {score}
+                </li>
+              );
+            })}
+          </ul>
+
+        </div>
       )}
     </div>
   );
@@ -344,6 +562,11 @@ function WorkplaceDashboard() {
           {activePage === "students" && (
   <div style={{ padding: "20px" }}>
     {renderStudents()}
+  </div>
+)}
+{activePage === "evaluations" && (
+  <div style={{ padding: "20px" }}>
+    {renderEvaluations()}
   </div>
 )}
 

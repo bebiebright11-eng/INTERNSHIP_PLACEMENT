@@ -1,4 +1,7 @@
+
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 function AcademicDashboard() {
@@ -7,6 +10,71 @@ function AcademicDashboard() {
   const [evaluations, setEvaluations] = useState([]);
   const [scores, setScores] = useState({});
   const [logs, setLogs] = useState({});
+
+  const [editingPlacement, setEditingPlacement] = useState(null);
+  const [activePage, setActivePage] = useState("home");
+  const [showMenu, setShowMenu] = useState(false);
+  const [expandedStudent, setExpandedStudent] = useState(null);
+  const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
+  const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
+  const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
+  const firstName = localStorage.getItem("first_name");
+  const lastName = localStorage.getItem("last_name");
+
+  // --- Styles ---
+
+  const menuButtonStyle = {
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "12px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "15px",
+  };
+
+  const dropdownStyle = {
+    position: "absolute",
+    top: "60px",
+    left: "0",
+    backgroundColor: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+    width: "220px",
+    padding: "10px",
+    zIndex: 1000,
+  };
+
+  const dropdownItemStyle = {
+    padding: "12px",
+    cursor: "pointer",
+    borderRadius: "8px",
+    marginBottom: "5px",
+    fontWeight: "bold",
+    color: "#198754",
+    backgroundColor: "#f8f9fa",
+  };
+
+  const cardStyle = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    minWidth: "220px",
+    flex: "1",
+  };
+
+  const cardTitleStyle = {
+    color: "#666",
+    marginBottom: "10px",
+  };
+
+  const cardNumberStyle = {
+    fontSize: "30px",
+    fontWeight: "bold",
+    color: "#198754",
+  };
 
   // --- Data Fetching Functions ---
 
@@ -18,19 +86,18 @@ function AcademicDashboard() {
         },
       });
 
-      const filtered = res.data.filter(
-        (p) => p.academic_supervisor === parseInt(localStorage.getItem("user_id"))
-      );
+      console.log("PLACEMENTS:", res.data);
+      console.log("USER ID:", localStorage.getItem("user_id"));
 
-      setPlacements(filtered);
+      setPlacements(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load placements ❌");
     }
   };
 
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/evaluationcriteria/", {
+      const res = await API.get("supervision/criteria/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -38,8 +105,13 @@ function AcademicDashboard() {
 
       setCriteria(res.data);
     } catch (error) {
-      console.log(error);
-    }
+       console.log("CRITERIA ERROR:", error.response);
+  console.log("DATA:", error.response?.data);
+  console.log("STATUS:", error.response?.status);
+
+  toast.error("Failed to load criteria ❌");
+     
+}
   };
 
   const fetchEvaluations = async () => {
@@ -50,37 +122,39 @@ function AcademicDashboard() {
         },
       });
 
+      console.log("EVALUATIONS FROM BACKEND:", res.data);
+
       setEvaluations(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load evaluations ❌");
     }
   };
 
-  // --- Event Handlers --- 
-
   const fetchLogs = async () => {
-  try {
-    const res = await API.get("supervision/weeklylogs/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    try {
+      const res = await API.get("supervision/weeklylogs/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
+      const grouped = {};
 
-    const grouped = {};
+      res.data.forEach((log) => {
+        if (!grouped[log.placement]) {
+          grouped[log.placement] = [];
+        }
+        grouped[log.placement].push(log);
+      });
 
-    res.data.forEach((log) => {
-      if (!grouped[log.placement]) {
-        grouped[log.placement] = [];
-      }
-      grouped[log.placement].push(log);
-    });
+      setLogs(grouped);
+    } catch (error) {
+      toast.error("Failed to load weekly logs ❌");
+    }
+  };
 
-    setLogs(grouped);
-  } catch (error) {
-    console.log(error);
-  }
-};
+  // --- Event Handlers ---
+
   const handleScoreChange = (placementId, criteriaId, value) => {
     setScores((prev) => ({
       ...prev,
@@ -91,26 +165,65 @@ function AcademicDashboard() {
     }));
   };
 
-const submitEvaluation = async (placementId) => {
-  try {
-    await API.post(
-      "supervision/final-evaluation/",
-      {
-        placement: placementId,
-        academic_score: scores[placementId],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+  const submitEvaluation = async (placementId) => {
+    try {
+      const academicScore = scores[placementId] || 0;
 
-    alert("Final evaluation submitted!");
-  } catch (error) {
-    console.log(error.response?.data);
-  }
-};
+      const academicEval = evaluations.find(
+        (ev) =>
+          ev.placement === placementId &&
+          ev.supervisor_type === "academic"
+      );
+
+      if (academicScore > 20) {
+        toast.error("Academic marks cannot exceed 20 ❌");
+        return;
+      }
+
+      if (editingPlacement === placementId && academicEval?.id) {
+        await API.put(
+          `supervision/evaluations/${academicEval.id}/`,
+          {
+            placement: placementId,
+            supervisor_type: "academic",
+            score: academicScore,
+            comments: "Academic final evaluation",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+      } else {
+        await API.post(
+          "supervision/evaluations/",
+          {
+            placement: placementId,
+            supervisor_type: "academic",
+            score: academicScore,
+            comments: "Academic final evaluation",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+      }
+
+      toast.success("Final evaluation submitted successfully ✅");
+
+      fetchEvaluations();
+      setEditingPlacement(null);
+    } catch (error) {
+      console.log("FULL ERROR:", error);
+      console.log("RESPONSE:", error.response);
+      console.log("DATA:", error.response?.data);
+
+      toast.error("Failed to submit evaluation ❌");
+    }
+  };
 
   // --- Lifecycle ---
 
@@ -124,103 +237,825 @@ const submitEvaluation = async (placementId) => {
   // --- Main Render ---
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Academic Supervisor Dashboard</h1>
+    <div
+      style={{
+        padding: "30px",
+        backgroundColor: "#f4f6f9",
+        minHeight: "100vh",
+        fontFamily: "Arial",
+      }}
+    >
+      {/* HEADER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+          position: "relative",
+        }}
+      >
+        <div>
+  <h1
+    style={{
+      margin: 0,
+      color: "#198754",
+      fontSize: "38px",
+      fontWeight: "bold",
+    }}
+  >
+    INTERNSHIP PLACEMENT SYSTEM (ILES)
+  </h1>
 
-      {placements.length === 0 ? (
-        <p>No students assigned</p>
-      ) : (
-        placements.map((p) => {
-const studentLogs = logs[p.id] || [];
-const logCount = studentLogs.length;
+  <h2
+    style={{
+      color: "#198754",
+      marginTop: "10px",
+      marginBottom: "5px",
+    }}
+  >
+    Academic Supervisor Dashboard
+  </h2>
 
-const countedLogs = Math.min(logCount, 8);
-const logScore = countedLogs * 2.5;
+  <p
+    style={{
+      color: "#666",
+      fontSize: "18px",
+      fontWeight: "bold",
+      marginTop: "0px",
+    }}
+  >
+    Welcome,  {firstName || "Academic"} 👋 
+  </p>
+</div>
 
+        
 
+        {/* MENU */}
+        <div style={{ position: "relative" }}>
+          <button
+            style={menuButtonStyle}
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            ☰ Menu
+          </button>
 
+          {showMenu && (
+            <div style={dropdownStyle}>
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setActivePage("home");
+                  setShowMenu(false);
+                }}
+              >
+                Home
+              </div>
 
-          const workplaceEval = evaluations.find(
-            (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
-          );
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setActivePage("students");
+                  setShowMenu(false);
+                }}
+              >
+                My Students
+              </div>
 
-            
-          const workplaceScore = workplaceEval?.score || 0;
-          const academicScore = scores[p.id] || 0;
-          const finalScore = workplaceScore + logScore + academicScore;
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setActivePage("evaluations");
+                  setShowMenu(false);
+                }}
+              >
+                Evaluations
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
-          return (
-            <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
-              <h3>Student: {p.student_name}</h3>
-              <p>Organization: {p.organization_name}</p>
+      {/* SUMMARY CARDS */}
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginBottom: "30px",
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Assigned Students</h3>
+          <p style={cardNumberStyle}>{placements.length}</p>
+        </div>
 
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Evaluated Students</h3>
+          <p style={cardNumberStyle}>
+            {
+              evaluations.filter(
+                (ev) => ev.supervisor_type === "academic"
+              ).length
+            }
+          </p>
+        </div>
 
-<h4>Workplace Evaluation</h4>
-{workplaceEval ? (
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Pending Students</h3>
+          <p style={cardNumberStyle}>
+            {placements.length -
+              evaluations.filter(
+                (ev) => ev.supervisor_type === "academic"
+              ).length}
+          </p>
+        </div>
+      </div>
+
+      {activePage === "home" && (
+        <div>
+          <h2
+            style={{
+              color: "#198754",
+              marginBottom: "20px",
+            }}
+          >
+            Assigned Students
+          </h2>
+
+          {placements.length === 0 ? (
+            <p>No students assigned</p>
+          ) : (
+            placements.map((p) => {
+              const studentLogs = logs[p.id] || [];
+              const logCount = studentLogs.length;
+
+              const countedLogs = Math.min(logCount, 8);
+              const logScore = countedLogs * 2.5;
+
+              const workplaceEval = evaluations.find(
+                (ev) =>
+                  ev.placement === p.id &&
+                  ev.supervisor_type === "workplace"
+              );
+
+              const academicEval = evaluations.find(
+                (ev) =>
+                  ev.placement === p.id &&
+                  ev.supervisor_type === "academic"
+              );
+
+              const workplaceScore = workplaceEval?.score || 0;
+
+              const academicScore =
+                academicEval?.score || scores[p.id] || 0;
+
+              const finalScore =
+                academicEval?.final_grade ||
+                workplaceScore + logScore + academicScore;
+
+              return (
+                <div
+                  key={p.id}
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "15px",
+                    padding: "20px",
+                    marginBottom: "20px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  <h3>Student: {p.student_name}</h3>
+                  <p>Organization: {p.organization_name}</p>
+
+                  <button
+                    onClick={() =>
+                      setExpandedStudent(
+                        expandedStudent === p.id ? null : p.id
+                      )
+                    }
+                    style={{
+                      backgroundColor: "#198754",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 18px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      marginTop: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Evaluate Student
+                  </button>
+
+                  {expandedStudent === p.id && (
+                    <div style={{ marginTop: "20px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "10px",
+                          flexWrap: "wrap",
+                          marginBottom: "20px",
+                        }}
+                      >
+                      
+                      <button
+  onClick={() => {
+    setShowWorkplaceEval(
+      showWorkplaceEval === p.id ? null : p.id
+    );
+
+    setShowWeeklyLogs(null);
+    setShowFinalEvaluation(null);
+  }}
+  style={menuButtonStyle}
+>
+  View Workplace Evaluation
+</button>
+
+<button
+  onClick={() => {
+    setShowWeeklyLogs(
+      showWeeklyLogs === p.id ? null : p.id
+    );
+
+    setShowWorkplaceEval(null);
+    setShowFinalEvaluation(null);
+  }}
+  style={menuButtonStyle}
+>
+  View Weekly Logs
+</button>
+
+<button
+  onClick={() => {
+    setShowFinalEvaluation(
+      showFinalEvaluation === p.id ? null : p.id
+    );
+
+    setShowWorkplaceEval(null);
+    setShowWeeklyLogs(null);
+  }}
+  style={menuButtonStyle}
+>
+  Give Final Evaluation
+</button>
+
+                      </div>
+
+                      {showWorkplaceEval === p.id && (
+                        <div>
+                          <h4>Workplace Evaluation</h4>
+
+                          {workplaceEval ? (
+                            <div>
+                              <p>
+                                <strong>Total Score:</strong>{" "}
+                                {workplaceEval.score} / 60
+                              </p>
+
+                              <h5>Criteria Breakdown</h5>
+
+                              <div
+                                style={{
+                                  marginTop: "15px",
+                                  borderRadius: "10px",
+                                  overflow: "hidden",
+                                  border: "1px solid #ddd",
+                                  width: "100%",
+                                  maxWidth: "500px",
+                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                }}
+                              >
+                                <table
+                                  style={{
+                                    width: "100%",
+                                    borderCollapse: "collapse",
+                                    fontFamily: "Arial",
+                                  }}
+                                >
+                                  <thead>
+                                    <tr
+                                      style={{
+                                        backgroundColor: "#198754",
+                                        color: "white",
+                                        textAlign: "left",
+                                      }}
+                                    >
+                                      <th style={{ padding: "12px" }}>
+                                        Criteria
+                                      </th>
+                                      <th style={{ padding: "12px" }}>
+                                        Marks
+                                      </th>
+                                    </tr>
+                                  </thead>
+
+                                  <tbody>
+                                    {workplaceEval.criteria_scores?.map(
+                                      (item, index) => (
+                                        <tr
+                                          key={item.id}
+                                          style={{
+                                            backgroundColor:
+                                              index % 2 === 0
+                                                ? "#f8f9fa"
+                                                : "white",
+                                          }}
+                                        >
+                                          <td
+                                            style={{
+                                              padding: "12px",
+                                              borderBottom:
+                                                "1px solid #ddd",
+                                            }}
+                                          >
+                                            {item.criteria_name}
+                                          </td>
+
+                                          <td
+                                            style={{
+                                              padding: "12px",
+                                              borderBottom:
+                                                "1px solid #ddd",
+                                              fontWeight: "bold",
+                                              color: "#198754",
+                                            }}
+                                          >
+                                            {item.score}
+                                          </td>
+                                        </tr>
+                                      )
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              <p>
+                                <strong>Comments:</strong>{" "}
+                                {workplaceEval.comments}
+                              </p>
+                            </div>
+                          ) : (
+                            <p>No workplace evaluation yet</p>
+                          )}
+                        </div>
+                      )}
+
+                      {showWeeklyLogs === p.id && (
+                        <div>
+                          <h4>Weekly Logs</h4>
+
+                          <p>Total Logs Submitted: {logCount}</p>
+                          <p>Logs Counted (Max 8): {countedLogs}</p>
+                          <p>Log Score: {logScore} / 20</p>
+
+                          <ul>
+                            {studentLogs
+                              .sort(
+                                (a, b) =>
+                                  a.week_number - b.week_number
+                              )
+                              .map((log, index) => {
+                                const isReviewed = index < 8;
+
+                                return (
+                                  <li key={log.id}>
+                                    Week {log.week_number}: {log.tasks}
+
+                                    <br />
+
+                                    Status:
+                                    <span
+                                      style={{
+                                        color: isReviewed
+                                          ? "green"
+                                          : "orange",
+                                        fontWeight: "bold",
+                                        marginLeft: "5px",
+                                      }}
+                                    >
+                                      {isReviewed
+                                        ? "Reviewed ✅"
+                                        : "Pending ⏳"}
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        </div>
+                      )}
+
+                      {showFinalEvaluation === p.id && (
+                        <div>
+                          {!academicEval ||
+                          editingPlacement === p.id ? (
+                            <div>
+                              <h4>Academic Supervisor Marks</h4>
+
+                              <input
+                                type="number"
+                                min="0"
+                                max="20"
+                                placeholder="Enter marks out of 20"
+                                value={scores[p.id] ?? ""}
+                                onChange={(e) => {
+                                  let value =
+                                    parseInt(e.target.value) || 0;
+
+                                  if (value < 0) value = 0;
+                                  if (value > 20) value = 20;
+
+                                  setScores((prev) => ({
+                                    ...prev,
+                                    [p.id]: value,
+                                  }));
+                                }}
+                              />
+
+                              <h4>Final Score</h4>
+
+                              <p>{finalScore} / 100</p>
+
+                              <br />
+
+                              <button
+                                onClick={() => submitEvaluation(p.id)}
+                              >
+                                Submit Final Evaluation
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              <h4>Academic Evaluation</h4>
+
+                              <p
+                                style={{
+                                  color: "green",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                ✅ Final Evaluation Submitted
+                              </p>
+
+                              <p>
+                                <strong>Academic Marks:</strong>{" "}
+                                {academicEval.score} / 20
+                              </p>
+
+                              <p>
+                                <strong>Final Grade:</strong>{" "}
+                                {academicEval.final_grade} / 100
+                              </p>
+
+                              <button
+                                onClick={() => {
+                                  setEditingPlacement(p.id);
+
+                                  setScores((prev) => ({
+                                    ...prev,
+                                    [p.id]: academicEval.score,
+                                  }));
+                                }}
+                              >
+                                Edit Evaluation
+                              </button>
+                            </div>
+                          )}
+
+                          
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {activePage === "students" && (
   <div>
-    <p><strong>Total Score:</strong> {workplaceEval.score} / 60</p>
+    <h2
+      style={{
+        color: "#198754",
+        marginBottom: "20px",
+      }}
+    >
+      My Students
+    </h2>
 
-    {/* ✅ ADD CRITERIA BREAKDOWN */}
-    <h5>Criteria Breakdown</h5>
-    <ul>
-      {workplaceEval.criteria_scores?.map((item) => (
-        <li key={item.id}>
-          {item.criteria_name}: {item.score}
-        </li>
-      ))}
-    </ul>
+    <div
+      style={{
+        backgroundColor: "white",
+        borderRadius: "15px",
+        padding: "20px",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        overflowX: "auto",
+      }}
+    >
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontFamily: "Arial",
+        }}
+      >
+        <thead>
+          <tr
+            style={{
+              backgroundColor: "#198754",
+              color: "white",
+              textAlign: "left",
+            }}
+          >
+            <th style={{ padding: "15px" }}>Student Name</th>
+            <th style={{ padding: "15px" }}>Organization</th>
+            <th style={{ padding: "15px" }}>Status</th>
+          </tr>
+        </thead>
 
-    <p><strong>Comments:</strong> {workplaceEval.comments}</p>
+        <tbody>
+          {placements.map((p, index) => {
+            const academicEval = evaluations.find(
+              (ev) =>
+                ev.placement === p.id &&
+                ev.supervisor_type === "academic"
+            );
+
+            return (
+              <tr
+                key={p.id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 0 ? "#f8f9fa" : "white",
+                }}
+              >
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  {p.student_name}
+                </td>
+
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  {p.organization_name}
+                </td>
+
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                    fontWeight: "bold",
+                    color: academicEval
+                      ? "green"
+                      : "orange",
+                  }}
+                >
+                  {academicEval
+                    ? "Evaluated ✅"
+                    : "Pending ⏳"}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   </div>
-) : (
-  <p>No workplace evaluation yet</p>
 )}
 
 
-<h4>Weekly Logs</h4>
+{activePage === "evaluations" && (
+  <div>
+    <h2
+      style={{
+        color: "#198754",
+        marginBottom: "20px",
+      }}
+    >
+      Student Evaluations
+    </h2>
 
-<p>Total Logs Submitted: {logCount}</p>
-<p>Logs Counted (Max 8): {countedLogs}</p>
-<p>Log Score: {logScore} / 20</p>
+    <div
+      style={{
+        backgroundColor: "white",
+        borderRadius: "15px",
+        padding: "20px",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        overflowX: "auto",
+      }}
+    >
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontFamily: "Arial",
+        }}
+      >
+        <thead>
+          <tr
+            style={{
+              backgroundColor: "#198754",
+              color: "white",
+              textAlign: "left",
+            }}
+          >
+            <th style={{ padding: "15px" }}>
+              Student Name
+            </th>
 
-<ul>
-  {studentLogs.map((log) => (
-    <li key={log.id}>
-      Week {log.week}: {log.description}
-    </li>
-  ))}
-</ul>
+            <th style={{ padding: "15px" }}>
+              Final Score
+            </th>
 
-<h4>Academic Supervisor Marks</h4>
+            <th style={{ padding: "15px" }}>
+              Action
+            </th>
+          </tr>
+        </thead>
 
-<input
-  type="number"
-  min="0"
-  max="20"
-  placeholder="Enter marks out of 20"
-  onChange={(e) =>
-    setScores((prev) => ({
-      ...prev,
-      [p.id]: parseInt(e.target.value),
-    }))
-  }
-/>
-<h4>Final Score</h4>
-<p>{finalScore} / 100</p>
+        <tbody>
+          {placements.map((p, index) => {
+            const academicEval = evaluations.find(
+              (ev) =>
+                ev.placement === p.id &&
+                ev.supervisor_type === "academic"
+            );
 
+            return (
+              <tr
+                key={p.id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 0
+                      ? "#f8f9fa"
+                      : "white",
+                }}
+              >
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  {p.student_name}
+                </td>
 
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                    fontWeight: "bold",
+                    color: "#198754",
+                  }}
+                >
+                  {academicEval
+                    ? `${academicEval.final_grade} / 100`
+                    : "Not Evaluated"}
+                </td>
 
-              <br />
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  <button
+                    onClick={() =>
+                      setExpandedStudent(
+                        expandedStudent === p.id
+                          ? null
+                          : p.id
+                      )
+                    }
+                    style={{
+                      backgroundColor: "#198754",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    View Full Evaluation
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
 
-              <button onClick={() => submitEvaluation(p.id)}>
-                Submit Final Evaluation
-              </button> 
-            </div>
-          );
-        })
-      )}
+    {/* FULL EVALUATION VIEW */}
+    {expandedStudent && (
+      <div
+        style={{
+          marginTop: "30px",
+          backgroundColor: "white",
+          borderRadius: "15px",
+          padding: "20px",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        }}
+      >
+        {placements
+          .filter((p) => p.id === expandedStudent)
+          .map((p) => {
+            const studentLogs = logs[p.id] || [];
+
+            const workplaceEval = evaluations.find(
+              (ev) =>
+                ev.placement === p.id &&
+                ev.supervisor_type === "workplace"
+            );
+
+            const academicEval = evaluations.find(
+              (ev) =>
+                ev.placement === p.id &&
+                ev.supervisor_type === "academic"
+            );
+
+            return (
+              <div key={p.id}>
+                <h3
+                  style={{
+                    color: "#198754",
+                  }}
+                >
+                  {p.student_name} Full Evaluation
+                </h3>
+
+                <p>
+                  <strong>Organization:</strong>{" "}
+                  {p.organization_name}
+                </p>
+
+                <hr />
+
+                <h4>Workplace Evaluation</h4>
+
+                <p>
+                  Score:{" "}
+                  {workplaceEval?.score || 0} / 60
+                </p>
+
+                <p>
+                  Comments:{" "}
+                  {workplaceEval?.comments ||
+                    "No comments"}
+                </p>
+
+                <hr />
+
+                <h4>Weekly Logs</h4>
+
+                <p>
+                  Logs Submitted: {studentLogs.length}
+                </p>
+
+                <ul>
+                  {studentLogs.map((log) => (
+                    <li key={log.id}>
+                      Week {log.week_number}:{" "}
+                      {log.tasks}
+                    </li>
+                  ))}
+                </ul>
+
+                <hr />
+
+                <h4>Academic Evaluation</h4>
+
+                <p>
+                  Academic Score:{" "}
+                  {academicEval?.score || 0} / 20
+                </p>
+
+                <p>
+                  <strong>Final Grade:</strong>{" "}
+                  {academicEval?.final_grade || 0}
+                  /100
+                </p>
+              </div>
+            );
+          })}
+      </div>
+    )}
+  </div>
+)}
     </div>
   );
 }
 
 export default AcademicDashboard;
+

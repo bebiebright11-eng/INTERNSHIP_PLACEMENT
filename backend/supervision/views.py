@@ -57,69 +57,45 @@ class EvaluationViewSet(viewsets.ModelViewSet):
                placement__student=user
            )
 
-    # 👨‍🏫 Workplace → only evaluations they created
+    #  Workplace → only evaluations they created
         if user.role == 'workplace':
             return Evaluation.objects.filter(
                supervisor=user
             )
 
-    # 👨‍🏫 Academic → evaluations for their students
+    #  Academic → evaluations for their students
         if user.role == 'academic':
             return Evaluation.objects.filter(
                placement__academic_supervisor=user
            )
 
-    # 🚫 Admin → no direct access here
+    #  Admin → no direct access here
         return Evaluation.objects.none()
     
 
-    
-    
     def perform_create(self, serializer):
         user = self.request.user
 
-    #  Students cannot create
-        if user.role == 'student':
-            raise PermissionDenied("Students cannot create evaluations")
+        if user.role in ['student', 'admin']:
+            raise PermissionDenied("You cannot create evaluations")
 
-    #  Admin cannot create
-        if user.role == 'admin':
-            raise PermissionDenied("Admin cannot create evaluations")
-
-    
-    
-    #  Workplace creates evaluation (criteria scoring)
-        # 🔒 Prevent duplicate evaluation per supervisor type
         placement = serializer.validated_data['placement']
         supervisor_type = serializer.validated_data['supervisor_type']
 
         existing = Evaluation.objects.filter(
-            placement=placement,
-            supervisor=user,
-            supervisor_type=supervisor_type
+           placement=placement,
+           supervisor=user,
+           supervisor_type=supervisor_type
         ).first()
 
         if existing:
-    # 🔄 Instead of blocking → update it
             serializer.instance = existing
-            serializer.save()
-        else:
-            serializer.save(supervisor=user)
-        
 
         serializer.save(supervisor=user)
+    
 
-    def create(self, request, *args, **kwargs):
-        user = request.user
 
-        # 🔥 ALLOW ONLY workplace supervisors
-        if user.role != "workplace":
-            return Response(
-                {"error": "Only workplace supervisors can submit evaluations"},
-                status=status.HTTP_403_FORBIDDEN
-            )
 
-        return super().create(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         user = request.user
