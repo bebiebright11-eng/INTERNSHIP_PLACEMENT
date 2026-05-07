@@ -106,7 +106,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
             evaluation.score = total
 
-    # 🔹 Academic evaluation
+    #  Academic Supervisor → Manual score (20)
         elif evaluation.supervisor_type == 'academic':
 
             academic_score = validated_data.get('score', 0)
@@ -135,7 +135,6 @@ class EvaluationSerializer(serializers.ModelSerializer):
             evaluation.is_final = True
 
         evaluation.save()
-
         return evaluation
     
 

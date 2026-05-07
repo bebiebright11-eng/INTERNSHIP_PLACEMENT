@@ -1239,8 +1239,8 @@ return (
           >
             <tr>
               <th>Student</th>
+              <th>Registration Number</th>
               <th>Organization</th>
-              <th>name</th>
               <th>Workplace Supervisor</th>
               <th>Final Grade</th>
             </tr>
@@ -1249,6 +1249,7 @@ return (
             {finalEvaluations.map((ev) => (
               <tr key={ev.id}>
                 <td>{ev.student_name}</td>
+                <td>{ev.student_registration_number}</td>
                 <td>{ev.organization_name}</td>
                 <td>{ev.supervisor_name}</td>
                 <td>
