@@ -420,6 +420,13 @@ return (
         📍 Placements
       </div>
 
+      <div
+        style={menuItemStyle}
+        onclick={() => handleMenuClick("finalEvaluations")}
+      >
+        🎓 Final Evaluations
+      </div>    
+
      
 
       
@@ -1196,6 +1203,16 @@ return (
     </div>
   </>
 )}
+{activeView === "finalEvaluations" && (
+  <>
+  <h2>Final Student Evaluations</h2>
+  {finalEvaluations.length === 0 ? (
+    <p>No evaluations yet</p>
+  ) : (
+
+
+  </>
+
    
     </div>    
   </div>
