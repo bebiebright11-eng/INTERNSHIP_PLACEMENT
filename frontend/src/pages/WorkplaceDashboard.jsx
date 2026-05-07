@@ -561,6 +561,11 @@ const renderEvaluations = () => {
     {renderStudents()}
   </div>
 )}
+{activePage === "evaluations" && (
+  <div style={{ padding: "20px" }}>
+    {renderEvaluations()}
+  </div>
+)}
 
         </div>
 
