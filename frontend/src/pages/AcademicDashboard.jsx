@@ -120,6 +120,8 @@ const submitEvaluation = async (placementId) => {
 
     alert("Final evaluation submitted successfully!");
 
+    fetchEvaluations();
+
   } catch (error) {
     
   console.log("FULL ERROR:", error);
