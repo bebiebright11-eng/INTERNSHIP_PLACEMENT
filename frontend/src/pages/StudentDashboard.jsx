@@ -54,19 +54,6 @@ const handleLogout = () => {
   });
 
 
-  const cardStyle = {
-  flex: "1",
-  minWidth: "120px",   // reduced from 150+
-  maxWidth: "120px",   // prevents cards from stretching too big
-  background: "#ebc6eb",  // lighter background
-  padding: "10px",     // reduced padding
-  borderRadius: "8px",
-  border: "1px solid #e97407",
-  boxShadow: "0px 1px 4px hsla(0, 66%, 75%, 0.08)", // softer shadow
-  textAlign: "center",
-  fontSize: "14px"     // smaller text
-};
-
   useEffect(() => {
     fetchApplications();
     fetchLogs();
@@ -215,111 +202,223 @@ const handleChange = (e) => {
     }
   };
 
-const pageStyle = {
-  padding: "30px",
-  backgroundColor: "#f4f6f9",
-  minHeight: "100vh",
-  fontFamily: "Arial",
+  const menuButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
 };
 
-  const menuItemStyle = {
-    padding: "10px",
-    cursor: "pointer",
-    borderRadius: "5px",
-    marginBottom: "5px",
-    transition: "0.2s",
-  };
+const dropdownStyle = {
+  position: "absolute",
+  top: "55px",
+  right: "0",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+  width: "220px",
+  padding: "10px",
+  zIndex: 1000,
+};
 
-  return (
+const dropdownItemStyle = {
+  padding: "12px",
+  cursor: "pointer",
+  borderRadius: "8px",
+  marginBottom: "5px",
+  fontWeight: "bold",
+  color: "#198754",
+  backgroundColor: "#f8f9fa",
+};
+
+const cardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "20px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+  minWidth: "220px",
+  flex: "1",
+};
+
+const cardTitleStyle = {
+  color: "#666",
+  marginBottom: "10px",
+};
+
+const cardNumberStyle = {
+  fontSize: "30px",
+  fontWeight: "bold",
+  color: "#198754",
+};
+
+
+return (
   <div
     style={{
-      display: "flex",
-      minHeight: "100vh",
+      padding: "30px",
       backgroundColor: "#f4f6f9",
+      minHeight: "100vh",
       fontFamily: "Arial",
     }}
   >
 
-    {/* SIDEBAR */}
-    <div
-      style={{
-        width: "240px",
-        backgroundColor: "#1e293b",
-        color: "white",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-      }}
-    >
-      <h2 style={{ marginBottom: "30px", textAlign: "center" }}>
-        ILES
-      </h2>
-
-      <div
-        style={menuItemStyle}
-        onClick={() => setActiveView("home")}
-      >
-        🏠 Home
-      </div>
-
-      <div
-        style={menuItemStyle}
-        onClick={() => setActiveView("organizations")}
-      >
-        🏢 Organizations
-      </div>
-
-      <div
-        style={menuItemStyle}
-        onClick={() => setActiveView("applications")}
-      >
-        📝 Applications
-      </div>
-
-      <div
-        style={menuItemStyle}
-        onClick={() => setActiveView("evaluations")}
-      >
-        📊 Evaluations
-      </div>
-
-      <div
-        style={menuItemStyle}
-        onClick={() => setActiveView("logs")}
-      >
-        📘 Weekly Logs
-      </div>
-
-      <button
-        onClick={handleLogout}
-        style={{
-          marginTop: "auto",
-          padding: "10px",
-          border: "none",
-          borderRadius: "8px",
-          backgroundColor: "#ef4444",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        Logout
-      </button>
-    </div>
-{/* MAIN CONTENT */}
+ {/* HEADER */}
 <div
   style={{
-    flex: 1,
-    padding: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+    position: "relative",
   }}
 >
+  <div>
+    <h1
+      style={{
+        margin: 0,
+        color: "#198754",
+        fontSize: "38px",
+        fontWeight: "bold",
+      }}
+    >
+      INTERNSHIP PLACEMENT SYSTEM (ILES)
+    </h1>
 
-      <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
-        INTERNSHIP  PLACEMENT  SYSTEM (ILES)
-      </h1>
+    <h2
+      style={{
+        color: "#198754",
+        marginTop: "10px",
+        marginBottom: "5px",
+      }}
+    >
+      Student Dashboard
+    </h2>
 
-      <h2 style={{textAlign: "center", marginBottom: "5px" }}>Student Dashboard</h2>
-      <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, {firstName || "Student"} 👋</p>
+    <p
+      style={{
+        color: "#666",
+        fontSize: "18px",
+        fontWeight: "bold",
+        marginTop: "0px",
+      }}
+    >
+      Welcome, {firstName || "Student"} 👋
+    </p>
+  </div>
+
+  {/* MENU */}
+  <div style={{ position: "relative" }}>
+    <button
+      style={menuButtonStyle}
+      onClick={() => setMenuOpen(!menuOpen)}
+    >
+      ☰ Menu
+    </button>
+
+    {menuOpen && (
+      <div style={dropdownStyle}>
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("home");
+            setMenuOpen(false);
+          }}
+        >
+          Home
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("organizations");
+            setMenuOpen(false);
+          }}
+        >
+          Organizations
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("applications");
+            setMenuOpen(false);
+          }}
+        >
+          Applications
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("evaluations");
+            setMenuOpen(false);
+          }}
+        >
+          Evaluations
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActiveView("logs");
+            setMenuOpen(false);
+          }}
+        >
+          Weekly Logs
+        </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={handleLogout}
+        >
+          Logout
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+
+  <div style={{
+  display: "flex",
+  gap: "10px",
+  marginBottom: "15px",
+  flexWrap: "wrap",
+}}>
+  
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {logs.length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {applications.length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
+    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
+       {applications.filter(a => a.status === "approved").length}
+    </p>
+  </div>
+
+  <div style={cardStyle}>
+    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
+    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
+       {evaluations.length}
+    </p>
+  </div>
+  </div>
+
 
 
 {notification && (
@@ -351,44 +450,6 @@ const pageStyle = {
         {activeView === "home" && (
           <>
 
-  <div style={{
-  display: "flex",
-  gap: "10px",
-  marginBottom: "15px",
-  flexWrap: "wrap",
-}}>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {logs.length}
-    </p>
-  </div>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.length}
-    </p>
-  </div>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.filter(a => a.status === "approved").length}
-    </p>
-  </div>
-
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
-    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
-       {evaluations.length}
-    </p>
-  </div>
-  </div>
-
-
-  
       {/* PLACEMENT STATUS SECTION */}
       <div style={{
         border: "2px solid #ee9714",
@@ -649,7 +710,6 @@ const pageStyle = {
       )}
      </>
 )} 
-    </div>
     </div>
   );
 }
