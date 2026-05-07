@@ -807,6 +807,227 @@ function AcademicDashboard() {
     </div>
   </div>
 )}
+
+
+{activePage === "evaluations" && (
+  <div>
+    <h2
+      style={{
+        color: "#198754",
+        marginBottom: "20px",
+      }}
+    >
+      Student Evaluations
+    </h2>
+
+    <div
+      style={{
+        backgroundColor: "white",
+        borderRadius: "15px",
+        padding: "20px",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        overflowX: "auto",
+      }}
+    >
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontFamily: "Arial",
+        }}
+      >
+        <thead>
+          <tr
+            style={{
+              backgroundColor: "#198754",
+              color: "white",
+              textAlign: "left",
+            }}
+          >
+            <th style={{ padding: "15px" }}>
+              Student Name
+            </th>
+
+            <th style={{ padding: "15px" }}>
+              Final Score
+            </th>
+
+            <th style={{ padding: "15px" }}>
+              Action
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {placements.map((p, index) => {
+            const academicEval = evaluations.find(
+              (ev) =>
+                ev.placement === p.id &&
+                ev.supervisor_type === "academic"
+            );
+
+            return (
+              <tr
+                key={p.id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 0
+                      ? "#f8f9fa"
+                      : "white",
+                }}
+              >
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  {p.student_name}
+                </td>
+
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                    fontWeight: "bold",
+                    color: "#198754",
+                  }}
+                >
+                  {academicEval
+                    ? `${academicEval.final_grade} / 100`
+                    : "Not Evaluated"}
+                </td>
+
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  <button
+                    onClick={() =>
+                      setExpandedStudent(
+                        expandedStudent === p.id
+                          ? null
+                          : p.id
+                      )
+                    }
+                    style={{
+                      backgroundColor: "#198754",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    View Full Evaluation
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    {/* FULL EVALUATION VIEW */}
+    {expandedStudent && (
+      <div
+        style={{
+          marginTop: "30px",
+          backgroundColor: "white",
+          borderRadius: "15px",
+          padding: "20px",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        }}
+      >
+        {placements
+          .filter((p) => p.id === expandedStudent)
+          .map((p) => {
+            const studentLogs = logs[p.id] || [];
+
+            const workplaceEval = evaluations.find(
+              (ev) =>
+                ev.placement === p.id &&
+                ev.supervisor_type === "workplace"
+            );
+
+            const academicEval = evaluations.find(
+              (ev) =>
+                ev.placement === p.id &&
+                ev.supervisor_type === "academic"
+            );
+
+            return (
+              <div key={p.id}>
+                <h3
+                  style={{
+                    color: "#198754",
+                  }}
+                >
+                  {p.student_name} Full Evaluation
+                </h3>
+
+                <p>
+                  <strong>Organization:</strong>{" "}
+                  {p.organization_name}
+                </p>
+
+                <hr />
+
+                <h4>Workplace Evaluation</h4>
+
+                <p>
+                  Score:{" "}
+                  {workplaceEval?.score || 0} / 60
+                </p>
+
+                <p>
+                  Comments:{" "}
+                  {workplaceEval?.comments ||
+                    "No comments"}
+                </p>
+
+                <hr />
+
+                <h4>Weekly Logs</h4>
+
+                <p>
+                  Logs Submitted: {studentLogs.length}
+                </p>
+
+                <ul>
+                  {studentLogs.map((log) => (
+                    <li key={log.id}>
+                      Week {log.week_number}:{" "}
+                      {log.tasks}
+                    </li>
+                  ))}
+                </ul>
+
+                <hr />
+
+                <h4>Academic Evaluation</h4>
+
+                <p>
+                  Academic Score:{" "}
+                  {academicEval?.score || 0} / 20
+                </p>
+
+                <p>
+                  <strong>Final Grade:</strong>{" "}
+                  {academicEval?.final_grade || 0}
+                  /100
+                </p>
+              </div>
+            );
+          })}
+      </div>
+    )}
+  </div>
+)}
     </div>
   );
 }
