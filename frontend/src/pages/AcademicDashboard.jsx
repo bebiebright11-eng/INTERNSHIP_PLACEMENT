@@ -9,9 +9,65 @@ function AcademicDashboard() {
   const [logs, setLogs] = useState({});
 
   const [editingPlacement, setEditingPlacement] = useState(null);
+  const [activePage, setActivePage] = useState("home");
+  const [showMenu, setShowMenu] = useState(false);
 
   // --- Data Fetching Functions ---
 
+
+
+  const menuButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px"
+};
+
+const dropdownStyle = {
+  position: "absolute",
+  top: "60px",
+  left: "0",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+  width: "220px",
+  padding: "10px",
+  zIndex: 1000
+};
+
+const dropdownItemStyle = {
+  padding: "12px",
+  cursor: "pointer",
+  borderRadius: "8px",
+  marginBottom: "5px",
+  fontWeight: "bold",
+  color: "#198754",
+  backgroundColor: "#f8f9fa"
+};
+
+const cardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "20px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+  minWidth: "220px",
+  flex: "1"
+};
+
+const cardTitleStyle = {
+  color: "#666",
+  marginBottom: "10px"
+};
+
+const cardNumberStyle = {
+  fontSize: "30px",
+  fontWeight: "bold",
+  color: "#198754"
+};
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/", {
@@ -176,8 +232,147 @@ const academicEval = evaluations.find(
   // --- Main Render ---
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Academic Supervisor Dashboard</h1>
+  <div
+    style={{
+      padding: "30px",
+      backgroundColor: "#f4f6f9",
+      minHeight: "100vh",
+      fontFamily: "Arial"
+    }}
+  >
+
+    {/* HEADER */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "30px",
+        position: "relative"
+      }}
+    >
+
+      <div>
+        <h1
+          style={{
+            margin: 0,
+            color: "#198754"
+          }}
+        >
+          Academic Supervisor Dashboard
+        </h1>
+
+        <p
+          style={{
+            color: "#666",
+            marginTop: "10px"
+          }}
+        >
+          Welcome {localStorage.getItem("username")}
+        </p>
+      </div>
+
+      {/* MENU */}
+      <div style={{ position: "relative" }}>
+
+        <button
+          style={menuButtonStyle}
+          onClick={() => setShowMenu(!showMenu)}
+        >
+          ☰ Menu
+        </button>
+
+        {showMenu && (
+          <div style={dropdownStyle}>
+
+            <div
+              style={dropdownItemStyle}
+              onClick={() => {
+                setActivePage("home");
+                setShowMenu(false);
+              }}
+            >
+              Home
+            </div>
+
+            <div
+              style={dropdownItemStyle}
+              onClick={() => {
+                setActivePage("students");
+                setShowMenu(false);
+              }}
+            >
+              My Students
+            </div>
+
+            <div
+              style={dropdownItemStyle}
+              onClick={() => {
+                setActivePage("evaluations");
+                setShowMenu(false);
+              }}
+            >
+              Evaluations
+            </div>
+
+          </div>
+        )}
+
+      </div>
+
+    </div>
+
+    {/* SUMMARY CARDS */}
+    <div
+      style={{
+        display: "flex",
+        gap: "20px",
+        marginBottom: "30px",
+        flexWrap: "wrap"
+      }}
+    >
+
+      <div style={cardStyle}>
+        <h3 style={cardTitleStyle}>
+          Assigned Students
+        </h3>
+
+        <p style={cardNumberStyle}>
+          {placements.length}
+        </p>
+      </div>
+
+      <div style={cardStyle}>
+        <h3 style={cardTitleStyle}>
+          Evaluated Students
+        </h3>
+
+        <p style={cardNumberStyle}>
+          {
+            evaluations.filter(
+              (ev) => ev.supervisor_type === "academic"
+            ).length
+          }
+        </p>
+      </div>
+
+      <div style={cardStyle}>
+        <h3 style={cardTitleStyle}>
+          Pending Students
+        </h3>
+
+        <p style={cardNumberStyle}>
+          {
+            placements.length -
+            evaluations.filter(
+              (ev) => ev.supervisor_type === "academic"
+            ).length
+          }
+        </p>
+      </div>
+
+    </div>
+
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
