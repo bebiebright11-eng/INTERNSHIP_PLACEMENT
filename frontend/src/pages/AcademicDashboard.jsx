@@ -16,6 +16,8 @@ function AcademicDashboard() {
   const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
   const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
   const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
+  const firstName = localStorage.getItem("first_name");
+  const lastName = localStorage.getItem("last_name");
 
   // --- Styles ---
 
@@ -247,24 +249,40 @@ function AcademicDashboard() {
         }}
       >
         <div>
-          <h1
-            style={{
-              margin: 0,
-              color: "#198754",
-            }}
-          >
-            Academic Supervisor Dashboard
-          </h1>
+  <h1
+    style={{
+      margin: 0,
+      color: "#198754",
+      fontSize: "38px",
+      fontWeight: "bold",
+    }}
+  >
+    INTERNSHIP PLACEMENT SYSTEM (ILES)
+  </h1>
 
-          <p
-            style={{
-              color: "#666",
-              marginTop: "10px",
-            }}
-          >
-            Welcome {localStorage.getItem("username")}
-          </p>
-        </div>
+  <h2
+    style={{
+      color: "#198754",
+      marginTop: "10px",
+      marginBottom: "5px",
+    }}
+  >
+    Academic Supervisor Dashboard
+  </h2>
+
+  <p
+    style={{
+      color: "#666",
+      fontSize: "18px",
+      fontWeight: "bold",
+      marginTop: "0px",
+    }}
+  >
+    Welcome,  {firstName || "Academic"} 👋 
+  </p>
+</div>
+
+        
 
         {/* MENU */}
         <div style={{ position: "relative" }}>
