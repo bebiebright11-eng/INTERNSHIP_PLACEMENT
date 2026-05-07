@@ -231,7 +231,20 @@ const pageStyle = {
   };
 
   return (
-    <div style={pageStyle}>
+  <div
+    style={{
+      display: "flex",
+      minHeight: "100vh",
+      backgroundColor: "#f4f6f9",
+      fontFamily: "Arial",
+    }}
+  >
+    <div
+  style={{
+    flex: 1,
+    padding: "20px",
+  }}
+>
       <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
         INTERNSHIP  PLACEMENT  SYSTEM (ILES)
       </h1>
@@ -623,6 +636,7 @@ const pageStyle = {
       )}
      </>
 )} 
+    </div>
     </div>
   );
 }
