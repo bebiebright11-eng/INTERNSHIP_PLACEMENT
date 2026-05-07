@@ -323,8 +323,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
 )
     criteria_scores = CriteriaScoreSerializer(
     many=True,
-    write_only=True,
-    required=False
+    read_only=True
 )
     class Meta:
         model = Evaluation

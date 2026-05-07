@@ -225,13 +225,23 @@ const logScore = countedLogs * 2.5;
 
     {/* ✅ ADD CRITERIA BREAKDOWN */}
     <h5>Criteria Breakdown</h5>
-    <ul>
-      {workplaceEval.criteria_scores?.map((item) => (
-        <li key={item.id}>
-          {item.criteria_name}: {item.score}
-        </li>
-      ))}
-    </ul>
+<table border="1" cellPadding="8">
+  <thead>
+    <tr>
+      <th>Criteria</th>
+      <th>Marks</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {workplaceEval.criteria_scores?.map((item) => (
+      <tr key={item.id}>
+        <td>{item.criteria_name}</td>
+        <td>{item.score}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
 
     <p><strong>Comments:</strong> {workplaceEval.comments}</p>
   </div>
