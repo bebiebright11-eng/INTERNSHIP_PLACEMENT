@@ -47,8 +47,11 @@ class EvaluationSerializer(serializers.ModelSerializer):
     source='get_supervisor_type_display',
     read_only=True
 )
-    criteria_scores = CriteriaScoreSerializer(many=True, write_only=True)
-
+    criteria_scores = CriteriaScoreSerializer(
+    many=True,
+    write_only=True,
+    required=False
+)
     class Meta:
         model = Evaluation
         fields = [

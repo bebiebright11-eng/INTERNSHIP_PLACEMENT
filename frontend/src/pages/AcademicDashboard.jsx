@@ -95,11 +95,21 @@ const fetchEvaluations = async () => {
 
 const submitEvaluation = async (placementId) => {
   try {
+
+    const academicScore = scores[placementId] || 0;
+
+    if (academicScore > 20) {
+      alert("Academic marks cannot exceed 20");
+      return;
+    }
+
     await API.post(
-      "supervision/final-evaluation/",
+      "supervision/evaluations/",
       {
         placement: placementId,
-        academic_score: scores[placementId],
+        supervisor_type: "academic",
+        score: academicScore,
+        comments: "Academic final evaluation",
       },
       {
         headers: {
@@ -108,9 +118,17 @@ const submitEvaluation = async (placementId) => {
       }
     );
 
-    alert("Final evaluation submitted!");
+    alert("Final evaluation submitted successfully!");
+
   } catch (error) {
-    console.log(error.response?.data);
+    
+  console.log("FULL ERROR:", error);
+
+  console.log("RESPONSE:", error.response);
+
+  console.log("DATA:", error.response?.data);
+
+  alert(JSON.stringify(error.response?.data));
   }
 };
 
