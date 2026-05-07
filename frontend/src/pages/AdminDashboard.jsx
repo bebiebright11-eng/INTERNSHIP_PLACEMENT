@@ -51,6 +51,7 @@ function AdminDashboard() {
   const [showDropdown, setShowDropdown] = useState({});
   const [savedRows, setSavedRows] = useState({});
   const [criteria, setCriteria] = useState([]);
+  const [finalEvaluations, setFinalEvaluations] = useState([]);
   const [newCriteria, setNewCriteria] = useState({
     name: "",
     max_score: "",
@@ -270,6 +271,22 @@ function AdminDashboard() {
     }
   };
 
+  const fetchFinalEvaluations = async () => {
+    try {
+
+      const res = await API.get("supervision/evaluations/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setFinalEvaluations(res.data);
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // ---------------- LOAD DATA ON MOUNT ----------------
   useEffect(() => {
     fetchApplications();
@@ -277,6 +294,7 @@ function AdminDashboard() {
     fetchSupervisors();
     fetchOrganizations();
     fetchCriteria();
+    fetchFinalEvaluations();
   }, []);
 
   const menuItemStyle = {
