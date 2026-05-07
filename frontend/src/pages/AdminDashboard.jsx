@@ -51,6 +51,7 @@ function AdminDashboard() {
   const [showDropdown, setShowDropdown] = useState({});
   const [savedRows, setSavedRows] = useState({});
   const [criteria, setCriteria] = useState([]);
+  const [finalEvaluations, setFinalEvaluations] = useState([]);
   const [newCriteria, setNewCriteria] = useState({
     name: "",
     max_score: "",
@@ -270,6 +271,22 @@ function AdminDashboard() {
     }
   };
 
+  const fetchFinalEvaluations = async () => {
+    try {
+
+      const res = await API.get("supervision/evaluations/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setFinalEvaluations(res.data);
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // ---------------- LOAD DATA ON MOUNT ----------------
   useEffect(() => {
     fetchApplications();
@@ -277,6 +294,7 @@ function AdminDashboard() {
     fetchSupervisors();
     fetchOrganizations();
     fetchCriteria();
+    fetchFinalEvaluations();
   }, []);
 
   const menuItemStyle = {
@@ -301,10 +319,47 @@ function AdminDashboard() {
   position: "absolute",
   zIndex: 1000,
 }; 
+const sectionWrapper = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginTop: "30px",
+};
 
+const sectionCard = {
+  border: "1px solid #140961",
+  padding: "20px",
+  borderRadius: "12px",
+  background: "#f4f7fb",
+  width: "100%",
+  maxWidth: "600px",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+};
+
+const sectionTitle = {
+  color: "#480303",
+  fontSize: "30px",
+  marginBottom: "15px",
+  textAlign: "center",
+};
 
 return (
   <div>
+    <h1
+      style={{
+        background: "#480303",
+        color: "white",
+        padding: "15px",
+        borderRadius: "10px",
+        textAlign: "center",
+        width: "fit-content",
+        margin: "20px auto",
+        boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+      }}
+    >
+      ADMIN DASHBOARD
+    </h1>
+
     {/* MENU */}
     <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
       <button
@@ -365,6 +420,13 @@ return (
          Placements
       </div>
 
+      <div
+        style={menuItemStyle}
+        onClick={() => handleMenuClick("finalEvaluations")}
+      >
+        🎓 Final Report
+      </div>    
+
      
 
       
@@ -375,7 +437,7 @@ return (
 
     {/* DASHBOARD CONTENT */}
     <div>
-      <h1>Admin Dashboard</h1>
+      
 
       {/* ⬇️ KEEP EVERYTHING ELSE EXACTLY AS YOU WROTE IT BELOW */}
 {activeView === "home" && ( 
@@ -411,109 +473,123 @@ return (
       </h1>
     </div>
   </div>   
-        <h2>Organization</h2>
     <div
       style={{
-        border: "1px solid #140961",
-        padding: "15px",
-        marginBottom: "20px",
-        borderRadius: "8px",
-        background: "#d4f4f4",
-        maxWidth: "500px"
-      }}
-    >
-      <h3>Add Organization</h3>    
+        display: "flex",
+        justifyContent: "center",
+        gap: "70px",
+        flexWrap: "wrap",
+        alignItems: "flex-start",
+        marginTop: "30px",
+        }}
+    >  
+        <div style={sectionWrapper}>
+          <h2 style={sectionTitle}>Organization</h2>
 
-      <input
-        type="text"
-        placeholder="Name"
-        value={orgForm.name}
-        onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
-      />
-      <br /><br />
+          <div style={sectionCard}>
+  
+            <h3>Add Organization</h3>    
 
-      <input
-        type ='text'
-        placeholder="Location"
-        value={orgForm.location}
-        onChange={(e) => setOrgForm({ ...orgForm, location: e.target.value })}
-      />
-      <br /><br />
+              <input
+                type="text"
+                placeholder="Name"
+                value={orgForm.name}
+                onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
+              />
+              <br /><br />
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={orgForm.email}
-        onChange={(e) => setOrgForm({ ...orgForm, email: e.target.value })}
-      />
-      <br /><br />
+              <input
+                type ='text'
+                placeholder="Location"
+                value={orgForm.location}
+                onChange={(e) => setOrgForm({ ...orgForm, location: e.target.value })}
+              />
+              <br /><br />
 
-      <input
-        type="text"
-        placeholder="Phone"
-        value={orgForm.phone}
-        onChange={(e) => setOrgForm({ ...orgForm, phone: e.target.value })}
-      />
-      <br /><br />
+              <input
+                type="email"
+                placeholder="Email"
+                value={orgForm.email}
+                onChange={(e) => setOrgForm({ ...orgForm, email: e.target.value })}
+              />
+              <br /><br />
 
-      <textarea
-        placeholder="Description"
-        value={orgForm.description}
-        onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
-      />
-      <br /><br />
+              <input
+                type="text"
+                placeholder="Phone"
+                value={orgForm.phone}
+                onChange={(e) => setOrgForm({ ...orgForm, phone: e.target.value })}
+              />
+              <br /><br />
 
-      <input
-        type='text'
-        placeholder ='website'
-        value={orgForm.website}
-        onChange={(e) => setOrgForm({...orgForm,website: e.target.value})}
-      />
-      <br /><br />  
+              <textarea
+                placeholder="Description"
+                value={orgForm.description}
+                onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
+              />
+              <br /><br />
 
-      <button onClick ={createOrganization}>
-        Create Organization
-      </button>
-    </div>
+              <input
+                type='text'
+                placeholder ='website'
+                value={orgForm.website}
+                onChange={(e) => setOrgForm({...orgForm,website: e.target.value})}
+              />
+              <br /><br />  
 
-    <h3>Create User</h3>
+          <button onClick ={createOrganization}>
+            Create Organization
+          </button>
+        </div>
+      </div> 
+        
 
+      <div style={sectionWrapper}>
+        <h2 style={sectionTitle}>Create User</h2>
 
+        <div style={sectionCard}>
+          <form onSubmit={handleCreateUser}>
+              <input
+                type="text"
+                placeholder="Registration Number / Email"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              <br /><br />
 
-<form onSubmit={handleCreateUser}>
-  <input
-    type="text"
-    placeholder="Registration Number / Email"
-    value={username}
-    onChange={(e) => setUsername(e.target.value)}
-    required
-  />
-  <br /><br />
+              <input
+                type="email"
+                placeholder="Email (for supervisors)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <br /><br />
 
-  <input
-    type="email"
-    placeholder="Email (for supervisors)"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-  />
-  <br /><br />
+              <select value={role} onChange={(e) => setRole(e.target.value)}>
+                <option value="student">Student</option>
+                <option value="admin">Admin</option>
+                <option value="workplace">Workplace Supervisor</option>
+                <option value="academic">Academic Supervisor</option>
+              </select>
+              <br /><br />
 
-  <select value={role} onChange={(e) => setRole(e.target.value)}>
-    <option value="student">Student</option>
-    <option value="admin">Admin</option>
-    <option value="workplace">Workplace Supervisor</option>
-    <option value="academic">Academic Supervisor</option>
-  </select>
-  <br /><br />
+            <button type="submit">Create User</button>
+          </form>
+        </div>
+      </div>  
 
-  <button type="submit">Create User</button>
-</form>
-
+    </div>      
 
   
 
  
-  <h2>Global Evaluation Criteria (Admin only)</h2>
+  <div style={sectionWrapper}>
+  <h2 style={sectionTitle}>
+    Global Evaluation Criteria
+  </h2>
+
+  <div style={sectionCard}></div>
 
   <table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginLeft: "30px" }}>
     <thead>
@@ -583,20 +659,20 @@ return (
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
     <button
-    onClick={async () => {
-      try {
-        await API.delete(`supervision/criteria/${c.id}/`);
+      onClick={async () => {
+        try {
+          await API.delete(`supervision/criteria/${c.id}/`);
 
-        // ✅ remove instantly from UI
-        setCriteria((prev) => prev.filter((item) => item.id !== c.id));
+          // ✅ remove instantly from UI
+          setCriteria((prev) => prev.filter((item) => item.id !== c.id));
 
-      } catch {
-        toast.error("Delete failed");
-      }
-    }}
-  >
-    Delete
-  </button>
+        } catch {
+          toast.error("Delete failed");
+        }
+      }}
+    >
+      Delete
+    </button>
 
 
           </td>
@@ -630,47 +706,47 @@ return (
         <td>-</td>  
 
         <td>
-  <button
-    onClick={async () => {
-      if (!newCriteria.name || !newCriteria.max_score) {
-        toast.warning("Please fill all fields");
-        return;
-      }
+    <button
+      onClick={async () => {
+        if (!newCriteria.name || !newCriteria.max_score) {
+          toast.warning("Please fill all fields");
+          return;
+        }
 
-      // 🚨 LIMIT CHECK
-      if (criteria.length >= 6) {
-        const confirmAdd = window.confirm(
-          "You have reached 6 criteria. Do you want to add another?"
-        );
+        // 🚨 LIMIT CHECK
+        if (criteria.length >= 6) {
+          const confirmAdd = window.confirm(
+            "You have reached 6 criteria. Do you want to add another?"
+          );
 
-        if (!confirmAdd) return;
-      }
+          if (!confirmAdd) return;
+        }
 
-      try {
-        const res = await API.post("supervision/criteria/", 
-          {
-          name: newCriteria.name,
-          max_score: Number(newCriteria.max_score),
-        });
+        try {
+          const res = await API.post("supervision/criteria/", {
+            name: newCriteria.name,
+            max_score: Number(newCriteria.max_score),
+          });
 
-        // ✅ add instantly to UI
-        setCriteria((prev) => [...prev, res.data]);
+          // ✅ add instantly to UI
+          setCriteria((prev) => [...prev, res.data]);
 
-        setNewCriteria({ name: "", max_score: "" });
+          setNewCriteria({ name: "", max_score: "" });
 
-      } catch (err) {
-        console.log(err.response?.data);
-        toast.error("Failed to create criteria");
-      }
-    }}
-  >
-    Add
-  </button>
+        } catch (err) {
+          console.log(err.response?.data);
+          toast.error("Failed to create criteria");
+        }
+      }}
+    >
+      Add
+    </button>
 
         </td>
       </tr>
     </tbody>
   </table>
+      </div>
   </>
 )}
 {activeView === "organizations" && (
@@ -1125,6 +1201,60 @@ return (
         })
       )}
     </div>
+  </>
+)}
+{activeView === "finalEvaluations" && (
+  <>
+    <div
+      style={{
+        display:'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: '30px'
+      }}
+    >
+      <h2>Final Student Evaluations</h2>
+      {finalEvaluations.length === 0 ? (
+        <p>No evaluations yet</p>
+      ) : (   
+        <table
+          border="1"
+          cellPadding="10"
+          style={{ marginTop: "20px", width: "100%", backgroundColor: "#f0f0f0", marginLeft: "30px",borderCollapse: "collapse" }}
+        >
+          <thead
+            style={{ 
+              backgroundColor: "#480303",
+              color: "white", 
+              fontWeight: "bold"
+          }}
+          >
+            <tr>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>name</th>
+              <th>Workplace Supervisor</th>
+              <th>Final Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {finalEvaluations.map((ev) => (
+              <tr key={ev.id}>
+                <td>{ev.student_name}</td>
+                <td>{ev.organization_name}</td>
+                <td>{ev.supervisor_name}</td>
+                <td>
+                  <strong>
+                    {ev.final_grade}
+                  </strong>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+  </div>
   </>
 )}
    

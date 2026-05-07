@@ -69,9 +69,13 @@ class EvaluationViewSet(viewsets.ModelViewSet):
                placement__academic_supervisor=user
            )
 
-    #  Admin → no direct access here
-        return Evaluation.objects.none()
-    
+    # ✅ Admin → only final evaluations
+        if user.role == 'admin':
+            return Evaluation.objects.filter(
+                is_final=True,
+                supervisor_type='academic'
+            )
+        
 
     def perform_create(self, serializer):
         user = self.request.user
