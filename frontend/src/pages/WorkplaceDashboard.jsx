@@ -121,7 +121,7 @@ const submitEvaluation = async (placementId) => {
   }
 };
 
-  const renderStudents = () => {
+ const renderStudents = () => {
   return (
     <div>
       <h2>My Students</h2>
@@ -129,7 +129,7 @@ const submitEvaluation = async (placementId) => {
       {placements.length === 0 ? (
         <p>No students assigned</p>
       ) : (
-        <table>
+        <table style={{ width: "100%" }}>
           <thead>
             <tr>
               <th>Student</th>
@@ -144,24 +144,99 @@ const submitEvaluation = async (placementId) => {
               const isEvaluated = !!submittedEvaluations[p.id];
 
               return (
-                <tr key={p.id}>
-                  <td>{p.student_name}</td>
-                  <td>{p.organization_name}</td>
-                  <td>{isEvaluated ? "Evaluated" : "Pending"}</td>
-                  <td>
-                    {isEvaluated ? (
-                      <button onClick={() => setSelectedPlacement(p)}>
-                        View
-                      </button>
-                    ) : (
-                      <button onClick={() => setActiveEvaluation(p.id)}>
-                        Evaluate
-                      </button>
-                    )}
-                  </td>
-                </tr>
+                <>
+                  <tr key={p.id}>
+                    <td>{p.student_name}</td>
+                    <td>{p.organization_name}</td>
 
-                
+                    <td>
+                      {isEvaluated ? "Evaluated" : "Pending"}
+                    </td>
+
+                    <td>
+                      {isEvaluated ? (
+                        <button onClick={() => setSelectedPlacement(p)}>
+                          View
+                        </button>
+                      ) : (
+                        <button onClick={() => setActiveEvaluation(p.id)}>
+                          Evaluate
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+
+                  {activeEvaluation === p.id &&
+                    !submittedEvaluations[p.id] && (
+                      <tr>
+                        <td colSpan="4">
+
+                          <div style={{ marginTop: "10px" }}>
+
+                            <table style={{ width: "100%" }}>
+                              <thead>
+                                <tr>
+                                  <th>Criteria</th>
+                                  <th>Max</th>
+                                  <th>Score</th>
+                                </tr>
+                              </thead>
+
+                              <tbody>
+                                {criteria.map((c) => (
+                                  <tr key={c.id}>
+                                    <td>{c.name}</td>
+                                    <td>{c.max_score}</td>
+
+                                    <td>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max={c.max_score}
+                                        value={scores[p.id]?.[c.id] || ""}
+                                        onChange={(e) =>
+                                          handleScoreChange(
+                                            p.id,
+                                            c.id,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+
+                            <textarea
+                              placeholder="Write comments..."
+                              value={comments[p.id] || ""}
+                              onChange={(e) =>
+                                setComments((prev) => ({
+                                  ...prev,
+                                  [p.id]: e.target.value,
+                                }))
+                              }
+                              rows="4"
+                              style={{
+                                width: "100%",
+                                marginTop: "10px",
+                              }}
+                            />
+
+                            <button
+                              onClick={() => submitEvaluation(p.id)}
+                              style={{ marginTop: "10px" }}
+                            >
+                              Submit Evaluation
+                            </button>
+
+                          </div>
+
+                        </td>
+                      </tr>
+                    )}
+                </>
               );
             })}
           </tbody>
