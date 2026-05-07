@@ -296,6 +296,85 @@ const submitEvaluation = async (placementId) => {
   );
 };
 
+const renderEvaluations = () => {
+  const evaluated = placements.filter(
+    (p) => submittedEvaluations[p.id]
+  );
+
+  return (
+    <div>
+      <h2>My Evaluations</h2>
+
+      {evaluated.length === 0 ? (
+        <p>No evaluations submitted yet</p>
+      ) : (
+        <table style={{ width: "100%" }}>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {evaluated.map((p) => (
+              <tr key={p.id}>
+                <td>{p.student_name}</td>
+                <td>{p.organization_name}</td>
+                <td>Evaluated</td>
+
+                <td>
+                  <button onClick={() => setSelectedPlacement(p)}>
+                    View Evaluation
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* VIEW DETAILS SECTION */}
+      {selectedPlacement && (
+        <div style={{
+          marginTop: "20px",
+          padding: "15px",
+          background: "#f4f4f4",
+          borderRadius: "8px"
+        }}>
+          <h3>Evaluation Details</h3>
+
+          <p>
+            <strong>Comments:</strong>{" "}
+            {savedEvaluations[selectedPlacement.id]?.comments || "No comments"}
+          </p>
+
+          <h4>Scores</h4>
+
+          <ul>
+            {Object.entries(
+              savedEvaluations[selectedPlacement.id]?.scores || {}
+            ).map(([criteriaId, score]) => {
+              const c = criteria.find(
+                (x) => x.id === parseInt(criteriaId)
+              );
+
+              return (
+                <li key={criteriaId}>
+                  {c?.name}: {score}
+                </li>
+              );
+            })}
+          </ul>
+
+        </div>
+      )}
+    </div>
+  );
+};
+
 
   return (
     <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
