@@ -8,6 +8,8 @@ function AcademicDashboard() {
   const [scores, setScores] = useState({});
   const [logs, setLogs] = useState({});
 
+  const [editingPlacement, setEditingPlacement] = useState(null);
+
   // --- Data Fetching Functions ---
 
   const fetchPlacements = async () => {
@@ -98,29 +100,57 @@ const submitEvaluation = async (placementId) => {
 
     const academicScore = scores[placementId] || 0;
 
+const academicEval = evaluations.find(
+  (ev) =>
+    ev.placement === placementId &&
+    ev.supervisor_type === "academic"
+);
+
     if (academicScore > 20) {
       alert("Academic marks cannot exceed 20");
       return;
     }
 
-    await API.post(
-      "supervision/evaluations/",
-      {
-        placement: placementId,
-        supervisor_type: "academic",
-        score: academicScore,
-        comments: "Academic final evaluation",
+    if (editingPlacement === placementId && academicEval?.id) {
+
+  await API.put(
+    `supervision/evaluations/${academicEval.id}/`,
+    {
+      placement: placementId,
+      supervisor_type: "academic",
+      score: academicScore,
+      comments: "Academic final evaluation",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    }
+  );
+
+} else {
+
+  await API.post(
+    "supervision/evaluations/",
+    {
+      placement: placementId,
+      supervisor_type: "academic",
+      score: academicScore,
+      comments: "Academic final evaluation",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+}
 
     alert("Final evaluation submitted successfully!");
 
     fetchEvaluations();
+    setEditingPlacement(null);
 
   } catch (error) {
     
@@ -242,7 +272,7 @@ const logScore = countedLogs * 2.5;
 })}
 </ul>
 
-{!academicEval ? (
+{(!academicEval || editingPlacement === p.id) ? (
   <div>
 
     <h4>Academic Supervisor Marks</h4>
@@ -309,18 +339,20 @@ const logScore = countedLogs * 2.5;
       {academicEval.final_grade} / 100
     </p>
 
-    <button
-      onClick={() => {
+<button
+  onClick={() => {
 
-        setScores((prev) => ({
-          ...prev,
-          [p.id]: academicEval.score,
-        }));
+    setEditingPlacement(p.id);
 
-      }}
-    >
-      Edit Evaluation
-    </button>
+    setScores((prev) => ({
+      ...prev,
+      [p.id]: academicEval.score,
+    }));
+
+  }}
+>
+  Edit Evaluation
+</button>
 
   </div>
 )}
