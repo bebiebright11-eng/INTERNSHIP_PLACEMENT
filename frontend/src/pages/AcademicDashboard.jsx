@@ -590,6 +590,9 @@ const academicEval = evaluations.find(
 )}
 
 
+{showWeeklyLogs === p.id && (
+<div>
+
 <h4>Weekly Logs</h4>
 
 <p>Total Logs Submitted: {logCount}</p>
@@ -621,6 +624,9 @@ const academicEval = evaluations.find(
   );
 })}
 </ul>
+</div>
+)}
+
 
 {(!academicEval || editingPlacement === p.id) ? (
   <div>
