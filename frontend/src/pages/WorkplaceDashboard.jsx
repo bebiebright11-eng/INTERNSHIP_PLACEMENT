@@ -14,6 +14,9 @@ function WorkplaceDashboard() {
   const [selectedPlacement, setSelectedPlacement] = useState(null);
 
 
+  const firstName = localStorage.getItem("first_name");
+  const lastName = localStorage.getItem("last_name");
+
   const assignedCount = placements.length;
   const evaluatedCount = Object.keys(submittedEvaluations).length;
   const pendingCount = assignedCount - evaluatedCount;
@@ -386,7 +389,7 @@ const renderEvaluations = () => {
 
       {/* 🔷 WELCOME */}
       <div style={{ padding: "10px 15px", backgroundColor: "#34495e", color: "#fff" }}>
-        <small>Welcome User</small>
+        <small>Welcome {firstName || "user"}</small>
       </div>
 
       {/* 🔷 MENU BUTTON */}

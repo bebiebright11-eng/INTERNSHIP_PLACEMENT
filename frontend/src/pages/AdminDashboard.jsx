@@ -417,7 +417,7 @@ return (
         style={menuItemStyle}
         onClick={() => handleMenuClick("placements")}
       >
-        📍 Placements
+         Placements
       </div>
 
       <div
