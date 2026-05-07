@@ -11,8 +11,7 @@ function WorkplaceDashboard() {
   const [savedEvaluations, setSavedEvaluations] = useState({});
   const [showMenu, setShowMenu] = useState(false);
   const [activePage, setActivePage] = useState("home");
-  const [selectedPlacement, setSelectedPlacement] = useState(null);
-
+  
 
   const assignedCount = placements.length;
   const evaluatedCount = Object.keys(submittedEvaluations).length;
@@ -160,6 +159,8 @@ const submitEvaluation = async (placementId) => {
                     )}
                   </td>
                 </tr>
+
+                
               );
             })}
           </tbody>
