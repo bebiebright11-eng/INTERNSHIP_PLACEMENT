@@ -239,75 +239,88 @@ const pageStyle = {
       fontFamily: "Arial",
     }}
   >
+
+    {/* SIDEBAR */}
     <div
+      style={{
+        width: "240px",
+        backgroundColor: "#1e293b",
+        color: "white",
+        padding: "20px",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
+      <h2 style={{ marginBottom: "30px", textAlign: "center" }}>
+        ILES
+      </h2>
+
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("home")}
+      >
+        🏠 Home
+      </div>
+
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("organizations")}
+      >
+        🏢 Organizations
+      </div>
+
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("applications")}
+      >
+        📝 Applications
+      </div>
+
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("evaluations")}
+      >
+        📊 Evaluations
+      </div>
+
+      <div
+        style={menuItemStyle}
+        onClick={() => setActiveView("logs")}
+      >
+        📘 Weekly Logs
+      </div>
+
+      <button
+        onClick={handleLogout}
+        style={{
+          marginTop: "auto",
+          padding: "10px",
+          border: "none",
+          borderRadius: "8px",
+          backgroundColor: "#ef4444",
+          color: "white",
+          cursor: "pointer",
+        }}
+      >
+        Logout
+      </button>
+    </div>
+{/* MAIN CONTENT */}
+<div
   style={{
     flex: 1,
     padding: "20px",
   }}
 >
+
       <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
         INTERNSHIP  PLACEMENT  SYSTEM (ILES)
       </h1>
 
-      <button onClick={handleLogout}>
-  Logout
-</button>
-
       <h2 style={{textAlign: "center", marginBottom: "5px" }}>Student Dashboard</h2>
       <p style={{textAlign: "center", fontWeight: "bold", marginTop: "0px" }}>Welcome, {firstName || "Student"} 👋</p>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{
-            fontSize: "22px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          ☰
-        </button>
-        <span
-          style={{ fontWeight: "bold", cursor: "pointer" }}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          Menu
-        </span>
-      </div>
-
-      {/* --- MENU SECTION FIXED --- */}
-      {menuOpen && (
-        <div
-          style={{
-            position: "absolute",
-            marginTop: "10px",
-            background: "white",
-            border: "1px solid #f35f5f",
-            padding: "10px",
-            width: "250px",
-            boxShadow: "0px 2px 8px rgba(0,0,0,0.2)",
-            borderRadius: "8px",
-            zIndex: 999,
-          }}
-        >
-          <div style={menuItemStyle} onClick={() => setActiveView("home")}>
-            🏠 Home
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("organizations")}>
-            🏢 Organizations
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("applications")}>
-            📝 My Applications
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("evaluations")}>
-            📊 My Evaluations
-          </div>
-          <div style={menuItemStyle} onClick={() => setActiveView("logs")}>
-            📘 Weekly Logs
-          </div>
-        </div>
-      )}
 
 {notification && (
   <div style={{
@@ -362,7 +375,7 @@ const pageStyle = {
   <div style={cardStyle}>
     <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
     <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       <p>{applications.filter(a=>a.status==="approved").length}</p>
+       {applications.filter(a => a.status === "approved").length}
     </p>
   </div>
 
@@ -617,7 +630,7 @@ const pageStyle = {
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
             <p style={{textAlign: "center"}}><strong>Name:</strong> {org.name}</p>
             <p style={{textAlign: "center"}}><strong>Location:</strong> {org.location}</p>
-            
+      
             {placement ? (
   <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>
     Already Placed
