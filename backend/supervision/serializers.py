@@ -47,11 +47,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
     source='get_supervisor_type_display',
     read_only=True
 )
-    criteria_scores = CriteriaScoreSerializer(
-    many=True,
-    source='criteriascore_set',
-    read_only=True
-)
+    criteria_scores = CriteriaScoreSerializer(many=True, write_only=True)
 
     class Meta:
         model = Evaluation
@@ -85,34 +81,55 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
 
 
-
     def create(self, validated_data):
+
+        criteria_data = validated_data.pop('criteria_scores', [])
+
         evaluation = Evaluation.objects.create(**validated_data)
 
+        total = 0
 
+    # 🔹 Workplace evaluation
+        if evaluation.supervisor_type == 'workplace':
 
-    #  Academic Supervisor → Manual score (20)
-        if evaluation.supervisor_type == 'academic':
+            for item in criteria_data:
+
+                CriteriaScore.objects.create(
+                    evaluation=evaluation,
+                    criteria=item['criteria'],
+                    score=item['score']
+                )
+
+                total += item['score']
+
+            evaluation.score = total
+
+    # 🔹 Academic evaluation
+        elif evaluation.supervisor_type == 'academic':
+
             evaluation.score = validated_data.get('score', 0)
 
-        #  ADD LOG SCORE
             log_score = self.get_log_score(evaluation.placement)
 
-        #  GET workplace score
             workplace_eval = Evaluation.objects.filter(
-                placement=evaluation.placement,
-                supervisor_type='workplace'
+               placement=evaluation.placement,
+               supervisor_type='workplace'
             ).first()
-            if not workplace_eval:
-                raise serializers.ValidationError("Workplace evaluation must be completed first")
-            
-            workplace_score = workplace_eval.score
 
-        #  FINAL CALCULATION
-            final = workplace_score + log_score + evaluation.score
+            if not workplace_eval:
+                raise serializers.ValidationError(
+                    "Workplace evaluation must be completed first"
+                )
+
+            final = (
+                workplace_eval.score +
+                log_score +
+                evaluation.score
+            )
 
             evaluation.final_grade = final
             evaluation.is_final = True
 
         evaluation.save()
+
         return evaluation
