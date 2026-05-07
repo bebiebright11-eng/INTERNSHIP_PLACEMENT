@@ -505,6 +505,9 @@ const academicEval = evaluations.find(
 
 
 
+{showWorkplaceEval === p.id && (
+<div>
+
 <h4>Workplace Evaluation</h4>
 {workplaceEval ? (
   <div>
@@ -580,7 +583,10 @@ const academicEval = evaluations.find(
     <p><strong>Comments:</strong> {workplaceEval.comments}</p>
   </div>
 ) : (
-  <p>No workplace evaluation yet</p>
+<p>No workplace evaluation yet</p>
+)}
+
+</div>
 )}
 
 
