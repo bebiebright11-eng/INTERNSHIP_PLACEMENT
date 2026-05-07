@@ -12,6 +12,9 @@ function AcademicDashboard() {
   const [activePage, setActivePage] = useState("home");
   const [showMenu, setShowMenu] = useState(false);
   const [expandedStudent, setExpandedStudent] = useState(null);
+  const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
+const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
+const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
 
   // --- Data Fetching Functions ---
 
@@ -452,8 +455,55 @@ const academicEval = evaluations.find(
   Evaluate Student
 </button>
 
+
 {expandedStudent === p.id && (
-<div>
+<div style={{ marginTop: "20px" }}>
+
+  <div
+    style={{
+      display: "flex",
+      gap: "10px",
+      flexWrap: "wrap",
+      marginBottom: "20px"
+    }}
+  >
+
+    <button
+      onClick={() =>
+        setShowWorkplaceEval(
+          showWorkplaceEval === p.id ? null : p.id
+        )
+      }
+      style={menuButtonStyle}
+    >
+      View Workplace Evaluation
+    </button>
+
+    <button
+      onClick={() =>
+        setShowWeeklyLogs(
+          showWeeklyLogs === p.id ? null : p.id
+        )
+      }
+      style={menuButtonStyle}
+    >
+      View Weekly Logs
+    </button>
+
+    <button
+      onClick={() =>
+        setShowFinalEvaluation(
+          showFinalEvaluation === p.id ? null : p.id
+        )
+      }
+      style={menuButtonStyle}
+    >
+      Give Final Evaluation
+    </button>
+
+  </div>
+
+
 
 <h4>Workplace Evaluation</h4>
 {workplaceEval ? (
