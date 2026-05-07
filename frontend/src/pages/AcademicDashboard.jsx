@@ -11,6 +11,7 @@ function AcademicDashboard() {
   const [editingPlacement, setEditingPlacement] = useState(null);
   const [activePage, setActivePage] = useState("home");
   const [showMenu, setShowMenu] = useState(false);
+  const [expandedStudent, setExpandedStudent] = useState(null);
 
   // --- Data Fetching Functions ---
 
@@ -419,10 +420,41 @@ const academicEval = evaluations.find(
 
 
           return (
-            <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
+            <div
+  key={p.id}
+  style={{
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    marginBottom: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+  }}
+>
               <h3>Student: {p.student_name}</h3>
               <p>Organization: {p.organization_name}</p>
 
+              <button
+  onClick={() =>
+    setExpandedStudent(
+      expandedStudent === p.id ? null : p.id
+    )
+  }
+  style={{
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "10px 18px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginTop: "10px",
+    fontWeight: "bold"
+  }}
+>
+  Evaluate Student
+</button>
+
+{expandedStudent === p.id && (
+<div>
 
 <h4>Workplace Evaluation</h4>
 {workplaceEval ? (
@@ -622,8 +654,10 @@ const academicEval = evaluations.find(
 
 
 
-            </div>
-          );
+          </div>
+)}
+</div>
+);
         })
            )}
     </div>
