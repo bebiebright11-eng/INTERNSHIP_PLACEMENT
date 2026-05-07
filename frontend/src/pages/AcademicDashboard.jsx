@@ -8,6 +8,8 @@ function AcademicDashboard() {
   const [scores, setScores] = useState({});
   const [logs, setLogs] = useState({});
 
+  const [editingPlacement, setEditingPlacement] = useState(null);
+
   // --- Data Fetching Functions ---
 
   const fetchPlacements = async () => {
@@ -42,19 +44,21 @@ function AcademicDashboard() {
     }
   };
 
-  const fetchEvaluations = async () => {
-    try {
-      const res = await API.get("supervision/evaluations/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+const fetchEvaluations = async () => {
+  try {
+    const res = await API.get("supervision/evaluations/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
-      setEvaluations(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    console.log("EVALUATIONS FROM BACKEND:", res.data); // 👈 ADD THIS
+
+    setEvaluations(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   // --- Event Handlers --- 
 
@@ -93,22 +97,70 @@ function AcademicDashboard() {
 
 const submitEvaluation = async (placementId) => {
   try {
-    await API.post(
-      "supervision/final-evaluation/",
-      {
-        placement: placementId,
-        academic_score: scores[placementId],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
 
-    alert("Final evaluation submitted!");
+    const academicScore = scores[placementId] || 0;
+
+const academicEval = evaluations.find(
+  (ev) =>
+    ev.placement === placementId &&
+    ev.supervisor_type === "academic"
+);
+
+    if (academicScore > 20) {
+      alert("Academic marks cannot exceed 20");
+      return;
+    }
+
+    if (editingPlacement === placementId && academicEval?.id) {
+
+  await API.put(
+    `supervision/evaluations/${academicEval.id}/`,
+    {
+      placement: placementId,
+      supervisor_type: "academic",
+      score: academicScore,
+      comments: "Academic final evaluation",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+} else {
+
+  await API.post(
+    "supervision/evaluations/",
+    {
+      placement: placementId,
+      supervisor_type: "academic",
+      score: academicScore,
+      comments: "Academic final evaluation",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+}
+
+    alert("Final evaluation submitted successfully!");
+
+    fetchEvaluations();
+    setEditingPlacement(null);
+
   } catch (error) {
-    console.log(error.response?.data);
+    
+  console.log("FULL ERROR:", error);
+
+  console.log("RESPONSE:", error.response);
+
+  console.log("DATA:", error.response?.data);
+
+  alert(JSON.stringify(error.response?.data));
   }
 };
 
@@ -144,10 +196,21 @@ const logScore = countedLogs * 2.5;
             (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
           );
 
-            
+          const academicEval = evaluations.find(
+            (ev) => ev.placement === p.id && ev.supervisor_type === "academic"
+          );
+
           const workplaceScore = workplaceEval?.score || 0;
-          const academicScore = scores[p.id] || 0;
-          const finalScore = workplaceScore + logScore + academicScore;
+
+          const academicScore =
+            academicEval?.score ||
+            scores[p.id] ||
+            0;
+
+          const finalScore =
+            academicEval?.final_grade ||
+            (workplaceScore + logScore + academicScore);
+
 
           return (
             <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
@@ -162,13 +225,70 @@ const logScore = countedLogs * 2.5;
 
     {/* ✅ ADD CRITERIA BREAKDOWN */}
     <h5>Criteria Breakdown</h5>
-    <ul>
-      {workplaceEval.criteria_scores?.map((item) => (
-        <li key={item.id}>
-          {item.criteria_name}: {item.score}
-        </li>
+<div
+  style={{
+    marginTop: "15px",
+    borderRadius: "10px",
+    overflow: "hidden",
+    border: "1px solid #ddd",
+    width: "100%",
+    maxWidth: "500px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+  }}
+>
+  <table
+    style={{
+      width: "100%",
+      borderCollapse: "collapse",
+      fontFamily: "Arial"
+    }}
+  >
+    <thead>
+      <tr
+        style={{
+          backgroundColor: "#198754",
+          color: "white",
+          textAlign: "left"
+        }}
+      >
+        <th style={{ padding: "12px" }}>Criteria</th>
+        <th style={{ padding: "12px" }}>Marks</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {workplaceEval.criteria_scores?.map((item, index) => (
+        <tr
+          key={item.id}
+          style={{
+            backgroundColor:
+              index % 2 === 0 ? "#f8f9fa" : "white"
+          }}
+        >
+          <td
+            style={{
+              padding: "12px",
+              borderBottom: "1px solid #ddd"
+            }}
+          >
+            {item.criteria_name}
+          </td>
+
+          <td
+            style={{
+              padding: "12px",
+              borderBottom: "1px solid #ddd",
+              fontWeight: "bold",
+              color: "#198754"
+            }}
+          >
+            {item.score}
+          </td>
+        </tr>
       ))}
-    </ul>
+    </tbody>
+  </table>
+</div>
 
     <p><strong>Comments:</strong> {workplaceEval.comments}</p>
   </div>
@@ -184,37 +304,117 @@ const logScore = countedLogs * 2.5;
 <p>Log Score: {logScore} / 20</p>
 
 <ul>
-  {studentLogs.map((log) => (
+  {studentLogs
+  .sort((a, b) => a.week_number - b.week_number)
+.map((log, index) => {
+
+  const isReviewed = index < 8;
+
+  return (
     <li key={log.id}>
-      Week {log.week}: {log.description}
+      Week {log.week_number}: {log.tasks}
+
+      <br />
+
+      Status:
+      <span style={{
+        color: isReviewed ? "green" : "orange",
+        fontWeight: "bold",
+        marginLeft: "5px"
+      }}>
+        {isReviewed ? "Reviewed ✅" : "Pending ⏳"}
+      </span>
     </li>
-  ))}
+  );
+})}
 </ul>
 
-<h4>Academic Supervisor Marks</h4>
+{(!academicEval || editingPlacement === p.id) ? (
+  <div>
 
-<input
-  type="number"
-  min="0"
-  max="20"
-  placeholder="Enter marks out of 20"
-  onChange={(e) =>
+    <h4>Academic Supervisor Marks</h4>
+
+    <input
+      type="number"
+      min="0"
+      max="20"
+      placeholder="Enter marks out of 20"
+
+      value={
+        scores[p.id] ??
+        ""
+      }
+
+      onChange={(e) => {
+
+        let value = parseInt(e.target.value) || 0;
+
+        if (value < 0) value = 0;
+        if (value > 20) value = 20;
+
+        setScores((prev) => ({
+          ...prev,
+          [p.id]: value,
+        }));
+      }}
+    />
+
+    <h4>Final Score</h4>
+
+    <p>{finalScore} / 100</p>
+
+    <br />
+
+    <button onClick={() => submitEvaluation(p.id)}>
+      Submit Final Evaluation
+    </button>
+
+  </div>
+) : (
+  <div>
+
+    <h4>Academic Evaluation</h4>
+
+    <p
+      style={{
+        color: "green",
+        fontWeight: "bold"
+      }}
+    >
+      ✅ Final Evaluation Submitted
+    </p>
+
+    <p>
+      <strong>Academic Marks:</strong>
+      {" "}
+      {academicEval.score} / 20
+    </p>
+
+    <p>
+      <strong>Final Grade:</strong>
+      {" "}
+      {academicEval.final_grade} / 100
+    </p>
+
+<button
+  onClick={() => {
+
+    setEditingPlacement(p.id);
+
     setScores((prev) => ({
       ...prev,
-      [p.id]: parseInt(e.target.value),
-    }))
-  }
-/>
-<h4>Final Score</h4>
-<p>{finalScore} / 100</p>
+      [p.id]: academicEval.score,
+    }));
+
+  }}
+>
+  Edit Evaluation
+</button>
+
+  </div>
+)}
 
 
-
-              <br />
-
-              <button onClick={() => submitEvaluation(p.id)}>
-                Submit Final Evaluation
-              </button> 
             </div>
           );
         })

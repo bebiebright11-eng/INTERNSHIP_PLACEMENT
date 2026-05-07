@@ -71,43 +71,55 @@ function WorkplaceDashboard() {
   };
 
   // 🔹 Submit evaluation
-  const submitEvaluation = async (placementId) => {
-    try {
-      const criteriaScores = Object.entries(scores[placementId] || {}).map(
-        ([criteriaId, score]) => ({
-          criteria: parseInt(criteriaId),
-          score: score,
-        })
-      );
+const submitEvaluation = async (placementId) => {
+  try {
+    const criteriaScores = Object.entries(scores[placementId] || {}).map(
+      ([criteriaId, score]) => ({
+        criteria: parseInt(criteriaId),
+        score: score,
+      })
+    );
 
-      if (criteriaScores.length === 0) {
-        alert("Please enter scores before submitting.");
-        return;
-      }
-
-      // ✅ Save locally
-      setSavedEvaluations((prev) => ({
-        ...prev,
-        [placementId]: {
-          scores: scores[placementId],
-          comments: comments[placementId],
-        },
-      }));
-
-      // ✅ Mark submitted
-      setSubmittedEvaluations((prev) => ({
-        ...prev,
-        [placementId]: true,
-      }));
-
-      // ✅ Close form
-      setActiveEvaluation(null);
-
-      alert("Evaluation submitted successfully!");
-    } catch (error) {
-      console.log(error);
+    if (criteriaScores.length === 0) {
+      alert("Please enter scores before submitting.");
+      return;
     }
-  };
+
+    await API.post(
+      "supervision/evaluations/",
+      {
+        placement: placementId,
+        supervisor_type: "workplace",
+        comments: comments[placementId] || "",
+        score: 0, // backend calculates real score
+        criteria_scores: criteriaScores,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    alert("Evaluation submitted and saved to database!");
+
+    setSubmittedEvaluations((prev) => ({
+      ...prev,
+      [placementId]: true,
+    }));
+
+    setActiveEvaluation(null);
+
+  } catch (error) {
+    console.log("FULL ERROR:", error);
+
+  console.log("RESPONSE:", error.response);
+
+  console.log("DATA:", error.response?.data);
+
+  alert(JSON.stringify(error.response?.data));
+  }
+};
 
   const renderStudents = () => {
   return (

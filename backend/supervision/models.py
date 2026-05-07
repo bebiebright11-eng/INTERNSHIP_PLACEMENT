@@ -49,7 +49,7 @@ class Evaluation(models.Model):
 
     score = models.IntegerField()
     comments = models.TextField()
-    final_grade = models.FloatField(null=True, blank=True)
+    final_grade = models.FloatField(null=True, blank=True, default=0)
     is_final = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
