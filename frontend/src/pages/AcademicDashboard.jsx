@@ -166,10 +166,21 @@ const logScore = countedLogs * 2.5;
             (ev) => ev.placement === p.id && ev.supervisor_type === "workplace"
           );
 
-            
+          const academicEval = evaluations.find(
+            (ev) => ev.placement === p.id && ev.supervisor_type === "academic"
+          );
+
           const workplaceScore = workplaceEval?.score || 0;
-          const academicScore = scores[p.id] || 0;
-          const finalScore = workplaceScore + logScore + academicScore;
+
+          const academicScore =
+            academicEval?.score ||
+            scores[p.id] ||
+            0;
+
+          const finalScore =
+            academicEval?.final_grade ||
+            (workplaceScore + logScore + academicScore);
+
 
           return (
             <div key={p.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
@@ -231,40 +242,90 @@ const logScore = countedLogs * 2.5;
 })}
 </ul>
 
-<h4>Academic Supervisor Marks</h4>
+{!academicEval ? (
+  <div>
 
-<input
-  type="number"
-  min="0"
-  max="20"
-  placeholder="Enter marks out of 20"
-  value={scores[p.id] || ""}
-  onChange={(e) => {
+    <h4>Academic Supervisor Marks</h4>
 
-    let value = parseInt(e.target.value) || 0;
+    <input
+      type="number"
+      min="0"
+      max="20"
+      placeholder="Enter marks out of 20"
 
-    // ✅ Prevent below 0
-    if (value < 0) value = 0;
+      value={
+        scores[p.id] ??
+        ""
+      }
 
-    // ✅ Prevent above 20
-    if (value > 20) value = 20;
+      onChange={(e) => {
 
-    setScores((prev) => ({
-      ...prev,
-      [p.id]: value,
-    }));
-  }}
-/>
-<h4>Final Score</h4>
-<p>{finalScore} / 100</p>
+        let value = parseInt(e.target.value) || 0;
+
+        if (value < 0) value = 0;
+        if (value > 20) value = 20;
+
+        setScores((prev) => ({
+          ...prev,
+          [p.id]: value,
+        }));
+      }}
+    />
+
+    <h4>Final Score</h4>
+
+    <p>{finalScore} / 100</p>
+
+    <br />
+
+    <button onClick={() => submitEvaluation(p.id)}>
+      Submit Final Evaluation
+    </button>
+
+  </div>
+) : (
+  <div>
+
+    <h4>Academic Evaluation</h4>
+
+    <p
+      style={{
+        color: "green",
+        fontWeight: "bold"
+      }}
+    >
+      ✅ Final Evaluation Submitted
+    </p>
+
+    <p>
+      <strong>Academic Marks:</strong>
+      {" "}
+      {academicEval.score} / 20
+    </p>
+
+    <p>
+      <strong>Final Grade:</strong>
+      {" "}
+      {academicEval.final_grade} / 100
+    </p>
+
+    <button
+      onClick={() => {
+
+        setScores((prev) => ({
+          ...prev,
+          [p.id]: academicEval.score,
+        }));
+
+      }}
+    >
+      Edit Evaluation
+    </button>
+
+  </div>
+)}
 
 
-
-              <br />
-
-              <button onClick={() => submitEvaluation(p.id)}>
-                Submit Final Evaluation
-              </button> 
             </div>
           );
         })
