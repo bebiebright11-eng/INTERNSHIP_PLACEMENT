@@ -624,9 +624,13 @@ const academicEval = evaluations.find(
   );
 })}
 </ul>
+
 </div>
 )}
 
+
+{showFinalEvaluation === p.id && (
+<div>
 
 {(!academicEval || editingPlacement === p.id) ? (
   <div>
@@ -711,6 +715,9 @@ const academicEval = evaluations.find(
 </button>
 
   </div>
+)}
+
+</div>
 )}
 
 
