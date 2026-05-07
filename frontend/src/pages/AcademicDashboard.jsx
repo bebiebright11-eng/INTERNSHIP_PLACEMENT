@@ -374,15 +374,26 @@ const academicEval = evaluations.find(
     </div>
 
 {activePage === "home" && (
-  placements.length === 0 ? (
+        <div>
+
+<h2
+  style={{
+    color: "#198754",
+    marginBottom: "20px"
+  }}
+>
+  Assigned Students
+</h2>
+
+{placements.length === 0 ? (
         <p>No students assigned</p>
       ) : (
         placements.map((p) => {
-const studentLogs = logs[p.id] || [];
-const logCount = studentLogs.length;
+  const studentLogs = logs[p.id] || [];
+  const logCount = studentLogs.length;
 
-const countedLogs = Math.min(logCount, 8);
-const logScore = countedLogs * 2.5;
+  const countedLogs = Math.min(logCount, 8);
+  const logScore = countedLogs * 2.5;
 
 
 
@@ -614,8 +625,9 @@ const logScore = countedLogs * 2.5;
             </div>
           );
         })
-      )
-      )} 
+           )}
+    </div>
+)} 
       
     
     </div>
