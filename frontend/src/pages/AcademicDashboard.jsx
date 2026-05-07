@@ -1,5 +1,8 @@
 
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import API from "../api";
 import API from "../api";
 
 function AcademicDashboard() {
@@ -89,7 +92,7 @@ function AcademicDashboard() {
 
       setPlacements(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load placements ❌");
     }
   };
 
@@ -103,8 +106,9 @@ function AcademicDashboard() {
 
       setCriteria(res.data);
     } catch (error) {
-      console.log(error);
-    }
+     
+     toast.error("Failed to load criteria ❌");
+}
   };
 
   const fetchEvaluations = async () => {
@@ -119,7 +123,7 @@ function AcademicDashboard() {
 
       setEvaluations(res.data);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load evaluations ❌");
     }
   };
 
@@ -142,7 +146,7 @@ function AcademicDashboard() {
 
       setLogs(grouped);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load weekly logs ❌");
     }
   };
 
@@ -169,7 +173,7 @@ function AcademicDashboard() {
       );
 
       if (academicScore > 20) {
-        alert("Academic marks cannot exceed 20");
+        toast.error("Academic marks cannot exceed 20 ❌");
         return;
       }
 
@@ -205,7 +209,7 @@ function AcademicDashboard() {
         );
       }
 
-      alert("Final evaluation submitted successfully!");
+      toast.success("Final evaluation submitted successfully ✅");
 
       fetchEvaluations();
       setEditingPlacement(null);
@@ -214,7 +218,7 @@ function AcademicDashboard() {
       console.log("RESPONSE:", error.response);
       console.log("DATA:", error.response?.data);
 
-      alert(JSON.stringify(error.response?.data));
+      toast.error("Failed to submit evaluation ❌");
     }
   };
 
