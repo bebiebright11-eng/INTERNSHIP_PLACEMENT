@@ -53,13 +53,6 @@ const handleLogout = () => {
     attendance_days: 5,
   });
 
-  const menuItemStyle = {
-    padding: "10px",
-    cursor: "pointer",
-    borderRadius: "5px",
-    marginBottom: "5px",
-    transition: "0.2s",
-  };
 
   const cardStyle = {
   flex: "1",
@@ -222,8 +215,23 @@ const handleChange = (e) => {
     }
   };
 
+const pageStyle = {
+  padding: "30px",
+  backgroundColor: "#f4f6f9",
+  minHeight: "100vh",
+  fontFamily: "Arial",
+};
+
+  const menuItemStyle = {
+    padding: "10px",
+    cursor: "pointer",
+    borderRadius: "5px",
+    marginBottom: "5px",
+    transition: "0.2s",
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={pageStyle}>
       <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
         INTERNSHIP  PLACEMENT  SYSTEM (ILES)
       </h1>
