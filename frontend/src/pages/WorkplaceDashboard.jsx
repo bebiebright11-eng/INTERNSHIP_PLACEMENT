@@ -101,6 +101,14 @@ const submitEvaluation = async (placementId) => {
       }
     );
 
+    setSavedEvaluations((prev) => ({
+  ...prev,
+  [placementId]: {
+    scores: scores[placementId],
+    comments: comments[placementId],
+  },
+}));
+
     alert("Evaluation submitted and saved to database!");
 
     setSubmittedEvaluations((prev) => ({
