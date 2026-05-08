@@ -417,8 +417,7 @@ const renderEvaluations = () => {
           <thead>
             <tr>
               <th>Student</th>
-              <th>Organization</th>
-              <th>Status</th>
+              <th>Score / 60</th>
               <th>Action</th>
             </tr>
           </thead>
