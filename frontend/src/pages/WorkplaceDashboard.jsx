@@ -426,8 +426,6 @@ const renderEvaluations = () => {
             {evaluated.map((p) => (
               <tr key={p.id}>
                 <td>{p.student_name}</td>
-                <td>{p.organization_name}</td>
-                <td>Evaluated</td>
 
                 <td>
                   <button onClick={() => setSelectedPlacement(p)}>
