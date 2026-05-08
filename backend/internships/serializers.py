@@ -26,6 +26,7 @@ class PlacementSerializer(serializers.ModelSerializer):
     is_fully_assigned = serializers.ReadOnlyField()
     workplace_supervisor_name = serializers.CharField(source='workplace_supervisor.username', read_only=True)
     academic_supervisor_name = serializers.CharField(source='academic_supervisor.username', read_only=True)
+    status = serializers.ReadOnlyField()
     class Meta:
         model = Placement
         fields = '__all__'
