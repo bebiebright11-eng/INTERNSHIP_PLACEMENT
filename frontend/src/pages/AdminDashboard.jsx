@@ -383,7 +383,7 @@ return (
   >
     <h1
       style={{
-        background: "#198754",
+        background: "#480303",
         color: "white",
         padding: "15px",
         borderRadius: "10px",
@@ -394,7 +394,7 @@ return (
       }}
     >
       ADMIN DASHBOARD
-    </h1>
+    </h2>
 
     {/* MENU */}
     <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
