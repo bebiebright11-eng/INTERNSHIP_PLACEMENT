@@ -302,36 +302,57 @@ function AdminDashboard() {
     fetchOrganizations();
     fetchCriteria();
     fetchFinalEvaluations();
-  }, []);
+  }, []); 
+
+  const menuButtonStyle = {
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "12px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "15px",
+  };
+  
 
   const menuItemStyle = {
-  padding: "20px",
-  cursor: "pointer",
-  borderBottom: "1px solid #eee"
-};
+    padding: "12px",
+    cursor: "pointer",
+    borderRadius: "8px",
+    marginBottom: "5px",
+    fontWeight: "bold",
+    color: "#198754",
+    backgroundColor: "#f8f9fa",
+  };
   const statsCard = {
-  background: "#f7c7c7",
-  padding: "10px",
-  borderRadius: "10px",
-  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-  textAlign: "center",
-  border: "1px solid #eee",
-  borderTop: "5px solid #480303"
-};
+    backgroundColor: "white",
+    padding: "20px",
+    borderRadius: "15px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    textAlign: "center",
+    flex: "1",
+    minWidth: "220px",
+  };
+
   const dropdownStyle = {
-  border: "1px solid #1e0707",
-  maxHeight: "120px",
-  overflowY: "auto",
-  background: "#e5bc91",
-  position: "absolute",
-  zIndex: 1000,
-}; 
-const sectionWrapper = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  marginTop: "30px",
-};
+    position: "absolute",
+    top: "60px",
+    left: "0",
+    backgroundColor: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+    width: "250px",
+    padding: "10px",
+    zIndex: 1000,
+  }; 
+  const sectionWrapper = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    width: "100%",
+ };
 
 const sectionCard = {
   border: "1px solid #140961",
@@ -344,14 +365,22 @@ const sectionCard = {
 };
 
 const sectionTitle = {
-  color: "#480303",
-  fontSize: "30px",
-  marginBottom: "15px",
+  color: "#198754",
+  fontSize: "28px",
+  marginBottom: "20px",
   textAlign: "center",
+  fontWeight: "bold",
 };
 
 return (
-  <div>
+  <div
+    style={{
+      padding: "30px",
+      backgroundColor :"#f4f6f9",
+      minHeight: "200vh",
+      frontFamily:"Arial",
+    }}
+  >
     <h1
       style={{
         margin:0,
@@ -435,7 +464,7 @@ return (
         style={menuItemStyle}
         onClick={() => handleMenuClick("placements")}
       >
-         Placements
+        🍭Placements
       </div>
 
       <div
