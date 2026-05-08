@@ -30,7 +30,7 @@ class IsAdmin(BasePermission):
         return (
             request.user.is_authenticated and
             getattr(request.user, "role", None) == "admin"
-        )
+         )
 
 
 class IsStudentOrAcademic(BasePermission):
