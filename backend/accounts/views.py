@@ -52,3 +52,88 @@ def activate_account(request):
     user.save()
 
     return Response({"message": "Account activated successfully"})
+
+
+
+
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from .serializers import PasswordResetRequestSerializer
+
+
+class PasswordResetRequestView(APIView):
+
+    def post(self, request):
+
+        serializer = PasswordResetRequestSerializer(
+            data=request.data
+        )
+
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data["user"]
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        token = default_token_generator.make_token(user)
+
+        reset_url = f"http://localhost:5173/reset-password/{uid}/{token}/"
+
+        send_mail(
+            subject="Password Reset",
+            message=f"Click this link to reset your password:\n{reset_url}",
+            from_email=None,
+            recipient_list=[user.email],
+        )
+
+        return Response({
+            "message": "Password reset link sent to email"
+        }, status=status.HTTP_200_OK)
+    
+
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class PasswordResetConfirmView(APIView):
+
+    def post(self, request, uidb64, token):
+        print(request.data)
+        password = request.data.get("password")
+
+        try:
+
+            uid = urlsafe_base64_decode(uidb64).decode()
+
+            user = User.objects.get(pk=uid)
+
+        except:
+
+            return Response(
+                {"error": "Invalid user"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not default_token_generator.check_token(user, token):
+
+            return Response(
+                {"error": "Invalid or expired token"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.set_password(password)
+
+        user.save()
+
+        return Response({
+            "message": "Password reset successful"
+        })

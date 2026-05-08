@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import WeeklyLog, Evaluation, EvaluationCriteria, CriteriaScore
+from django.utils import timezone
+from datetime import timedelta
 
 
 class WeeklyLogSerializer(serializers.ModelSerializer):
@@ -8,9 +10,64 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
 
     # show organization name
     organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
+    status = serializers.SerializerMethodField()
+
+
     class Meta:
         model = WeeklyLog
         fields = '__all__'
+    
+    def get_status(self, obj):
+
+        placement_logs = WeeklyLog.objects.filter(
+            placement=obj.placement
+        ).order_by("submitted_at")
+
+        reviewed_ids = placement_logs[:8].values_list("id", flat=True)
+
+        if obj.id in reviewed_ids:
+            return "reviewed"
+
+        return "pending"
+     
+    def validate(self, data):
+
+        placement = data.get("placement")
+
+        today = timezone.now().date()
+
+    # Prevent submission before placement starts
+        if placement.start_date and today < placement.start_date:
+            raise serializers.ValidationError(
+                f"You cannot submit logs before {placement.start_date}"
+            )
+
+    # Prevent submission after placement ends
+        if placement.end_date and today > placement.end_date:
+            raise serializers.ValidationError(
+                "This placement has already ended"
+            )
+
+    # Monday of current week
+        start_of_week = today - timedelta(days=today.weekday())
+
+    # Sunday of current week
+        end_of_week = start_of_week + timedelta(days=6)
+
+    # Prevent more than one submission in same week
+        existing_log = WeeklyLog.objects.filter(
+            placement=placement,
+            submitted_at__date__gte=start_of_week,
+            submitted_at__date__lte=end_of_week
+        ).exists()
+
+        if existing_log:
+            raise serializers.ValidationError(
+                "You have already submitted a weekly log for this week."
+            )
+
+        return data
+
 
 
 class EvaluationCriteriaSerializer(serializers.ModelSerializer):
@@ -71,12 +128,14 @@ class EvaluationSerializer(serializers.ModelSerializer):
         ]
 
     def get_log_score(self, placement):
-        logs = WeeklyLog.objects.filter(
-            placement=placement,
-            status='reviewed'
-        ).count()
 
-        score = logs * 2.5
+        reviewed_logs = WeeklyLog.objects.filter(
+            placement=placement
+        ).order_by("submitted_at", "id")[:8]
+
+        count = reviewed_logs.count()
+
+        score = count * 2.5
 
         return min(score, 20)  # cap at 20
     

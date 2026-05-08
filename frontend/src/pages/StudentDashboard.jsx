@@ -648,6 +648,7 @@ return (
   <p>• This placement will be evaluated based on <strong>evaluation criteria</strong> including performance, punctuality, and professionalism.</p>
 
   <p>• Ensure all logs are submitted on time and accurately reflect your weekly activities.</p>
+  <p>• The Academic Supervisor will a ward you marks out of 20 manually depending on how you work and connect with people at your workplace and also from workplace supervisor comments about you.</p>
 </div>
 
         </>
