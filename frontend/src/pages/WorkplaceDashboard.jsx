@@ -57,32 +57,65 @@ function WorkplaceDashboard() {
     }
   };
 
-  const fetchEvaluations = async () => {
-  try {
-    const res = await API.get("supervision/evaluations/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+  
+   const fetchEvaluations = async () => {
 
-    // workplace evaluations only
+  try {
+
+    const res = await API.get(
+      "supervision/evaluations/",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    // ONLY workplace evaluations
     const workplaceEvaluations = res.data.filter(
       (ev) => ev.supervisor_type === "workplace"
     );
 
     setEvaluations(workplaceEvaluations);
 
-    // mark submitted evaluations
+    // 🔹 Track submitted evaluations
     const submitted = {};
 
+    // 🔹 Store saved evaluation details
+    const saved = {};
+
     workplaceEvaluations.forEach((ev) => {
+
       submitted[ev.placement] = true;
+
+      // convert criteria_scores array into object
+      const scoreMap = {};
+
+      ev.criteria_scores.forEach((item) => {
+
+        scoreMap[item.criteria] = item.score;
+
+      });
+
+      saved[ev.placement] = {
+
+        comments: ev.comments,
+
+        scores: scoreMap,
+
+      };
+
     });
 
     setSubmittedEvaluations(submitted);
 
+    // 🔥 THIS WAS MISSING
+    setSavedEvaluations(saved);
+
   } catch (error) {
+
     console.log("EVALUATIONS ERROR:", error);
+
   }
 };
 
