@@ -267,6 +267,49 @@ const submitEvaluation = async (placementId) => {
     color: "#198754",
   };
 
+
+  const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  overflow: "hidden",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+};
+
+const thStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  padding: "14px",
+  textAlign: "left",
+  fontSize: "15px",
+};
+
+const tdStyle = {
+  padding: "14px",
+  borderBottom: "1px solid #eee",
+  fontSize: "15px",
+  color: "#333",
+};
+
+const actionButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
+
+const detailsCardStyle = {
+  marginTop: "20px",
+  backgroundColor: "white",
+  padding: "20px",
+  borderRadius: "12px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+};
+
  const renderStudents = () => {
   return (
     <div>
@@ -446,14 +489,14 @@ const renderEvaluations = () => {
       {evaluated.length === 0 ? (
         <p>No evaluations submitted yet</p>
       ) : (
-        <table style={{ width: "100%" }}>
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Score / 60</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+        <table style={tableStyle}>
+        <thead>
+  <tr>
+    <th style={thStyle}>Student</th>
+    <th style={thStyle}>Score / 60</th>
+    <th style={thStyle}>Action</th>
+  </tr>
+</thead>
 
           <tbody>
   {evaluated.map((p) => {
@@ -463,17 +506,26 @@ const renderEvaluations = () => {
     ).reduce((sum, score) => sum + score, 0);
 
     return (
-      <tr key={p.id}>
-        <td>{p.student_name}</td>
+    <tr key={p.id}>
 
-        <td>{totalScore} / 60</td>
+  <td style={tdStyle}>
+    {p.student_name}
+  </td>
 
-        <td>
-          <button onClick={() => setSelectedPlacement(p)}>
-            View Evaluation
-          </button>
-        </td>
-      </tr>
+  <td style={tdStyle}>
+    <strong>{totalScore} / 60</strong>
+  </td>
+
+  <td style={tdStyle}>
+    <button
+      style={actionButtonStyle}
+      onClick={() => setSelectedPlacement(p)}
+    >
+      View Evaluation
+    </button>
+  </td>
+
+</tr>
     );
 
   })}
@@ -483,12 +535,7 @@ const renderEvaluations = () => {
 
       {/* VIEW DETAILS SECTION */}
       {selectedPlacement && (
-        <div style={{
-          marginTop: "20px",
-          padding: "15px",
-          background: "#f4f4f4",
-          borderRadius: "8px"
-        }}>
+          <div style={detailsCardStyle}>
           <h3>Evaluation Details</h3>
 
           <p>
@@ -498,7 +545,7 @@ const renderEvaluations = () => {
 
           <h4>Scores</h4>
 
-          <ul>
+          <ul style={{ lineHeight: "2", paddingLeft: "20px" }}>
             {Object.entries(
               savedEvaluations[selectedPlacement.id]?.scores || {}
             ).map(([criteriaId, score]) => {
