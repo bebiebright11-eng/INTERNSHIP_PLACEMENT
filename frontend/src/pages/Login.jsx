@@ -105,6 +105,15 @@ function Login() {
     Activate here
   </span>
 </p>
+<p>
+  <span
+    onClick={() => navigate("/forgot-password")}
+    style={{ color: "green", cursor: "pointer" }}
+  >
+    Forgot Password?
+  </span>
+</p>
+
 </form>
     </div>
   );

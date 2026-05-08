@@ -31,3 +31,38 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         
         return data
 
+
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+User = get_user_model()
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    identifier = serializers.CharField()
+
+    def validate(self, attrs):
+        identifier = attrs.get("identifier")
+
+        user = User.objects.filter(
+            username=identifier
+        ).first()
+
+        if not user:
+            user = User.objects.filter(
+                email=identifier
+            ).first()
+
+        if not user:
+            raise serializers.ValidationError(
+                "No account found"
+            )
+
+        if not user.email:
+            raise serializers.ValidationError(
+                "This account has no email attached"
+            )
+
+        attrs["user"] = user
+
+        return attrs

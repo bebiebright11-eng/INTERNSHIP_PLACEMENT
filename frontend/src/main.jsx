@@ -14,6 +14,8 @@ import StudentDashboard from "./pages/StudentDashboard";
 import WorkplaceDashboard from "./pages/WorkplaceDashboard";
 import AcademicDashboard from "./pages/AcademicDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 localStorage.clear();
 
@@ -27,6 +29,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/student" element={<ProtectedRoute allowedRole="student"><StudentDashboard /></ProtectedRoute>} />
       <Route path="/workplace" element={<ProtectedRoute allowedRole="workplace"><WorkplaceDashboard /></ProtectedRoute>} />
       <Route path="/academic" element={<ProtectedRoute allowedRole="academic"><AcademicDashboard /></ProtectedRoute>} />
+      <Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+<Route
+  path="/reset-password/:uid/:token"
+  element={<ResetPassword />}
+/>
     </Routes>
 
     <ToastContainer position="top-right" autoClose={3000} />
