@@ -383,6 +383,17 @@ return (
   >
     <h1
       style={{
+        margin:0,
+        color: "#198754",
+        fontSize: "36px",
+        fontWeight:"bold"
+      }}
+    >
+      INTERNSHIP PLACEMENT SYSTEM(ILES)
+    </h1>
+
+    <h2
+      style={{
         background: "#198754",
         color: "white",
         padding: "15px",
@@ -394,7 +405,7 @@ return (
       }}
     >
       ADMIN DASHBOARD
-    </h1>
+    </h2>
 
     {/* MENU */}
     <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
