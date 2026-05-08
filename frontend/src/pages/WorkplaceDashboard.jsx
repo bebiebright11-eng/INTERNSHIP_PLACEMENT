@@ -423,18 +423,28 @@ const renderEvaluations = () => {
           </thead>
 
           <tbody>
-            {evaluated.map((p) => (
-              <tr key={p.id}>
-                <td>{p.student_name}</td>
+  {evaluated.map((p) => {
 
-                <td>
-                  <button onClick={() => setSelectedPlacement(p)}>
-                    View Evaluation
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+    const totalScore = Object.values(
+      savedEvaluations[p.id]?.scores || {}
+    ).reduce((sum, score) => sum + score, 0);
+
+    return (
+      <tr key={p.id}>
+        <td>{p.student_name}</td>
+
+        <td>{totalScore} / 60</td>
+
+        <td>
+          <button onClick={() => setSelectedPlacement(p)}>
+            View Evaluation
+          </button>
+        </td>
+      </tr>
+    );
+
+  })}
+</tbody>
         </table>
       )}
 
