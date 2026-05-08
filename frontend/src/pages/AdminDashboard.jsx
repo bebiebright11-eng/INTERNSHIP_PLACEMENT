@@ -349,7 +349,9 @@ function AdminDashboard() {
   const sectionWrapper = {
     backgroundColor: "white",
     borderRadius: "15px",
-    padding: "20px",
+    padding: "30px",
+    marginTop: "30px",
+    marginBottom: "40px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
     width: "100%",
  };
@@ -360,7 +362,8 @@ const sectionCard = {
   borderRadius: "12px",
   background: "#f4f7fb",
   width: "100%",
-  maxWidth: "600px",
+  maxWidth: "900px",
+  margin: "0 auto",
   boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
 };
 
@@ -371,6 +374,25 @@ const sectionTitle = {
   textAlign: "center",
   fontWeight: "bold",
 };
+  const cardStyle = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    minWidth: "220px",
+    flex: "1",
+  };
+
+  const cardTitleStyle = {
+    color: "#666",
+    marginBottom: "10px",
+  };
+
+  const cardNumberStyle = {
+    fontSize: "30px",
+    fontWeight: "bold",
+    color: "#198754",
+  };
 
 return (
   <div
@@ -378,38 +400,40 @@ return (
       padding: "30px",
       backgroundColor :"#f4f6f9",
       minHeight: "200vh",
-      frontFamily:"Arial",
+      fontFamily:"Arial",
     }}
   >
-    <h1
-      style={{
-<<<<<<< HEAD
-        background: "#480303",
-=======
-        margin:0,
-        color: "#198754",
-        fontSize: "36px",
-        fontWeight:"bold"
-      }}
-    >
-      INTERNSHIP PLACEMENT SYSTEM(ILES)
-    </h1>
+   <div>
+      <h1
+        style={{
+          margin:0,
+          color: "#198754",
+          fontSize: "36px",
+          fontWeight:"bold"
+        }}
+      >
+        INTERNSHIP PLACEMENT SYSTEM(ILES)
+      </h1>
 
-    <h2
-      style={{
-        background: "#198754",
->>>>>>> 348031998fb8551dda03f282e2c963330cd9d1e5
-        color: "white",
-        padding: "15px",
-        borderRadius: "10px",
-        textAlign: "center",
-        width: "fit-content",
-        margin: "20px auto",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-      }}
-    >
-      ADMIN DASHBOARD
-    </h2>
+      <h2
+        style={{
+        color: "#198754",
+          marginTop: "10px",
+          marginBottom: "5px",
+        }} 
+      >
+        ADMIN DASHBOARD
+      </h2>
+      <p
+        style={{
+          color: "#666",
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
+      >
+        Welcome, Admin 👋
+      </p>
+    </div>
 
     {/* MENU */}
     <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
@@ -434,7 +458,7 @@ return (
             top: "50px",
             left: "0",
             width: "250px",
-            background: "#efdfb9",
+            background: "#ffff",
             borderRadius: "12px",
             padding: "20px",
             border: "2px solid #ff6b6b",
@@ -494,34 +518,29 @@ return (
 {activeView === "home" && ( 
 
   <> 
-        <div
+  <div
     style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      display: "flex",
       gap: "20px",
-      marginBottom: "30px"
+      marginBottom: "30px",
+      flexWrap : "wrap",
     }}
   >
-    {/* Organizations */}
-    <div style={statsCard}>
-      <h3>🏢 Organizations</h3>
-      <h1>{organizations.length}</h1>
-    </div>
+   <div style={cardStyle}>
+    <h3 style={cardTitleStyle}>Organizations</h3>
+    <p style={cardNumberStyle}>{organizations.length}</p>
+  </div>
 
-    {/* Applications */}
-    <div style={statsCard}>
-      <h3>📝 Applications</h3>
-      <h1>{applications.length}</h1>
-    </div>
+  <div style={cardStyle}>
+    <h3 style={cardTitleStyle}>Applications</h3>
+    <p style={cardNumberStyle}>{applications.length}</p>
+  </div>
 
-    {/* Active Placements */}
-    <div style={statsCard}>
-      <h3>📍 Active Placements</h3>
-      <h1>
-        {
-          placements.filter((p) => p.is_fully_assigned).length
-        }
-      </h1>
+  <div style={cardStyle}>
+    <h3 style={cardTitleStyle}>Placements</h3>
+    <p style={cardNumberStyle}>
+      {placements.filter((p) => p.is_fully_assigned).length}
+    </p>  
     </div>
   </div>   
     <div
@@ -640,9 +659,11 @@ return (
     Global Evaluation Criteria
   </h2>
 
-  <div style={sectionCard}></div>
+  <div style={sectionCard}>
+    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+  
 
-  <table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginLeft: "30px" }}>
+  
     <thead>
       <tr>
         <th>Criteria</th>
@@ -798,6 +819,7 @@ return (
     </tbody>
   </table>
       </div>
+  </div>    
   </>
 )}
 {activeView === "organizations" && (
