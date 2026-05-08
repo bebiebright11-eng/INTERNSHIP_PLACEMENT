@@ -12,7 +12,7 @@ function WorkplaceDashboard() {
   const [showMenu, setShowMenu] = useState(false);
   const [activePage, setActivePage] = useState("home");
   const [selectedPlacement, setSelectedPlacement] = useState(null);
-
+  const [evaluations, setEvaluations] = useState([]);
 
   const firstName = localStorage.getItem("first_name");
   const lastName = localStorage.getItem("last_name");
@@ -57,9 +57,39 @@ function WorkplaceDashboard() {
     }
   };
 
+  const fetchEvaluations = async () => {
+  try {
+    const res = await API.get("supervision/evaluations/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    // workplace evaluations only
+    const workplaceEvaluations = res.data.filter(
+      (ev) => ev.supervisor_type === "workplace"
+    );
+
+    setEvaluations(workplaceEvaluations);
+
+    // mark submitted evaluations
+    const submitted = {};
+
+    workplaceEvaluations.forEach((ev) => {
+      submitted[ev.placement] = true;
+    });
+
+    setSubmittedEvaluations(submitted);
+
+  } catch (error) {
+    console.log("EVALUATIONS ERROR:", error);
+  }
+};
+
   useEffect(() => {
     fetchPlacements();
     fetchCriteria();
+    fetchEvaluations();
   }, []);
 
   // 🔹 Handle score input
@@ -76,6 +106,7 @@ function WorkplaceDashboard() {
   // 🔹 Submit evaluation
 const submitEvaluation = async (placementId) => {
   try {
+
     const criteriaScores = Object.entries(scores[placementId] || {}).map(
       ([criteriaId, score]) => ({
         criteria: parseInt(criteriaId),
@@ -88,47 +119,63 @@ const submitEvaluation = async (placementId) => {
       return;
     }
 
-    await API.post(
-      "supervision/evaluations/",
-      {
-        placement: placementId,
-        supervisor_type: "workplace",
-        comments: comments[placementId] || "",
-        score: 0, // backend calculates real score
-        criteria_scores: criteriaScores,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
+    // check if evaluation already exists
+    const existingEvaluation = evaluations.find(
+      (ev) => ev.placement === placementId
     );
 
-    setSavedEvaluations((prev) => ({
-  ...prev,
-  [placementId]: {
-    scores: scores[placementId],
-    comments: comments[placementId],
-  },
-}));
+    const payload = {
+      placement: placementId,
+      supervisor_type: "workplace",
+      comments: comments[placementId] || "",
+      score: 0,
+      criteria_scores: criteriaScores,
+    };
 
-    alert("Evaluation submitted and saved to database!");
+    if (existingEvaluation) {
 
-    setSubmittedEvaluations((prev) => ({
-      ...prev,
-      [placementId]: true,
-    }));
+      // UPDATE existing evaluation
+      await API.put(
+        `supervision/evaluations/${existingEvaluation.id}/`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      alert("Evaluation updated successfully ✅");
+
+    } else {
+
+      // CREATE new evaluation
+      await API.post(
+        "supervision/evaluations/",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      alert("Evaluation submitted successfully ✅");
+    }
+
+    fetchEvaluations();
 
     setActiveEvaluation(null);
 
   } catch (error) {
+
     console.log("FULL ERROR:", error);
 
-  console.log("RESPONSE:", error.response);
+    console.log("RESPONSE:", error.response);
 
-  console.log("DATA:", error.response?.data);
+    console.log("DATA:", error.response?.data);
 
-  alert(JSON.stringify(error.response?.data));
+    alert(JSON.stringify(error.response?.data));
   }
 };
 
