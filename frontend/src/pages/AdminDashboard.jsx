@@ -383,7 +383,22 @@ return (
   >
     <h1
       style={{
+<<<<<<< HEAD
         background: "#480303",
+=======
+        margin:0,
+        color: "#198754",
+        fontSize: "36px",
+        fontWeight:"bold"
+      }}
+    >
+      INTERNSHIP PLACEMENT SYSTEM(ILES)
+    </h1>
+
+    <h2
+      style={{
+        background: "#198754",
+>>>>>>> 348031998fb8551dda03f282e2c963330cd9d1e5
         color: "white",
         padding: "15px",
         borderRadius: "10px",
