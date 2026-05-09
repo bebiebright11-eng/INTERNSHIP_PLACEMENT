@@ -302,36 +302,59 @@ function AdminDashboard() {
     fetchOrganizations();
     fetchCriteria();
     fetchFinalEvaluations();
-  }, []);
+  }, []); 
+
+  const menuButtonStyle = {
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "12px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "15px",
+  };
+  
 
   const menuItemStyle = {
-  padding: "20px",
-  cursor: "pointer",
-  borderBottom: "1px solid #eee"
-};
+    padding: "12px",
+    cursor: "pointer",
+    borderRadius: "8px",
+    marginBottom: "5px",
+    fontWeight: "bold",
+    color: "#198754",
+    backgroundColor: "#f8f9fa",
+  };
   const statsCard = {
-  background: "#f7c7c7",
-  padding: "10px",
-  borderRadius: "10px",
-  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-  textAlign: "center",
-  border: "1px solid #eee",
-  borderTop: "5px solid #480303"
-};
+    backgroundColor: "white",
+    padding: "20px",
+    borderRadius: "15px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    textAlign: "center",
+    flex: "1",
+    minWidth: "220px",
+  };
+
   const dropdownStyle = {
-  border: "1px solid #1e0707",
-  maxHeight: "120px",
-  overflowY: "auto",
-  background: "#e5bc91",
-  position: "absolute",
-  zIndex: 1000,
-}; 
-const sectionWrapper = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  marginTop: "30px",
-};
+    position: "absolute",
+    top: "60px",
+    left: "0",
+    backgroundColor: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+    width: "250px",
+    padding: "10px",
+    zIndex: 1000,
+  }; 
+  const sectionWrapper = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "30px",
+    marginTop: "30px",
+    marginBottom: "40px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    width: "100%",
+ };
 
 const sectionCard = {
   border: "1px solid #140961",
@@ -339,33 +362,78 @@ const sectionCard = {
   borderRadius: "12px",
   background: "#f4f7fb",
   width: "100%",
-  maxWidth: "600px",
+  maxWidth: "900px",
+  margin: "0 auto",
   boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
 };
 
 const sectionTitle = {
-  color: "#480303",
-  fontSize: "30px",
-  marginBottom: "15px",
+  color: "#198754",
+  fontSize: "28px",
+  marginBottom: "20px",
   textAlign: "center",
+  fontWeight: "bold",
 };
+  const cardStyle = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    minWidth: "220px",
+    flex: "1",
+  };
+
+  const cardTitleStyle = {
+    color: "#666",
+    marginBottom: "10px",
+  };
+
+  const cardNumberStyle = {
+    fontSize: "30px",
+    fontWeight: "bold",
+    color: "#198754",
+  };
 
 return (
-  <div>
-    <h1
-      style={{
-        background: "#480303",
-        color: "white",
-        padding: "15px",
-        borderRadius: "10px",
-        textAlign: "center",
-        width: "fit-content",
-        margin: "20px auto",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-      }}
-    >
-      ADMIN DASHBOARD
-    </h1>
+  <div
+    style={{
+      padding: "30px",
+      backgroundColor :"#f4f6f9",
+      minHeight: "200vh",
+      fontFamily:"Arial",
+    }}
+  >
+   <div>
+      <h1
+        style={{
+          margin:0,
+          color: "#198754",
+          fontSize: "36px",
+          fontWeight:"bold"
+        }}
+      >
+        INTERNSHIP PLACEMENT SYSTEM(ILES)
+      </h1>
+
+      <h2
+        style={{
+        color: "#198754",
+          marginTop: "10px",
+          marginBottom: "5px",
+        }} 
+      >
+        ADMIN DASHBOARD
+      </h2>
+      <p
+        style={{
+          color: "#666",
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
+      >
+        Welcome, Admin 👋
+      </p>
+    </div>
 
     {/* MENU */}
     <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
@@ -390,7 +458,7 @@ return (
             top: "50px",
             left: "0",
             width: "250px",
-            background: "#efdfb9",
+            background: "#ffff",
             borderRadius: "12px",
             padding: "20px",
             border: "2px solid #ff6b6b",
@@ -424,7 +492,7 @@ return (
         style={menuItemStyle}
         onClick={() => handleMenuClick("placements")}
       >
-         Placements
+        🍭Placements
       </div>
 
       <div
@@ -450,34 +518,29 @@ return (
 {activeView === "home" && ( 
 
   <> 
-        <div
+  <div
     style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      display: "flex",
       gap: "20px",
-      marginBottom: "30px"
+      marginBottom: "30px",
+      flexWrap : "wrap",
     }}
   >
-    {/* Organizations */}
-    <div style={statsCard}>
-      <h3>🏢 Organizations</h3>
-      <h1>{organizations.length}</h1>
-    </div>
+   <div style={cardStyle}>
+    <h3 style={cardTitleStyle}>Organizations</h3>
+    <p style={cardNumberStyle}>{organizations.length}</p>
+  </div>
 
-    {/* Applications */}
-    <div style={statsCard}>
-      <h3>📝 Applications</h3>
-      <h1>{applications.length}</h1>
-    </div>
+  <div style={cardStyle}>
+    <h3 style={cardTitleStyle}>Applications</h3>
+    <p style={cardNumberStyle}>{applications.length}</p>
+  </div>
 
-    {/* Active Placements */}
-    <div style={statsCard}>
-      <h3>📍 Active Placements</h3>
-      <h1>
-        {
-          placements.filter((p) => p.is_fully_assigned).length
-        }
-      </h1>
+  <div style={cardStyle}>
+    <h3 style={cardTitleStyle}>Placements</h3>
+    <p style={cardNumberStyle}>
+      {placements.filter((p) => p.is_fully_assigned).length}
+    </p>  
     </div>
   </div>   
     <div
@@ -596,9 +659,11 @@ return (
     Global Evaluation Criteria
   </h2>
 
-  <div style={sectionCard}></div>
+  <div style={sectionCard}>
+    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+  
 
-  <table border ='1'cellPadding ="10" style={{ marginTop: "10px", marginLeft: "30px" }}>
+  
     <thead>
       <tr>
         <th>Criteria</th>
@@ -754,6 +819,7 @@ return (
     </tbody>
   </table>
       </div>
+  </div>    
   </>
 )}
 {activeView === "organizations" && (
