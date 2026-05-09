@@ -807,7 +807,7 @@ return (
                         </>
                       )}
 
-                      {/* 🔴 IMPORTANT: FORM MUST BE INSIDE MAP (THIS FIXES YOUR CRASH) */}
+                      {/* IMPORTANT: FORM MUST BE INSIDE MAP (THIS FIXES YOUR CRASH) */}
                       {activeEvaluation === p.id && !submittedEvaluations[p.id] && (
                         <div style={{ marginTop: "10px" }}>
                           
@@ -866,14 +866,37 @@ return (
                 </div>
               )}
 
-              {/* 🔷 NOTES */}
-              <div style={{ marginTop: "30px" }}>
-                <h4>Important Notes</h4>
-                <textarea
-                  defaultValue="Only assigned students should be evaluated."
-                  style={{ width: "100%", height: "100px" }}
-                />
-              </div>
+{/* 🔷 NOTES */}
+<div
+  style={{
+    marginTop: "30px",
+    backgroundColor: "#c6f1cd",
+    padding: "20px",
+    borderRadius: "10px",
+    border: "1px solid #7e73e8",
+    lineHeight: "1.8",
+  }}
+>
+  <h4 style={{ color: "#856404", marginBottom: "15px" }}>
+    Important Notes
+  </h4>
+
+  <ul style={{ paddingLeft: "20px", color: "#333" }}>
+    <li>
+      Students should be evaluated strictly based on the provided <strong>evaluation
+      criteria</strong>. Each criterion carries 10 marks and finl evaluation is ot of 60. Ensure that the scores awarded
+      accurately reflect the student's actual performance and involvement at the
+      workplace.
+    </li>
+
+    <li style={{ marginTop: "10px" }}>
+      Workplace supervisors are required to review and verify students’ weekly
+      logs before approval. Confirm that the activities recorded in the weekly
+      logs accurately represent the tasks performed by the student during the
+      internship period.
+    </li>
+  </ul>
+</div>
             </div>
           )}
           {activePage === "students" && (
