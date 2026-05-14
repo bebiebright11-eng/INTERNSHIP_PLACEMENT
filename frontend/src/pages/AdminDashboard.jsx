@@ -306,7 +306,7 @@ function AdminDashboard() {
 
   const menuButtonStyle = {
     backgroundColor: "#198754",
-    color: "blue",
+    color: "white",
     border: "none",
     padding: "12px 18px",
     borderRadius: "10px",
@@ -510,11 +510,11 @@ return (
       )}
     </div>
 
-    {/* DASHBOARD CONTENT */}
+  
     <div>
       
 
-      {/* ⬇️ KEEP EVERYTHING ELSE EXACTLY AS YOU WROTE IT BELOW */}
+      
 {activeView === "home" && ( 
 
   <> 
@@ -704,7 +704,6 @@ return (
             />
           </td>
 
-          {/* 🔥 Score column (Admin optional / future use) */}
           <td>
             <input type="number" placeholder="-" disabled />
           </td>
