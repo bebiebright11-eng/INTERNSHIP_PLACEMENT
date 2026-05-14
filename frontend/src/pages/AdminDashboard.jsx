@@ -306,7 +306,7 @@ function AdminDashboard() {
 
   const menuButtonStyle = {
     backgroundColor: "#198754",
-    color: "white",
+    color: "blue",
     border: "none",
     padding: "12px 18px",
     borderRadius: "10px",
