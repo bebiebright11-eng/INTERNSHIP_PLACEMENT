@@ -458,11 +458,11 @@ return (
             top: "50px",
             left: "0",
             width: "250px",
-            background: "#ffff",
+            background: "#ffffffd5",
             borderRadius: "12px",
             padding: "20px",
             border: "2px solid #ff6b6b",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.47)",
             zIndex: 1000
           }}
         >
@@ -551,6 +551,7 @@ return (
         flexWrap: "wrap",
         alignItems: "flex-start",
         marginTop: "30px",
+        
         }}
     >  
         <div style={sectionWrapper}>
