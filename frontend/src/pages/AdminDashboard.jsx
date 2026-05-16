@@ -407,7 +407,7 @@ return (
       <h1
         style={{
           margin:0,
-          color: "#198754",
+          color: "#198754ee",
           fontSize: "36px",
           fontWeight:"bold"
         }}
@@ -417,7 +417,7 @@ return (
 
       <h2
         style={{
-        color: "#198754",
+        color: "#198754eb",
           marginTop: "10px",
           marginBottom: "5px",
         }} 
@@ -426,7 +426,7 @@ return (
       </h2>
       <p
         style={{
-          color: "#666",
+          color: "#a4a4a4",
           fontSize: "18px",
           fontWeight: "bold",
         }}
