@@ -407,7 +407,7 @@ return (
       <h1
         style={{
           margin:0,
-          color: "#198754",
+          color: "#198754ee",
           fontSize: "36px",
           fontWeight:"bold"
         }}
@@ -417,7 +417,7 @@ return (
 
       <h2
         style={{
-        color: "#198754",
+        color: "#198754eb",
           marginTop: "10px",
           marginBottom: "5px",
         }} 
@@ -426,7 +426,7 @@ return (
       </h2>
       <p
         style={{
-          color: "#666",
+          color: "#a4a4a4",
           fontSize: "18px",
           fontWeight: "bold",
         }}
@@ -458,11 +458,11 @@ return (
             top: "50px",
             left: "0",
             width: "250px",
-            background: "#ffff",
+            background: "#ffffffd5",
             borderRadius: "12px",
             padding: "20px",
             border: "2px solid #ff6b6b",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.47)",
             zIndex: 1000
           }}
         >
@@ -551,6 +551,7 @@ return (
         flexWrap: "wrap",
         alignItems: "flex-start",
         marginTop: "30px",
+        
         }}
     >  
         <div style={sectionWrapper}>
