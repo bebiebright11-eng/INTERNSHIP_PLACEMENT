@@ -198,7 +198,12 @@ const handleChange = (e) => {
       });
       fetchLogs();
     } catch (error) {
-      toast.error("Failed to submit log ❌");
+       console.log(error.response?.data);
+
+       toast.error(
+         error.response?.data?.non_field_errors?.[0] ||
+         "Failed to submit log ❌"
+      );
     }
   };
 
