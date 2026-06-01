@@ -13,11 +13,23 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
     permission_classes = [IsAuthenticated]  
 
-
 class ApplicationViewSet(viewsets.ModelViewSet):
-    queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
-         #Have been added after getting an error in then frontend trying to apply . 
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # Admin sees all applications
+        if user.role == "admin":
+            return Application.objects.all()
+
+        # Students only see their own applications
+        if user.role == "student":
+            return Application.objects.filter(student=user)
+
+        return Application.objects.none()
+
     def perform_create(self, serializer):
         serializer.save(student=self.request.user)
 
