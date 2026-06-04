@@ -71,7 +71,7 @@ const handleLogout = () => {
       });
       setApplications(res.data);
     } catch (error) {
-      toast.error("Failed to load placement data ❌");
+      toast.error("Failed to load placement data ");
     }
   };
 
@@ -84,7 +84,7 @@ const handleLogout = () => {
       });
       setLogs(res.data);
     } catch (error) {
-      toast.error("Failed to load logs ❌");
+      toast.error("Failed to load logs ");
     }
   };
 
@@ -97,7 +97,7 @@ const handleLogout = () => {
       });
       setEvaluations(res.data);
     } catch (error) {
-      toast.error("Failed to load evaluations ❌");
+      toast.error("Failed to load evaluations ");
     }
   };
 
@@ -110,7 +110,7 @@ const handleLogout = () => {
         });
       setOrganizations(res.data);
     } catch (error) {
-      toast.error("Failed to load organizations ❌");
+      toast.error("Failed to load organizations ");
     }
   };
 
@@ -129,7 +129,7 @@ const handleLogout = () => {
       fetchApplications();
     } catch (error) {
       console.log(error.response?.data);
-      toast.error("Failed to apply ❌");
+      toast.error("Failed to apply ");
     }
   };
 
@@ -162,7 +162,7 @@ const fetchPlacement = async () => {
     setPlacement(myPlacement || null);
 
   } catch (error) {
-    toast.error("Failed to load placement data ❌");
+    toast.error("Failed to load placement data ");
   }
 };
 
@@ -198,7 +198,12 @@ const handleChange = (e) => {
       });
       fetchLogs();
     } catch (error) {
-      toast.error("Failed to submit log ❌");
+       console.log(error.response?.data);
+
+       toast.error(
+         error.response?.data?.non_field_errors?.[0] ||
+         "Failed to submit log ❌"
+      );
     }
   };
 
