@@ -3,61 +3,37 @@ import API from "../api";
 
 function WorkplaceDashboard() {
   const [placements, setPlacements] = useState([]);
-  const [criteria, setCriteria] = useState([]);
+  const [criteria, setCriteria] = useState([]); // Added missing state
   const [scores, setScores] = useState({});
-  const [activeEvaluation, setActiveEvaluation] = useState(null);
-  const [comments, setComments] = useState({});
-  const [submittedEvaluations, setSubmittedEvaluations] = useState({});
-  const [savedEvaluations, setSavedEvaluations] = useState({});
-  const [showMenu, setShowMenu] = useState(false);
-  const [activePage, setActivePage] = useState("home");
-  const [selectedPlacement, setSelectedPlacement] = useState(null);
-  const [evaluations, setEvaluations] = useState([]);
 
-  const firstName = localStorage.getItem("first_name");
-  const lastName = localStorage.getItem("last_name");
-
-  const assignedCount = placements.length;
-  const evaluatedCount = Object.keys(submittedEvaluations).length;
-  const pendingCount = assignedCount - evaluatedCount;
-
-  // 🔹 Fetch placements
+  // 1. Fetch Placements
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-
-      const filtered = res.data.filter(
-        (p) =>
-          p.workplace_supervisor ===
-          parseInt(localStorage.getItem("user_id"))
-      );
-
+      const userId = parseInt(localStorage.getItem("user_id"));
+      const filtered = res.data.filter((p) => p.workplace_supervisor === userId);
       setPlacements(filtered);
     } catch (error) {
-      console.log("PLACEMENT ERROR:", error);
+      console.error("Error fetching placements:", error);
     }
   };
 
-  // 🔹 Fetch criteria
+  // 2. Fetch Criteria
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/criteria/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const res = await API.get("supervision/evaluationcriteria/", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-
-      setCriteria(res.data.filter((c) => c.is_active));
+      setCriteria(res.data);
     } catch (error) {
-      console.log("CRITERIA ERROR:", error);
+      console.error("Error fetching criteria:", error);
     }
   };
 
-  const fetchEvaluations = async () => {
+  
+   const fetchEvaluations = async () => {
 
   try {
 
@@ -121,10 +97,9 @@ function WorkplaceDashboard() {
   useEffect(() => {
     fetchPlacements();
     fetchCriteria();
-    fetchEvaluations();
   }, []);
 
-  // 🔹 Handle score input
+  // 3. Handle Score Changes
   const handleScoreChange = (placementId, criteriaId, value) => {
     setScores((prev) => ({
       ...prev,
@@ -135,128 +110,39 @@ function WorkplaceDashboard() {
     }));
   };
 
-  // 🔹 Submit evaluation
-const submitEvaluation = async (placementId) => {
-  try {
-
-    const criteriaScores = Object.entries(scores[placementId] || {}).map(
-      ([criteriaId, score]) => ({
-        criteria: parseInt(criteriaId),
-        score: score,
-      })
-    );
-
-    if (criteriaScores.length === 0) {
-      alert("Please enter scores before submitting.");
-      return;
-    }
-
-    // check if evaluation already exists
-    const existingEvaluation = evaluations.find(
-      (ev) => ev.placement === placementId
-    );
-
-    const payload = {
-      placement: placementId,
-      supervisor_type: "workplace",
-      comments: comments[placementId] || "",
-      score: 0,
-      criteria_scores: criteriaScores,
-    };
-
-    if (existingEvaluation) {
-
-      // UPDATE existing evaluation
-      await API.put(
-        `supervision/evaluations/${existingEvaluation.id}/`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+  // 4. Submit Evaluation
+  const submitEvaluation = async (placementId) => {
+    try {
+      const criteriaScores = Object.entries(scores[placementId] || {}).map(
+        ([criteriaId, score]) => ({ 
+          criteria: parseInt(criteriaId),
+          score: score,
+        })
       );
 
-      alert("Evaluation updated successfully ✅");
-
-    } else {
-
-      // CREATE new evaluation
-      await API.post(
-        "supervision/evaluations/",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      alert("Evaluation submitted successfully ✅");
-    }
-
-    fetchEvaluations();
-
-    setActiveEvaluation(null);
-
-  } catch (error) {
-
-  console.log("FULL ERROR:", error);
-  console.log("RESPONSE:", error.response);
-  console.log("DATA:", error.response?.data);
-
-  const data = error.response?.data;
-
-  if (data?.criteria_scores) {
-
-    for (const item of data.criteria_scores) {
-
-      if (item?.non_field_errors?.length > 0) {
-
-        alert(item.non_field_errors[0]);
-
+      if (criteriaScores.length === 0) {
+        alert("Please enter scores before submitting.");
         return;
       }
+
+      await API.post(
+        "supervision/evaluations/",
+        {
+          placement: placementId,
+          supervisor_type: "workplace",
+          comments: "Workplace evaluation submitted",
+          criteria_scores: criteriaScores,
+        },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      alert("Evaluation submitted successfully!");
+    } catch (error) {
+      console.error("BACKEND ERROR:", error.response?.data);
+      alert("Failed to submit: " + JSON.stringify(error.response?.data));
     }
-  }
-
-  alert("Failed to submit evaluation.");
-}
-};
-
-  // --- Styles ---
-
-  const menuButtonStyle = {
-    backgroundColor: "#198754",
-    color: "white",
-    border: "none",
-    padding: "12px 18px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "15px",
-  };
-
-  const dropdownStyle = {
-    position: "absolute",
-    top: "60px",
-    right: "0",
-    backgroundColor: "white",
-    borderRadius: "12px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
-    width: "220px",
-    padding: "10px",
-    zIndex: 1000,
-  };
-
-  const dropdownItemStyle = {
-    padding: "12px",
-    cursor: "pointer",
-    borderRadius: "8px",
-    marginBottom: "5px",
-    fontWeight: "bold",
-    color: "#198754",
-    backgroundColor: "#f8f9fa",
   };
 
   const cardStyle = {
@@ -279,10 +165,53 @@ const submitEvaluation = async (placementId) => {
     color: "#198754",
   };
 
+
+  const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  overflow: "hidden",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+};
+
+const thStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  padding: "14px",
+  textAlign: "left",
+  fontSize: "15px",
+};
+
+const tdStyle = {
+  padding: "14px",
+  borderBottom: "1px solid #eee",
+  fontSize: "15px",
+  color: "#333",
+};
+
+const actionButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
+
+const detailsCardStyle = {
+  marginTop: "20px",
+  backgroundColor: "white",
+  padding: "20px",
+  borderRadius: "12px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+};
+
  const renderStudents = () => {
   return (
-    <div>
-      <h2>My Students</h2>
+    <div style={{ padding: "20px" }}>
+      <h1>Workplace Supervisor Dashboard</h1>
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
@@ -458,14 +387,14 @@ const renderEvaluations = () => {
       {evaluated.length === 0 ? (
         <p>No evaluations submitted yet</p>
       ) : (
-        <table style={{ width: "100%" }}>
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Score / 60</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+        <table style={tableStyle}>
+        <thead>
+  <tr>
+    <th style={thStyle}>Student</th>
+    <th style={thStyle}>Score / 60</th>
+    <th style={thStyle}>Action</th>
+  </tr>
+</thead>
 
           <tbody>
   {evaluated.map((p) => {
@@ -475,17 +404,26 @@ const renderEvaluations = () => {
     ).reduce((sum, score) => sum + score, 0);
 
     return (
-      <tr key={p.id}>
-        <td>{p.student_name}</td>
+    <tr key={p.id}>
 
-        <td>{totalScore} / 60</td>
+  <td style={tdStyle}>
+    {p.student_name}
+  </td>
 
-        <td>
-          <button onClick={() => setSelectedPlacement(p)}>
-            View Evaluation
-          </button>
-        </td>
-      </tr>
+  <td style={tdStyle}>
+    <strong>{totalScore} / 60</strong>
+  </td>
+
+  <td style={tdStyle}>
+    <button
+      style={actionButtonStyle}
+      onClick={() => setSelectedPlacement(p)}
+    >
+      View Evaluation
+    </button>
+  </td>
+
+</tr>
     );
 
   })}
@@ -495,12 +433,7 @@ const renderEvaluations = () => {
 
       {/* VIEW DETAILS SECTION */}
       {selectedPlacement && (
-        <div style={{
-          marginTop: "20px",
-          padding: "15px",
-          background: "#f4f4f4",
-          borderRadius: "8px"
-        }}>
+          <div style={detailsCardStyle}>
           <h3>Evaluation Details</h3>
 
           <p>
@@ -510,7 +443,7 @@ const renderEvaluations = () => {
 
           <h4>Scores</h4>
 
-          <ul>
+          <ul style={{ lineHeight: "2", paddingLeft: "20px" }}>
             {Object.entries(
               savedEvaluations[selectedPlacement.id]?.scores || {}
             ).map(([criteriaId, score]) => {
@@ -772,7 +705,7 @@ return (
                         </>
                       )}
 
-                      {/* 🔴 IMPORTANT: FORM MUST BE INSIDE MAP (THIS FIXES YOUR CRASH) */}
+                      {/* IMPORTANT: FORM MUST BE INSIDE MAP (THIS FIXES YOUR CRASH) */}
                       {activeEvaluation === p.id && !submittedEvaluations[p.id] && (
                         <div style={{ marginTop: "10px" }}>
                           
@@ -831,44 +764,37 @@ return (
                 </div>
               )}
 
-              {/* 🔷 NOTES */}
-              <div
-              style={{
-                marginTop: "30px",
-                backgroundColor: "#fff8e1",
-                border: "1px solid #f0c36d",
-                borderRadius: "10px",
-                padding: "20px",
-              }}
-            >
-            <h4 style={{ color: "#856404" }}>
-              Important Notes
-            </h4>
+{/* 🔷 NOTES */}
+<div
+  style={{
+    marginTop: "30px",
+    backgroundColor: "#c6f1cd",
+    padding: "20px",
+    borderRadius: "10px",
+    border: "1px solid #7e73e8",
+    lineHeight: "1.8",
+  }}
+>
+  <h4 style={{ color: "#856404", marginBottom: "15px" }}>
+    Important Notes
+  </h4>
 
-            <ul style={{ lineHeight: "1.8" }}>
-            <li>
-              Student evaluations should be conducted towards the end of the internship
-              period after the student's performance, conduct, and workplace behavior
-              have been adequately observed.
-            </li>
+  <ul style={{ paddingLeft: "20px", color: "#333" }}>
+    <li>
+      Students should be evaluated strictly based on the provided <strong>evaluation
+      criteria</strong>. Each criterion carries 10 marks and finl evaluation is ot of 60. Ensure that the scores awarded
+      accurately reflect the student's actual performance and involvement at the
+      workplace.
+    </li>
 
-            <li>
-              Ensure that the scores awarded for each evaluation criterion accurately
-              reflect the student's demonstrated performance, skills, professionalism,
-              and conduct throughout the internship period.
-            </li>
-
-            <li>
-              Evaluation scores should be fair, objective, and based on evidence from
-              the student's actual workplace activities and contributions.
-            </li>
-
-            <li>
-              Only students officially assigned to you for supervision should be
-              evaluated.
-            </li>
-            </ul>
-            </div>
+    <li style={{ marginTop: "10px" }}>
+      Workplace supervisors are required to review and verify students’ weekly
+      logs before approval. Confirm that the activities recorded in the weekly
+      logs accurately represent the tasks performed by the student during the
+      internship period.
+    </li>
+  </ul>
+</div>
             </div>
           )}
           {activePage === "students" && (
@@ -882,9 +808,16 @@ return (
   </div>
 )}
 
+              <button 
+                onClick={() => submitEvaluation(p.id)} 
+                style={{ marginTop: "15px", padding: "8px 16px", cursor: "pointer" }}
+              >
+                Submit Evaluation
+              </button>
+            </div>
+          ))}
         </div>
-
-      </div>
+      )}
     </div>
   );
 }
