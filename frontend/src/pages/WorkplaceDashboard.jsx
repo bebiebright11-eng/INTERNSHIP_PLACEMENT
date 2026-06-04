@@ -201,14 +201,27 @@ const submitEvaluation = async (placementId) => {
 
   } catch (error) {
 
-    console.log("FULL ERROR:", error);
+  console.log("FULL ERROR:", error);
+  console.log("RESPONSE:", error.response);
+  console.log("DATA:", error.response?.data);
 
-    console.log("RESPONSE:", error.response);
+  const data = error.response?.data;
 
-    console.log("DATA:", error.response?.data);
+  if (data?.criteria_scores) {
 
-    alert(JSON.stringify(error.response?.data));
+    for (const item of data.criteria_scores) {
+
+      if (item?.non_field_errors?.length > 0) {
+
+        alert(item.non_field_errors[0]);
+
+        return;
+      }
+    }
   }
+
+  alert("Failed to submit evaluation.");
+}
 };
 
   // --- Styles ---
@@ -819,13 +832,43 @@ return (
               )}
 
               {/* 🔷 NOTES */}
-              <div style={{ marginTop: "30px" }}>
-                <h4>Important Notes</h4>
-                <textarea
-                  defaultValue="Only assigned students should be evaluated."
-                  style={{ width: "100%", height: "100px" }}
-                />
-              </div>
+              <div
+              style={{
+                marginTop: "30px",
+                backgroundColor: "#fff8e1",
+                border: "1px solid #f0c36d",
+                borderRadius: "10px",
+                padding: "20px",
+              }}
+            >
+            <h4 style={{ color: "#856404" }}>
+              Important Notes
+            </h4>
+
+            <ul style={{ lineHeight: "1.8" }}>
+            <li>
+              Student evaluations should be conducted towards the end of the internship
+              period after the student's performance, conduct, and workplace behavior
+              have been adequately observed.
+            </li>
+
+            <li>
+              Ensure that the scores awarded for each evaluation criterion accurately
+              reflect the student's demonstrated performance, skills, professionalism,
+              and conduct throughout the internship period.
+            </li>
+
+            <li>
+              Evaluation scores should be fair, objective, and based on evidence from
+              the student's actual workplace activities and contributions.
+            </li>
+
+            <li>
+              Only students officially assigned to you for supervision should be
+              evaluated.
+            </li>
+            </ul>
+            </div>
             </div>
           )}
           {activePage === "students" && (

@@ -87,6 +87,25 @@ class CriteriaScoreSerializer(serializers.ModelSerializer):
         fields = ['id', 'criteria','criteria_name', 'score']
 
 
+    def validate(self, attrs):
+
+        criteria = attrs.get("criteria")
+        score = attrs.get("score")
+
+        if score < 0:
+            raise serializers.ValidationError(
+                f"{criteria.name} cannot be less than 0."
+            )
+
+        if score > criteria.max_score:
+            raise serializers.ValidationError(
+                f"{criteria.name} cannot exceed {criteria.max_score} marks."
+            )
+
+        return attrs
+    
+    
+
 class EvaluationSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source='placement.student.username', read_only=True)
 
