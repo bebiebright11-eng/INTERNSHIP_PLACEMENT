@@ -5,6 +5,19 @@ function WorkplaceDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]); // Added missing state
   const [scores, setScores] = useState({});
+  const [activeEvaluation, setActiveEvaluation] = useState(null);
+const [comments, setComments] = useState({});
+const [submittedEvaluations, setSubmittedEvaluations] = useState({});
+const [savedEvaluations, setSavedEvaluations] = useState({});
+const [showMenu, setShowMenu] = useState(false);
+const [activePage, setActivePage] = useState("home");
+const [selectedPlacement, setSelectedPlacement] = useState(null);
+const [evaluations, setEvaluations] = useState([]);
+const assignedCount = placements.length;
+const evaluatedCount = Object.keys(submittedEvaluations).length;
+const pendingCount = assignedCount - evaluatedCount;
+
+const firstName = localStorage.getItem("first_name");
 
   // 1. Fetch Placements
   const fetchPlacements = async () => {
@@ -23,7 +36,7 @@ function WorkplaceDashboard() {
   // 2. Fetch Criteria
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/evaluationcriteria/", {
+      const res = await API.get("supervision/criteria/", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setCriteria(res.data);
@@ -97,6 +110,7 @@ function WorkplaceDashboard() {
   useEffect(() => {
     fetchPlacements();
     fetchCriteria();
+    fetchEvaluations();
   }, []);
 
   // 3. Handle Score Changes
@@ -140,10 +154,66 @@ function WorkplaceDashboard() {
 
       alert("Evaluation submitted successfully!");
     } catch (error) {
-      console.error("BACKEND ERROR:", error.response?.data);
-      alert("Failed to submit: " + JSON.stringify(error.response?.data));
+
+  const errors = error.response?.data;
+
+  let message = "Failed to submit evaluation.";
+
+  if (errors?.criteria_scores) {
+
+    for (const item of errors.criteria_scores) {
+
+      if (item?.non_field_errors?.length) {
+
+        message = item.non_field_errors[0];
+        break;
+
+      }
+
     }
+
+  }
+
+  alert(message);
+
+}
   };
+
+
+
+  const menuButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+};
+
+const dropdownStyle = {
+  position: "absolute",
+  top: "60px",
+  right: "0",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+  width: "220px",
+  padding: "10px",
+  zIndex: 1000,
+};
+
+const dropdownItemStyle = {
+  padding: "12px",
+  cursor: "pointer",
+  borderRadius: "8px",
+  marginBottom: "5px",
+  fontWeight: "bold",
+  color: "#198754",
+  backgroundColor: "#f8f9fa",
+};
+
 
   const cardStyle = {
     backgroundColor: "white",
@@ -764,34 +834,50 @@ return (
                 </div>
               )}
 
-{/* 🔷 NOTES */}
+{/* 🔷 IMPORTANT NOTES */}
 <div
   style={{
     marginTop: "30px",
-    backgroundColor: "#c6f1cd",
+    backgroundColor: "#fff3cd",
     padding: "20px",
     borderRadius: "10px",
-    border: "1px solid #7e73e8",
+    border: "1px solid #ffe69c",
     lineHeight: "1.8",
   }}
 >
-  <h4 style={{ color: "#856404", marginBottom: "15px" }}>
+  <h4
+    style={{
+      color: "#856404",
+      marginBottom: "15px",
+    }}
+  >
     Important Notes
   </h4>
 
   <ul style={{ paddingLeft: "20px", color: "#333" }}>
     <li>
-      Students should be evaluated strictly based on the provided <strong>evaluation
-      criteria</strong>. Each criterion carries 10 marks and finl evaluation is ot of 60. Ensure that the scores awarded
-      accurately reflect the student's actual performance and involvement at the
-      workplace.
+      Student evaluations should be conducted towards the end of the
+      internship period, after sufficient observation of the student's
+      conduct, professional behaviour, communication skills, teamwork,
+      punctuality, and overall performance at the workplace.
     </li>
 
     <li style={{ marginTop: "10px" }}>
-      Workplace supervisors are required to review and verify students’ weekly
-      logs before approval. Confirm that the activities recorded in the weekly
-      logs accurately represent the tasks performed by the student during the
-      internship period.
+      Ensure that the marks awarded for each evaluation criterion
+      accurately reflect the student's actual performance, level of
+      participation, and demonstrated abilities during the internship.
+    </li>
+
+    <li style={{ marginTop: "10px" }}>
+      Evaluate students objectively and fairly. Scores should be based
+      on observed evidence and workplace performance rather than personal
+      relationships, assumptions, or favoritism.
+    </li>
+
+    <li style={{ marginTop: "10px" }}>
+      Carefully review each criterion before assigning marks and ensure
+      that the scores awarded are within the maximum marks specified for
+      each evaluation criterion.
     </li>
   </ul>
 </div>
@@ -808,16 +894,8 @@ return (
   </div>
 )}
 
-              <button 
-                onClick={() => submitEvaluation(p.id)} 
-                style={{ marginTop: "15px", padding: "8px 16px", cursor: "pointer" }}
-              >
-                Submit Evaluation
-              </button>
-            </div>
-          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }
