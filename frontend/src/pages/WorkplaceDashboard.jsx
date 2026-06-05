@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import API from "../api";
 
 function WorkplaceDashboard() {
+  const navigate = useNavigate();
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]); // Added missing state
   const [scores, setScores] = useState({});
@@ -18,6 +21,11 @@ const evaluatedCount = Object.keys(submittedEvaluations).length;
 const pendingCount = assignedCount - evaluatedCount;
 
 const firstName = localStorage.getItem("first_name");
+const handleLogout = () => {
+  localStorage.clear();
+  toast.success("Logged out successfully 👋");
+  navigate("/");
+};
 
   // 1. Fetch Placements
   const fetchPlacements = async () => {
@@ -743,6 +751,14 @@ return (
         >
           My Evaluations
         </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={handleLogout}
+        >
+         Logout
+        </div>
+
       </div>
     )}
   </div>
