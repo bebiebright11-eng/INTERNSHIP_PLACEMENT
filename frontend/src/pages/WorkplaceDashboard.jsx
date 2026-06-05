@@ -81,11 +81,19 @@ const firstName = localStorage.getItem("first_name");
 
       ev.criteria_scores.forEach((item) => {
 
+
+      console.log(
+  "EVALUATION FULL:",
+  JSON.stringify(ev, null, 2)
+);
+
         scoreMap[item.criteria] = item.score;
 
       });
 
       saved[ev.placement] = {
+
+        id: ev.id,
 
         comments: ev.comments,
 
@@ -127,6 +135,16 @@ const firstName = localStorage.getItem("first_name");
   // 4. Submit Evaluation
   const submitEvaluation = async (placementId) => {
     try {
+
+      console.log(
+  "SAVED EVALUATION:",
+  savedEvaluations[placementId]
+);
+
+console.log(
+  "EVALUATION ID:",
+  savedEvaluations[placementId]?.id
+);
       const criteriaScores = Object.entries(scores[placementId] || {}).map(
         ([criteriaId, score]) => ({ 
           criteria: parseInt(criteriaId),
@@ -139,21 +157,60 @@ const firstName = localStorage.getItem("first_name");
         return;
       }
 
-      await API.post(
-        "supervision/evaluations/",
-        {
-          placement: placementId,
-          supervisor_type: "workplace",
-          comments: "Workplace evaluation submitted",
-          criteria_scores: criteriaScores,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      console.log(
+  JSON.stringify(
+    {
+      placement: placementId,
+      supervisor_type: "workplace",
+      comments: comments[placementId] || "",
+      criteria_scores: criteriaScores,
+    },
+    null,
+    2
+  )
+);
+   const evaluationId = savedEvaluations[placementId]?.id;
 
-      alert("Evaluation submitted successfully!");
+const payload = {
+  placement: placementId,
+  supervisor_type: "workplace",
+  score: 0,
+  comments: comments[placementId] || "",
+  criteria_scores: criteriaScores,
+};
+
+if (evaluationId) {
+  await API.put(
+    `supervision/evaluations/${evaluationId}/`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+  alert("Evaluation updated successfully!");
+} else {
+  await API.post(
+    "supervision/evaluations/",
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+  alert("Evaluation submitted successfully!");
+}
+
+fetchEvaluations();
+setActiveEvaluation(null);
+ 
     } catch (error) {
+
+    alert(JSON.stringify(error.response?.data, null, 2));
 
   const errors = error.response?.data;
 
