@@ -133,6 +133,20 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
     # Workplace → can ONLY edit criteria scores
         if user.role == 'workplace':
+
+            placement = serializer.instance.placement
+
+            academic_evaluation = Evaluation.objects.filter(
+                placement=placement,
+                supervisor_type='academic',
+                is_final=True
+            ).exists()
+
+            if academic_evaluation:
+                raise PermissionDenied(
+                    "You cannot edit this evaluation because the Academic Supervisor has already submitted the final evaluation."
+                )
+
         # Prevent setting final grade
             serializer.save(
                 final_grade=None,
