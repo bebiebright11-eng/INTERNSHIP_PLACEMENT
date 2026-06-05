@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import API from "../api";
 
 function WorkplaceDashboard() {
+  const navigate = useNavigate();
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]); // Added missing state
   const [scores, setScores] = useState({});
@@ -18,6 +21,11 @@ const evaluatedCount = Object.keys(submittedEvaluations).length;
 const pendingCount = assignedCount - evaluatedCount;
 
 const firstName = localStorage.getItem("first_name");
+const handleLogout = () => {
+  localStorage.clear();
+  toast.success("Logged out successfully 👋");
+  navigate("/");
+};
 
   // 1. Fetch Placements
   const fetchPlacements = async () => {
@@ -30,6 +38,7 @@ const firstName = localStorage.getItem("first_name");
       setPlacements(filtered);
     } catch (error) {
       console.error("Error fetching placements:", error);
+      toast.error("Failed to load assigned students");
     }
   };
 
@@ -42,6 +51,7 @@ const firstName = localStorage.getItem("first_name");
       setCriteria(res.data);
     } catch (error) {
       console.error("Error fetching criteria:", error);
+      toast.error("Failed to load evaluation criteria");
     }
   };
 
@@ -111,6 +121,7 @@ const firstName = localStorage.getItem("first_name");
   } catch (error) {
 
     console.log("EVALUATIONS ERROR:", error);
+    toast.error("Failed to load evaluations");
 
   }
 };
@@ -153,7 +164,7 @@ console.log(
       );
 
       if (criteriaScores.length === 0) {
-        alert("Please enter scores before submitting.");
+        toast.warning("Please enter scores before submitting.");
         return;
       }
 
@@ -190,7 +201,7 @@ if (evaluationId) {
     }
   );
 
-  alert("Evaluation updated successfully!");
+  toast.success("Evaluation updated successfully ✅");
 } else {
   await API.post(
     "supervision/evaluations/",
@@ -202,7 +213,7 @@ if (evaluationId) {
     }
   );
 
-  alert("Evaluation submitted successfully!");
+  toast.success("Evaluation submitted successfully ✅");
 }
 
 fetchEvaluations();
@@ -214,15 +225,13 @@ setActiveEvaluation(null);
 
   console.log("ERROR RESPONSE:", error.response);
 
-  console.log("ERROR DATA:", error.response?.data);
+  console.log("ERROR DATA:", error.response?.data)
 
-  alert(
-    JSON.stringify(
-      error.response?.data || error.message,
-      null,
-      2
-    )
-  );
+toast.error(
+  error.response?.data?.detail ||
+  error.message ||
+  "Failed to submit evaluation ❌"
+);
 
 } 
   };
@@ -743,6 +752,14 @@ return (
         >
           My Evaluations
         </div>
+
+        <div
+          style={dropdownItemStyle}
+          onClick={handleLogout}
+        >
+         Logout
+        </div>
+
       </div>
     )}
   </div>
