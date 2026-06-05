@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import API from "../api";
 
 function Login() {
@@ -39,19 +40,25 @@ function Login() {
       const role = (res.data.role || "").toLowerCase();
 
       if (role === "student") {
+        toast.success("Logged in successfully 👋");
         navigate("/student");
 
       } else if (role === "admin") {
+
+        toast.success("Logged in successfully 👋");
+
         navigate("/admin");
 
       } else if (role === "workplace") {
+        toast.success("Logged in successfully 👋");
         navigate("/workplace");
 
       } else if (role === "academic") {
+        toast.success("Logged in successfully 👋");
         navigate("/academic");
 
       } else {
-        alert("Unknown role");
+        toast.error("Unknown user role");
       }
 
     } catch (error) {
