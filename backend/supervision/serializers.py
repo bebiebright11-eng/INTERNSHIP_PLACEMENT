@@ -87,12 +87,32 @@ class CriteriaScoreSerializer(serializers.ModelSerializer):
         fields = ['id', 'criteria','criteria_name', 'score']
 
 
+    def validate(self, attrs):
+
+        criteria = attrs.get("criteria")
+        score = attrs.get("score")
+
+        if score < 0:
+            raise serializers.ValidationError(
+                f"{criteria.name} cannot be less than 0."
+            )
+
+        if score > criteria.max_score:
+            raise serializers.ValidationError(
+                f"{criteria.name} cannot exceed {criteria.max_score} marks."
+            )
+
+        return attrs
+    
+    
+
 class EvaluationSerializer(serializers.ModelSerializer):
 
     student_registration_number = serializers.CharField(
     source='placement.student.username',
     read_only=True
     )
+
 
     student_name = serializers.SerializerMethodField()
 
@@ -204,3 +224,46 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
         evaluation.save()
         return evaluation
+    
+
+    def update(self, instance, validated_data):
+
+        criteria_data = validated_data.pop('criteria_scores', [])
+
+        instance.comments = validated_data.get(
+            'comments',
+            instance.comments
+        )
+
+        instance.score = validated_data.get(
+            'score',
+            instance.score
+        )
+
+        instance.save()
+
+    # Delete old criteria scores
+        instance.criteria_scores.all().delete()
+
+        total = 0
+
+    # Create new criteria scores
+        for item in criteria_data:
+
+            score_obj = CriteriaScore(
+                evaluation=instance,
+                criteria=item['criteria'],
+                score=item['score']
+            )
+
+            score_obj.full_clean()
+            score_obj.save()
+
+            total += item['score']
+
+        if instance.supervisor_type == "workplace":
+            instance.score = total
+
+        instance.save()
+
+        return instance

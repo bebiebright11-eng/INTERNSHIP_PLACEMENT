@@ -309,6 +309,16 @@ const logCardStyle = {
 };
 
 
+console.log("Applications:", applications);
+console.log("Applications count:", applications.length);
+
+console.log("Evaluations:", evaluations);
+console.log("Evaluations count:", evaluations.length);
+
+console.log("Logs:", logs);
+console.log("Logs count:", logs.length);
+console.log("Evaluations Data:", evaluations);
+
 return (
   <div
     style={{
@@ -451,14 +461,14 @@ return (
   </div>
 
   <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
+    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
     <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
        {applications.length}
     </p>
   </div>
 
   <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
+    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
     <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
        {applications.filter(a => a.status === "approved").length}
     </p>
@@ -467,7 +477,11 @@ return (
   <div style={cardStyle}>
     <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
     <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
-       {evaluations.length}
+      {
+        evaluations.filter(
+          ev => ev.supervisor_type === "academic"
+       ).length
+      }
     </p>
   </div>
   </div>
