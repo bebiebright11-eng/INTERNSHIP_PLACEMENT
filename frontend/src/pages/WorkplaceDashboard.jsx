@@ -38,6 +38,7 @@ const handleLogout = () => {
       setPlacements(filtered);
     } catch (error) {
       console.error("Error fetching placements:", error);
+      toast.error("Failed to load assigned students");
     }
   };
 
@@ -50,6 +51,7 @@ const handleLogout = () => {
       setCriteria(res.data);
     } catch (error) {
       console.error("Error fetching criteria:", error);
+      toast.error("Failed to load evaluation criteria");
     }
   };
 
@@ -119,6 +121,7 @@ const handleLogout = () => {
   } catch (error) {
 
     console.log("EVALUATIONS ERROR:", error);
+    toast.error("Failed to load evaluations");
 
   }
 };
@@ -161,7 +164,7 @@ console.log(
       );
 
       if (criteriaScores.length === 0) {
-        alert("Please enter scores before submitting.");
+        toast.warning("Please enter scores before submitting.");
         return;
       }
 
@@ -198,7 +201,7 @@ if (evaluationId) {
     }
   );
 
-  alert("Evaluation updated successfully!");
+  toast.success("Evaluation updated successfully ✅");
 } else {
   await API.post(
     "supervision/evaluations/",
@@ -210,7 +213,7 @@ if (evaluationId) {
     }
   );
 
-  alert("Evaluation submitted successfully!");
+  toast.success("Evaluation submitted successfully ✅");
 }
 
 fetchEvaluations();
@@ -222,15 +225,13 @@ setActiveEvaluation(null);
 
   console.log("ERROR RESPONSE:", error.response);
 
-  console.log("ERROR DATA:", error.response?.data);
+  console.log("ERROR DATA:", error.response?.data)
 
-  alert(
-    JSON.stringify(
-      error.response?.data || error.message,
-      null,
-      2
-    )
-  );
+toast.error(
+  error.response?.data?.detail ||
+  error.message ||
+  "Failed to submit evaluation ❌"
+);
 
 } 
   };
