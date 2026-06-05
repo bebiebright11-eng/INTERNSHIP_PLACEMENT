@@ -5,6 +5,19 @@ function WorkplaceDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]); // Added missing state
   const [scores, setScores] = useState({});
+  const [activeEvaluation, setActiveEvaluation] = useState(null);
+const [comments, setComments] = useState({});
+const [submittedEvaluations, setSubmittedEvaluations] = useState({});
+const [savedEvaluations, setSavedEvaluations] = useState({});
+const [showMenu, setShowMenu] = useState(false);
+const [activePage, setActivePage] = useState("home");
+const [selectedPlacement, setSelectedPlacement] = useState(null);
+const [evaluations, setEvaluations] = useState([]);
+const assignedCount = placements.length;
+const evaluatedCount = Object.keys(submittedEvaluations).length;
+const pendingCount = assignedCount - evaluatedCount;
+
+const firstName = localStorage.getItem("first_name");
 
   // 1. Fetch Placements
   const fetchPlacements = async () => {
@@ -23,7 +36,7 @@ function WorkplaceDashboard() {
   // 2. Fetch Criteria
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/evaluationcriteria/", {
+      const res = await API.get("supervision/criteria/", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setCriteria(res.data);
@@ -68,11 +81,19 @@ function WorkplaceDashboard() {
 
       ev.criteria_scores.forEach((item) => {
 
+
+      console.log(
+  "EVALUATION FULL:",
+  JSON.stringify(ev, null, 2)
+);
+
         scoreMap[item.criteria] = item.score;
 
       });
 
       saved[ev.placement] = {
+
+        id: ev.id,
 
         comments: ev.comments,
 
@@ -97,6 +118,7 @@ function WorkplaceDashboard() {
   useEffect(() => {
     fetchPlacements();
     fetchCriteria();
+    fetchEvaluations();
   }, []);
 
   // 3. Handle Score Changes
@@ -113,6 +135,16 @@ function WorkplaceDashboard() {
   // 4. Submit Evaluation
   const submitEvaluation = async (placementId) => {
     try {
+
+      console.log(
+  "SAVED EVALUATION:",
+  savedEvaluations[placementId]
+);
+
+console.log(
+  "EVALUATION ID:",
+  savedEvaluations[placementId]?.id
+);
       const criteriaScores = Object.entries(scores[placementId] || {}).map(
         ([criteriaId, score]) => ({ 
           criteria: parseInt(criteriaId),
@@ -125,25 +157,135 @@ function WorkplaceDashboard() {
         return;
       }
 
-      await API.post(
-        "supervision/evaluations/",
-        {
-          placement: placementId,
-          supervisor_type: "workplace",
-          comments: "Workplace evaluation submitted",
-          criteria_scores: criteriaScores,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      console.log(
+  JSON.stringify(
+    {
+      placement: placementId,
+      supervisor_type: "workplace",
+      comments: comments[placementId] || "",
+      criteria_scores: criteriaScores,
+    },
+    null,
+    2
+  )
+);
+   const evaluationId = savedEvaluations[placementId]?.id;
 
-      alert("Evaluation submitted successfully!");
-    } catch (error) {
-      console.error("BACKEND ERROR:", error.response?.data);
-      alert("Failed to submit: " + JSON.stringify(error.response?.data));
+const payload = {
+  placement: placementId,
+  supervisor_type: "workplace",
+  score: 0,
+  comments: comments[placementId] || "",
+  criteria_scores: criteriaScores,
+};
+
+if (evaluationId) {
+  await API.put(
+    `supervision/evaluations/${evaluationId}/`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }
+  );
+
+  alert("Evaluation updated successfully!");
+} else {
+  await API.post(
+    "supervision/evaluations/",
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+  alert("Evaluation submitted successfully!");
+}
+
+fetchEvaluations();
+setActiveEvaluation(null);
+ 
+    }catch (error) {
+
+  console.log("FULL ERROR:", error);
+
+  console.log("ERROR RESPONSE:", error.response);
+
+  console.log("ERROR DATA:", error.response?.data);
+
+  alert(
+    JSON.stringify(
+      error.response?.data || error.message,
+      null,
+      2
+    )
+  );
+
+} 
   };
+
+
+  const editButtonStyle = {
+  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
+  color: "white",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "14px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+};
+
+  const primaryButton = {
+  background: "linear-gradient(135deg,#198754,#20c997)",
+  color: "white",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "14px",
+};
+
+
+
+  const menuButtonStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+};
+
+const dropdownStyle = {
+  position: "absolute",
+  top: "60px",
+  right: "0",
+  backgroundColor: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+  width: "220px",
+  padding: "10px",
+  zIndex: 1000,
+};
+
+const dropdownItemStyle = {
+  padding: "12px",
+  cursor: "pointer",
+  borderRadius: "8px",
+  marginBottom: "5px",
+  fontWeight: "bold",
+  color: "#198754",
+  backgroundColor: "#f8f9fa",
+};
+
 
   const cardStyle = {
     backgroundColor: "white",
@@ -173,6 +315,7 @@ function WorkplaceDashboard() {
   borderRadius: "12px",
   overflow: "hidden",
   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  tableLayout: "fixed",
 };
 
 const thStyle = {
@@ -181,6 +324,7 @@ const thStyle = {
   padding: "14px",
   textAlign: "left",
   fontSize: "15px",
+  verticalAlign: "middle",
 };
 
 const tdStyle = {
@@ -211,18 +355,18 @@ const detailsCardStyle = {
  const renderStudents = () => {
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Workplace Supervisor Dashboard</h1>
+      <h1 style={{ color: "#198754", marginBottom: "20px" }}>Evaluate Students Here</h1>
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
       ) : (
-        <table style={{ width: "100%" }}>
+        <table style={tableStyle}>
           <thead>
             <tr>
-              <th>Student</th>
-              <th>Organization</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th style={thStyle}>Student</th>
+              <th style={thStyle}>Organization</th>
+              <th style={thStyle}>Status</th>
+              <th style={thStyle}>Action</th>
             </tr>
           </thead>
 
@@ -233,14 +377,31 @@ const detailsCardStyle = {
               return (
                 <>
                   <tr key={p.id}>
-                    <td>{p.student_name}</td>
-                    <td>{p.organization_name}</td>
+                    <td style={tdStyle}>{p.student_name}</td>
+                    <td style={tdStyle}>{p.organization_name}</td>
 
-                    <td>
-                      {isEvaluated ? "Evaluated" : "Pending"}
-                    </td>
+                    <td style={tdStyle}>
+                     <span
+                       style={{
+                        backgroundColor:
+                          isEvaluated
+                            ? "#d1e7dd"
+                            : "#fff3cd",
+                      color:
+                        isEvaluated
+                            ? "#0f5132"
+                            : "#856404",
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                      fontSize: "13px",
+                    }}
+                  >
+                    {isEvaluated ? "Evaluated" : "Pending"}
+                  </span>
+                </td>
 
-                    <td>
+                    <td style={tdStyle}>
                       {isEvaluated ? (
                         <button onClick={() => setSelectedPlacement(p)}>
                           View
@@ -257,12 +418,14 @@ const detailsCardStyle = {
     <td colSpan="4">
 
       <div
-        style={{
-          background: "#f9f9f9",
-          padding: "15px",
-          marginTop: "10px",
-          borderRadius: "8px",
-        }}
+      style={{
+        background: "#fff",
+        borderRadius: "18px",
+        padding: "25px",
+        marginBottom: "20px",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+        borderLeft: "6px solid #198754",
+      }}
       >
         <h4>Evaluation Details</h4>
 
@@ -302,20 +465,21 @@ const detailsCardStyle = {
 
                           <div style={{ marginTop: "10px" }}>
 
-                            <table style={{ width: "100%" }}>
+                            <table style={tableStyle}>
                               <thead>
                                 <tr>
-                                  <th>Criteria</th>
-                                  <th>Max</th>
-                                  <th>Score</th>
+                                  <th style={thStyle}>Criteria</th>
+                                  <th style={thStyle}>Max Score</th>
+                                  <th style={thStyle}>Awarded</th>
+                                  
                                 </tr>
                               </thead>
 
                               <tbody>
                                 {criteria.map((c) => (
                                   <tr key={c.id}>
-                                    <td>{c.name}</td>
-                                    <td>{c.max_score}</td>
+                                    <td style={tdStyle}>{c.name}</td>
+                                    <td style={tdStyle}>{c.max_score}</td>
 
                                     <td>
                                       <input
@@ -324,12 +488,16 @@ const detailsCardStyle = {
                                         max={c.max_score}
                                         value={scores[p.id]?.[c.id] || ""}
                                         onChange={(e) =>
-                                          handleScoreChange(
-                                            p.id,
-                                            c.id,
-                                            e.target.value
-                                          )
+                                        handleScoreChange(p.id, c.id, e.target.value)
                                         }
+                                        style={{
+                                          width: "80px",
+                                          padding: "10px",
+                                          borderRadius: "8px",
+                                          border: "1px solid #ddd",
+                                          fontSize: "15px",
+                                          textAlign: "center",
+                                        }}
                                       />
                                     </td>
                                   </tr>
@@ -338,7 +506,8 @@ const detailsCardStyle = {
                             </table>
 
                             <textarea
-                              placeholder="Write comments..."
+                              rows="5"
+                              placeholder="Enter supervisor comments..."
                               value={comments[p.id] || ""}
                               onChange={(e) =>
                                 setComments((prev) => ({
@@ -346,16 +515,30 @@ const detailsCardStyle = {
                                   [p.id]: e.target.value,
                                 }))
                               }
-                              rows="4"
                               style={{
                                 width: "100%",
-                                marginTop: "10px",
-                              }}
-                            />
+                                padding: "15px",
+                                marginTop: "15px",
+                                borderRadius: "12px",
+                                border: "1px solid #ddd",
+                                fontSize: "15px",
+                                resize: "vertical",
+                                }}
+                              />
 
                             <button
                               onClick={() => submitEvaluation(p.id)}
-                              style={{ marginTop: "10px" }}
+                              style={{
+                                marginTop: "15px",
+                                background:
+                                  "linear-gradient(135deg,#198754,#20c997)",
+                                color: "white",
+                                border: "none",
+                                padding: "12px 25px",
+                                borderRadius: "10px",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                              }}
                             >
                               Submit Evaluation
                             </button>
@@ -659,25 +842,46 @@ return (
                     <div
                       key={p.id}
                       style={{
-                        border: "1px solid #ccc",
-                        margin: "10px 0",
-                        padding: "15px",
-                        borderRadius: "8px",
+                        background: "#fff",
+                        borderRadius: "18px",
+                        padding: "25px",
+                        marginBottom: "20px",
+                        boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+                        borderLeft: "6px solid #198754",
                       }}
                     >
-                      <h3>{p.student_name}</h3>
-                      <p><strong>Organization:</strong> {p.organization_name}</p>
+                      <h3 style={{marginBottom: "10px",color: "#198754",fontSize: "24px",}}>
+                       {p.student_name}
+                      </h3>
+                      <p style={{color: "#555",marginBottom: "20px",fontSize: "16px"}}>
+                      <strong>Organization:</strong> {p.organization_name}
+                      </p>
 
                       {!submittedEvaluations[p.id] ? (
-                        <button onClick={() => setActiveEvaluation(p.id)}>
+                        <button 
+                        style={primaryButton}
+                        onClick={() => setActiveEvaluation(p.id)}
+                        >
                           Add Evaluation
                         </button>
                       ) : (
                         <>
-                          <p style={{ color: "green" }}>✅ Evaluation Submitted</p>
+                          <p 
+                            style={{
+                              display: "inline-block",
+                              backgroundColor: "#d1e7dd",
+                              color: "#0f5132",
+                              padding: "10px 16px",
+                              borderRadius: "20px",
+                              fontWeight: "bold",
+                              marginBottom: "15px",
+                            }}
+                          >✅ Evaluation Submitted
+                          </p>
 
                           {/* 🔷 EDIT BUTTON */}
                           <button
+                             style={editButtonStyle}
                             onClick={() => {
                               setSubmittedEvaluations((prev) => ({
                                 ...prev,
@@ -709,20 +913,20 @@ return (
                       {activeEvaluation === p.id && !submittedEvaluations[p.id] && (
                         <div style={{ marginTop: "10px" }}>
                           
-                          <table style={{ width: "100%", marginTop: "10px" }}>
+                          <table style={tableStyle}>
                             <thead>
                               <tr>
-                                <th>Criteria</th>
-                                <th>Max</th>
-                                <th>Score</th>
+                                <th style={thStyle}>Criteria</th>
+                                <th style={thStyle}>Maximum Marks</th>
+                                <th style={thStyle}>Awarded Marks</th>
                               </tr>
                             </thead>
                             <tbody>
                               {criteria.map((c) => (
                                 <tr key={c.id}>
-                                  <td>{c.name}</td>
-                                  <td>{c.max_score}</td>
-                                  <td>
+                                  <td style={tdStyle}>{c.name}</td>
+                                  <td style={tdStyle}><strong>{c.max_score}</strong></td>
+                                  <td style={tdStyle}>
                                     <input
                                       type="number"
                                       min="0"
@@ -731,6 +935,15 @@ return (
                                       onChange={(e) =>
                                         handleScoreChange(p.id, c.id, e.target.value)
                                       }
+                                        style={{
+                                          width: "90px",
+                                          padding: "10px",
+                                          borderRadius: "10px",
+                                          border: "1px solid #ced4da",
+                                          textAlign: "center",
+                                          fontWeight: "bold",
+                                          fontSize: "15px",
+                                        }}
                                     />
                                   </td>
                                 </tr>
@@ -747,13 +960,33 @@ return (
                                 [p.id]: e.target.value,
                               }))
                             }
-                            rows="4"
-                            style={{ width: "100%", marginTop: "10px" }}
+                            style={{
+                              width: "100%",
+                              padding: "15px",
+                              marginTop: "20px",
+                              borderRadius: "12px",
+                              border: "1px solid #ddd",
+                              fontSize: "15px",
+                              resize: "vertical",
+                              backgroundColor: "#fafafa",
+                            }}
+
                           />
 
                           <button
                             onClick={() => submitEvaluation(p.id)}
-                            style={{ marginTop: "10px" }}
+                            style={{
+                              marginTop: "20px",
+                              background:
+                                "linear-gradient(135deg,#198754,#20c997)",
+                              color: "white",
+                              border: "none",
+                              padding: "12px 25px",
+                              borderRadius: "10px",
+                              fontWeight: "bold",
+                              cursor: "pointer",
+                              fontSize: "15px",
+                            }}
                           >
                             Submit Evaluation
                           </button>
@@ -764,34 +997,50 @@ return (
                 </div>
               )}
 
-{/* 🔷 NOTES */}
+{/* 🔷 IMPORTANT NOTES */}
 <div
   style={{
     marginTop: "30px",
-    backgroundColor: "#c6f1cd",
+    backgroundColor: "#fff3cd",
     padding: "20px",
     borderRadius: "10px",
-    border: "1px solid #7e73e8",
+    border: "1px solid #ffe69c",
     lineHeight: "1.8",
   }}
 >
-  <h4 style={{ color: "#856404", marginBottom: "15px" }}>
+  <h4
+    style={{
+      color: "#856404",
+      marginBottom: "15px",
+    }}
+  >
     Important Notes
   </h4>
 
   <ul style={{ paddingLeft: "20px", color: "#333" }}>
     <li>
-      Students should be evaluated strictly based on the provided <strong>evaluation
-      criteria</strong>. Each criterion carries 10 marks and finl evaluation is ot of 60. Ensure that the scores awarded
-      accurately reflect the student's actual performance and involvement at the
-      workplace.
+      Student evaluations should be conducted towards the end of the
+      internship period, after sufficient observation of the student's
+      conduct, professional behaviour, communication skills, teamwork,
+      punctuality, and overall performance at the workplace.
     </li>
 
     <li style={{ marginTop: "10px" }}>
-      Workplace supervisors are required to review and verify students’ weekly
-      logs before approval. Confirm that the activities recorded in the weekly
-      logs accurately represent the tasks performed by the student during the
-      internship period.
+      Ensure that the marks awarded for each evaluation criterion
+      accurately reflect the student's actual performance, level of
+      participation, and demonstrated abilities during the internship.
+    </li>
+
+    <li style={{ marginTop: "10px" }}>
+      Evaluate students objectively and fairly. Scores should be based
+      on observed evidence and workplace performance rather than personal
+      relationships, assumptions, or favoritism.
+    </li>
+
+    <li style={{ marginTop: "10px" }}>
+      Carefully review each criterion before assigning marks and ensure
+      that the scores awarded are within the maximum marks specified for
+      each evaluation criterion.
     </li>
   </ul>
 </div>
@@ -808,16 +1057,8 @@ return (
   </div>
 )}
 
-              <button 
-                onClick={() => submitEvaluation(p.id)} 
-                style={{ marginTop: "15px", padding: "8px 16px", cursor: "pointer" }}
-              >
-                Submit Evaluation
-              </button>
-            </div>
-          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }
