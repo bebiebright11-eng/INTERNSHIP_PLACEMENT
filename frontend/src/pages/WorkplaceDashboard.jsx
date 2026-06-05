@@ -208,32 +208,23 @@ if (evaluationId) {
 fetchEvaluations();
 setActiveEvaluation(null);
  
-    } catch (error) {
+    }catch (error) {
 
-    alert(JSON.stringify(error.response?.data, null, 2));
+  console.log("FULL ERROR:", error);
 
-  const errors = error.response?.data;
+  console.log("ERROR RESPONSE:", error.response);
 
-  let message = "Failed to submit evaluation.";
+  console.log("ERROR DATA:", error.response?.data);
 
-  if (errors?.criteria_scores) {
+  alert(
+    JSON.stringify(
+      error.response?.data || error.message,
+      null,
+      2
+    )
+  );
 
-    for (const item of errors.criteria_scores) {
-
-      if (item?.non_field_errors?.length) {
-
-        message = item.non_field_errors[0];
-        break;
-
-      }
-
-    }
-
-  }
-
-  alert(message);
-
-}
+} 
   };
 
 
@@ -324,6 +315,7 @@ const dropdownItemStyle = {
   borderRadius: "12px",
   overflow: "hidden",
   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  tableLayout: "fixed",
 };
 
 const thStyle = {
@@ -332,6 +324,7 @@ const thStyle = {
   padding: "14px",
   textAlign: "left",
   fontSize: "15px",
+  verticalAlign: "middle",
 };
 
 const tdStyle = {
@@ -362,18 +355,18 @@ const detailsCardStyle = {
  const renderStudents = () => {
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Workplace Supervisor Dashboard</h1>
+      <h1 style={{ color: "#198754", marginBottom: "20px" }}>Evaluate Students Here</h1>
 
       {placements.length === 0 ? (
         <p>No students assigned</p>
       ) : (
-        <table style={{ width: "100%" }}>
+        <table style={tableStyle}>
           <thead>
             <tr>
-              <th>Student</th>
-              <th>Organization</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th style={thStyle}>Student</th>
+              <th style={thStyle}>Organization</th>
+              <th style={thStyle}>Status</th>
+              <th style={thStyle}>Action</th>
             </tr>
           </thead>
 
@@ -384,10 +377,10 @@ const detailsCardStyle = {
               return (
                 <>
                   <tr key={p.id}>
-                    <td>{p.student_name}</td>
-                    <td>{p.organization_name}</td>
+                    <td style={tdStyle}>{p.student_name}</td>
+                    <td style={tdStyle}>{p.organization_name}</td>
 
-                    <td>
+                    <td style={tdStyle}>
                      <span
                        style={{
                         backgroundColor:
@@ -408,7 +401,7 @@ const detailsCardStyle = {
                   </span>
                 </td>
 
-                    <td>
+                    <td style={tdStyle}>
                       {isEvaluated ? (
                         <button onClick={() => setSelectedPlacement(p)}>
                           View
@@ -873,7 +866,18 @@ return (
                         </button>
                       ) : (
                         <>
-                          <p style={{ color: "green" }}>✅ Evaluation Submitted</p>
+                          <p 
+                            style={{
+                              display: "inline-block",
+                              backgroundColor: "#d1e7dd",
+                              color: "#0f5132",
+                              padding: "10px 16px",
+                              borderRadius: "20px",
+                              fontWeight: "bold",
+                              marginBottom: "15px",
+                            }}
+                          >✅ Evaluation Submitted
+                          </p>
 
                           {/* 🔷 EDIT BUTTON */}
                           <button
