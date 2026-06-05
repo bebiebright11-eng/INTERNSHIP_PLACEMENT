@@ -237,6 +237,30 @@ setActiveEvaluation(null);
   };
 
 
+  const editButtonStyle = {
+  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
+  color: "white",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "14px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+};
+
+  const primaryButton = {
+  background: "linear-gradient(135deg,#198754,#20c997)",
+  color: "white",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "14px",
+};
+
+
 
   const menuButtonStyle = {
   backgroundColor: "#198754",
@@ -364,8 +388,25 @@ const detailsCardStyle = {
                     <td>{p.organization_name}</td>
 
                     <td>
-                      {isEvaluated ? "Evaluated" : "Pending"}
-                    </td>
+                     <span
+                       style={{
+                        backgroundColor:
+                          isEvaluated
+                            ? "#d1e7dd"
+                            : "#fff3cd",
+                      color:
+                        isEvaluated
+                            ? "#0f5132"
+                            : "#856404",
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                      fontSize: "13px",
+                    }}
+                  >
+                    {isEvaluated ? "Evaluated" : "Pending"}
+                  </span>
+                </td>
 
                     <td>
                       {isEvaluated ? (
@@ -384,12 +425,14 @@ const detailsCardStyle = {
     <td colSpan="4">
 
       <div
-        style={{
-          background: "#f9f9f9",
-          padding: "15px",
-          marginTop: "10px",
-          borderRadius: "8px",
-        }}
+      style={{
+        background: "#fff",
+        borderRadius: "18px",
+        padding: "25px",
+        marginBottom: "20px",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+        borderLeft: "6px solid #198754",
+      }}
       >
         <h4>Evaluation Details</h4>
 
@@ -429,20 +472,21 @@ const detailsCardStyle = {
 
                           <div style={{ marginTop: "10px" }}>
 
-                            <table style={{ width: "100%" }}>
+                            <table style={tableStyle}>
                               <thead>
                                 <tr>
-                                  <th>Criteria</th>
-                                  <th>Max</th>
-                                  <th>Score</th>
+                                  <th style={thStyle}>Criteria</th>
+                                  <th style={thStyle}>Max Score</th>
+                                  <th style={thStyle}>Awarded</th>
+                                  
                                 </tr>
                               </thead>
 
                               <tbody>
                                 {criteria.map((c) => (
                                   <tr key={c.id}>
-                                    <td>{c.name}</td>
-                                    <td>{c.max_score}</td>
+                                    <td style={tdStyle}>{c.name}</td>
+                                    <td style={tdStyle}>{c.max_score}</td>
 
                                     <td>
                                       <input
@@ -451,12 +495,16 @@ const detailsCardStyle = {
                                         max={c.max_score}
                                         value={scores[p.id]?.[c.id] || ""}
                                         onChange={(e) =>
-                                          handleScoreChange(
-                                            p.id,
-                                            c.id,
-                                            e.target.value
-                                          )
+                                        handleScoreChange(p.id, c.id, e.target.value)
                                         }
+                                        style={{
+                                          width: "80px",
+                                          padding: "10px",
+                                          borderRadius: "8px",
+                                          border: "1px solid #ddd",
+                                          fontSize: "15px",
+                                          textAlign: "center",
+                                        }}
                                       />
                                     </td>
                                   </tr>
@@ -465,7 +513,8 @@ const detailsCardStyle = {
                             </table>
 
                             <textarea
-                              placeholder="Write comments..."
+                              rows="5"
+                              placeholder="Enter supervisor comments..."
                               value={comments[p.id] || ""}
                               onChange={(e) =>
                                 setComments((prev) => ({
@@ -473,16 +522,30 @@ const detailsCardStyle = {
                                   [p.id]: e.target.value,
                                 }))
                               }
-                              rows="4"
                               style={{
                                 width: "100%",
-                                marginTop: "10px",
-                              }}
-                            />
+                                padding: "15px",
+                                marginTop: "15px",
+                                borderRadius: "12px",
+                                border: "1px solid #ddd",
+                                fontSize: "15px",
+                                resize: "vertical",
+                                }}
+                              />
 
                             <button
                               onClick={() => submitEvaluation(p.id)}
-                              style={{ marginTop: "10px" }}
+                              style={{
+                                marginTop: "15px",
+                                background:
+                                  "linear-gradient(135deg,#198754,#20c997)",
+                                color: "white",
+                                border: "none",
+                                padding: "12px 25px",
+                                borderRadius: "10px",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                              }}
                             >
                               Submit Evaluation
                             </button>
@@ -786,17 +849,26 @@ return (
                     <div
                       key={p.id}
                       style={{
-                        border: "1px solid #ccc",
-                        margin: "10px 0",
-                        padding: "15px",
-                        borderRadius: "8px",
+                        background: "#fff",
+                        borderRadius: "18px",
+                        padding: "25px",
+                        marginBottom: "20px",
+                        boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+                        borderLeft: "6px solid #198754",
                       }}
                     >
-                      <h3>{p.student_name}</h3>
-                      <p><strong>Organization:</strong> {p.organization_name}</p>
+                      <h3 style={{marginBottom: "10px",color: "#198754",fontSize: "24px",}}>
+                       {p.student_name}
+                      </h3>
+                      <p style={{color: "#555",marginBottom: "20px",fontSize: "16px"}}>
+                      <strong>Organization:</strong> {p.organization_name}
+                      </p>
 
                       {!submittedEvaluations[p.id] ? (
-                        <button onClick={() => setActiveEvaluation(p.id)}>
+                        <button 
+                        style={primaryButton}
+                        onClick={() => setActiveEvaluation(p.id)}
+                        >
                           Add Evaluation
                         </button>
                       ) : (
@@ -805,6 +877,7 @@ return (
 
                           {/* 🔷 EDIT BUTTON */}
                           <button
+                             style={editButtonStyle}
                             onClick={() => {
                               setSubmittedEvaluations((prev) => ({
                                 ...prev,
@@ -836,20 +909,20 @@ return (
                       {activeEvaluation === p.id && !submittedEvaluations[p.id] && (
                         <div style={{ marginTop: "10px" }}>
                           
-                          <table style={{ width: "100%", marginTop: "10px" }}>
+                          <table style={tableStyle}>
                             <thead>
                               <tr>
-                                <th>Criteria</th>
-                                <th>Max</th>
-                                <th>Score</th>
+                                <th style={thStyle}>Criteria</th>
+                                <th style={thStyle}>Maximum Marks</th>
+                                <th style={thStyle}>Awarded Marks</th>
                               </tr>
                             </thead>
                             <tbody>
                               {criteria.map((c) => (
                                 <tr key={c.id}>
-                                  <td>{c.name}</td>
-                                  <td>{c.max_score}</td>
-                                  <td>
+                                  <td style={tdStyle}>{c.name}</td>
+                                  <td style={tdStyle}><strong>{c.max_score}</strong></td>
+                                  <td style={tdStyle}>
                                     <input
                                       type="number"
                                       min="0"
@@ -858,6 +931,15 @@ return (
                                       onChange={(e) =>
                                         handleScoreChange(p.id, c.id, e.target.value)
                                       }
+                                        style={{
+                                          width: "90px",
+                                          padding: "10px",
+                                          borderRadius: "10px",
+                                          border: "1px solid #ced4da",
+                                          textAlign: "center",
+                                          fontWeight: "bold",
+                                          fontSize: "15px",
+                                        }}
                                     />
                                   </td>
                                 </tr>
@@ -874,13 +956,33 @@ return (
                                 [p.id]: e.target.value,
                               }))
                             }
-                            rows="4"
-                            style={{ width: "100%", marginTop: "10px" }}
+                            style={{
+                              width: "100%",
+                              padding: "15px",
+                              marginTop: "20px",
+                              borderRadius: "12px",
+                              border: "1px solid #ddd",
+                              fontSize: "15px",
+                              resize: "vertical",
+                              backgroundColor: "#fafafa",
+                            }}
+
                           />
 
                           <button
                             onClick={() => submitEvaluation(p.id)}
-                            style={{ marginTop: "10px" }}
+                            style={{
+                              marginTop: "20px",
+                              background:
+                                "linear-gradient(135deg,#198754,#20c997)",
+                              color: "white",
+                              border: "none",
+                              padding: "12px 25px",
+                              borderRadius: "10px",
+                              fontWeight: "bold",
+                              cursor: "pointer",
+                              fontSize: "15px",
+                            }}
                           >
                             Submit Evaluation
                           </button>
