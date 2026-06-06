@@ -428,7 +428,7 @@ const handleCreateStaff = async (e) => {
 
   const sectionWrapper = {
   background: "#fff",
-  borderRadius: "16px",
+  borderRadius: "18px",
   padding: "30px",
   marginTop: "30px",
   border: "1px solid #e5e7eb",
@@ -450,7 +450,7 @@ const sectionTitle = {
 };
   const cardStyle = {
   background: "#fff",
-  borderRadius: "16px",
+  borderRadius: "18px",
   padding: "25px",
   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
   border: "1px solid #e5e7eb",
@@ -473,29 +473,36 @@ const sectionTitle = {
 
   const tableContainerStyle = {
   background: "#fff",
-  borderRadius: "16px",
-  overflow: "hidden",
+  borderRadius: "18px",
+  overflow: "auto",
   border: "1px solid #e5e7eb",
   boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+  marginTop: "20px",
 };
 
 const tableStyle = {
   width: "100%",
-  borderCollapse: "collapse",
+  borderCollapse: "seperate",
+  borderSpacing : 0,
   fontFamily: "Arial",
 };
 
 const tableHeaderStyle = {
   backgroundColor: "#198754",
   color: "#fff",
-  padding: "16px",
-  fontWeight: "600",
+  padding: "18px",
+  fontWeight: "bold",
   textAlign: "left",
+  fontSize: "15px",
+  letterSpacing:"0.5px",
 };
 
 const tableCellStyle = {
   padding: "18px 16px",
-  borderBottom: "1px solid #e5e7eb",
+  borderBottom: "1px solid #|1|5|9",
+  fontSize: "15px",
+  color:"#374151",
+  verticalAlign:"middle",
 };
 
 const primaryButton = {
@@ -716,7 +723,16 @@ return (
     <p style={cardNumberStyle}>{applications.length}</p>
   </div>
 
-  <div style={cardStyle}>
+  <div style={cardStyle}
+    onMouseEnter ={(e) => {
+      e.currentTarget.style.transform = "translateY(-5px)";
+      e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
+    }} 
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+    }}  
+  >
     <h3 style={cardTitleStyle}>Placements</h3>
     <p style={cardNumberStyle}>
       {placements.filter((p) => p.is_fully_assigned).length}
