@@ -13,6 +13,8 @@ function AdminDashboard() {
   const [supervisors, setSupervisors] = useState([]);
   const [organizations, setOrganizations] = useState([]);
 
+  const [applicationSearch, setApplicationSearch] = useState("");
+
 // Student form
   const [studentRegNo, setStudentRegNo] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
@@ -46,6 +48,17 @@ function AdminDashboard() {
   navigate("/");
 };
 
+
+const filteredApplications = applications.filter(
+  (app) =>
+    app.organization_name
+      ?.toLowerCase()
+      .includes(applicationSearch.toLowerCase()) ||
+
+    app.student_name
+      ?.toLowerCase()
+      .includes(applicationSearch.toLowerCase())
+);
 
   const [orgForm, setOrgForm] = useState({
     name: "",
@@ -1377,135 +1390,277 @@ return (
    
 {activeView === "applications" && (
   <>
+    <h2>Applications</h2>
 
-        <h2>Applications</h2>
+    <input
+      style={{
+        ...inputStyle,
+        maxWidth: "400px",
+        marginBottom: "20px",
+      }}
+      type="text"
+      placeholder="Search student /organization..."
+      value={applicationSearch}
+      onChange={(e) =>
+        setApplicationSearch(e.target.value)
+      }
+    />
 
-  {applications.length === 0 ? (
-    <p>No applications yet</p>
-  ) : (
-    Object.entries(groupApplicationsByStudent()).map(([student, apps]) => (
-      <div
-        key={student}
-        style={{ border: "2px solid black", margin: "15px", padding: "10px" }}
-      >
-        
-        {/* 🔥 STUDENT NAME */}
-        <h3>Student: {student}</h3>
+    {applications.length === 0 ? (
+      <p>No applications yet</p>
+    ) : (
+      Object.entries(
+        filteredApplications.reduce((grouped, app) => {
+          const student = app.student_name;
 
-        {/* 🔥 APPLICATIONS UNDER THAT STUDENT */}
-        {apps.map((app) => (
+          if (!grouped[student]) {
+            grouped[student] = [];
+          }
+
+          grouped[student].push(app);
+
+          return grouped;
+        }, {})
+      ).map(
+        ([student, apps]) => (
           <div
-            key={app.id}
+            key={student}
             style={{
-              marginLeft: "20px",
-              borderTop: "1px solid gray",
-              padding: "5px",
+              border: "2px solid black",
+              margin: "15px",
+              padding: "10px",
             }}
           >
-            <p><strong>Organization:</strong> {app.organization_name}</p>
-            <p><strong>Status:</strong> {app.status}</p>
+            <h3>Student: {student}</h3>
 
-            {app.status === "pending" && (
-              <>
-                <button onClick={() => updateStatus(app.id, "approved")}>
-                  Approve
-                </button>
+            <div style={tableContainerStyle}>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={tableHeaderStyle}>
+                      Organization
+                    </th>
 
-                <button onClick={() => updateStatus(app.id, "rejected")}>
-                  Reject
-                </button>
-              </>
-            )}
-            
+                    <th style={tableHeaderStyle}>
+                      Status
+                    </th>
 
-          
+                    <th style={tableHeaderStyle}>
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
 
-  {/* 🔥 SHOW BUTTON ONLY IF APPROVED */}
-  {app.status === "approved" && (
-    placements.some((p) => p.student === app.student) ? (
-      <p style={{ color: "green", fontWeight: "bold" }}>
-        ✅ Placement Created Go to Placements Tab in menu Assign supervisors and confirm placement
-      </p>
-    ) : (
-      <button
-        onClick={() => {
-          setActivePlacementForm(app.id);
-          setPlacementFormData({
-            start_date: "",
-            end_date: "",
-          });
-        }}
-      >
-        Create Placement
-      </button>
-    )
-  )}
+                <tbody>
+                  {apps.map((app, index) => (
+                    <tr
+                      key={app.id}
+                      style={{
+                        backgroundColor:
+                          index % 2 === 0
+                            ? "#f8f9fa"
+                            : "white",
+                      }}
+                    >
+                      <td style={tableCellStyle}>
+                        {app.organization_name}
+                      </td>
 
-  {/* 🔥 INLINE PLACEMENT FORM */}
-  {activePlacementForm === app.id && (
-    <div style={{ marginTop: "10px", padding: "10px", border: "1px solid blue" }}>
-      
-      {/* START DATE */}
-      <input
-        type="date"
-        value={placementFormData.start_date}
-        onChange={(e) =>
-          setPlacementFormData({
-            ...placementFormData,
-            start_date: e.target.value,
-          })
-        }
-      />
-      {/* END DATE */}
-      <input
-        type="date"
-        value={placementFormData.end_date}
-        onChange={(e) =>
-          setPlacementFormData({
-            ...placementFormData,
-            end_date: e.target.value,
-          })
-        }
-      />
-      <br /><br />
+                      <td style={tableCellStyle}>
+                        {app.status}
+                      </td>
 
-      {/* SAVE BUTTON */}
-      <button
-        onClick={async () => {
-          try {
-            await API.post("internships/placements/", {
-              student: app.student,
-              organization: app.organization,
-              start_date: placementFormData.start_date,
-              end_date: placementFormData.end_date,
-            });
-            toast.success("Placement created!");
+                      <td style={tableCellStyle}>
+                        {app.status === "pending" && (
+                          <>
+                            <button
+                              style={{
+                                ...primaryButton,
+                                marginRight: "10px",
+                              }}
+                              onClick={() =>
+                                updateStatus(
+                                  app.id,
+                                  "approved"
+                                )
+                              }
+                            >
+                              Approve
+                            </button>
 
-            // 🔥 close form after saving
-            setActivePlacementForm(null);
+                            <button
+                              style={deleteButtonStyle}
+                              onClick={() =>
+                                updateStatus(
+                                  app.id,
+                                  "rejected"
+                                )
+                              }
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
 
-            fetchPlacements();
-          } catch (error) {
-              console.log(error.response?.data);
+                        {app.status === "approved" && (
+                          <>
+                            {placements.some(
+                              (p) =>
+                                p.student ===
+                                app.student
+                            ) ? (
+                              <p
+                                style={{
+                                  color: "green",
+                                  fontWeight: "bold",
+                                  marginTop: "10px",
+                                }}
+                              >
+                                ✅ Placement Created , Confirm placement from "Menu" placements
+                              </p>
+                            ) : (
+                              <>
+                                <button
+                                  style={primaryButton}
+                                  onClick={() => {
+                                    setActivePlacementForm(
+                                      app.id
+                                    );
 
-              if (error.response?.data?.student) {
-                toast.warning("This student already has a placement!");
-              } else {
-                toast.error("Failed to create placement");
-              }
-            }
-        }}
-      >
-        Save Placement
-      </button>
+                                    setPlacementFormData({
+                                      start_date: "",
+                                      end_date: "",
+                                    });
+                                  }}
+                                >
+                                  Create Placement
+                                </button>
 
-    </div>
-  )}
+                                {activePlacementForm ===
+                                  app.id && (
+                                  <div
+                                    style={{
+                                      marginTop: "10px",
+                                      padding: "10px",
+                                      border:
+                                        "1px solid #198754",
+                                      borderRadius:
+                                        "8px",
+                                    }}
+                                  >
+                                    <input
+                                      style={
+                                        inputStyle
+                                      }
+                                      type="date"
+                                      value={
+                                        placementFormData.start_date
+                                      }
+                                      onChange={(e) =>
+                                        setPlacementFormData(
+                                          {
+                                            ...placementFormData,
+                                            start_date:
+                                              e.target
+                                                .value,
+                                          }
+                                        )
+                                      }
+                                    />
+
+                                    <input
+                                      style={
+                                        inputStyle
+                                      }
+                                      type="date"
+                                      value={
+                                        placementFormData.end_date
+                                      }
+                                      onChange={(e) =>
+                                        setPlacementFormData(
+                                          {
+                                            ...placementFormData,
+                                            end_date:
+                                              e.target
+                                                .value,
+                                          }
+                                        )
+                                      }
+                                    />
+
+                                    <button
+                                      style={
+                                        primaryButton
+                                      }
+                                      onClick={async () => {
+                                        try {
+                                          await API.post(
+                                            "internships/placements/",
+                                            {
+                                              student:
+                                                app.student,
+                                              organization:
+                                                app.organization,
+                                              start_date:
+                                                placementFormData.start_date,
+                                              end_date:
+                                                placementFormData.end_date,
+                                            }
+                                          );
+
+                                          toast.success(
+                                            "Placement created!"
+                                          );
+
+                                          setActivePlacementForm(
+                                            null
+                                          );
+
+                                          fetchPlacements();
+                                        } catch (
+                                          error
+                                        ) {
+                                          console.log(
+                                            error
+                                              .response
+                                              ?.data
+                                          );
+
+                                          if (
+                                            error
+                                              .response
+                                              ?.data
+                                              ?.student
+                                          ) {
+                                            toast.warning(
+                                              "This student already has a placement!"
+                                            );
+                                          } else {
+                                            toast.error(
+                                              "Failed to create placement"
+                                            );
+                                          }
+                                        }
+                                      }}
+                                    >
+                                      Save Placement
+                                    </button>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        ))}
-      </div>
-    ))
-  )}
+        )
+      )
+    )}
   </>
 )}
       
