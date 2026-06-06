@@ -486,7 +486,7 @@ const tableStyle = {
   borderSpacing : 0,
   fontFamily: "Arial",
 };
-
+ 
 const tableHeaderStyle = {
   backgroundColor: "#198754",
   color: "#fff",
@@ -944,7 +944,18 @@ return (
 
     <tbody>
       {criteria.map((c) => (
-        <tr key={c.id}>
+        <tr key={c.id}
+          style ={{ 
+            backgroundColor: savedRows[c.id] ? "#d1e7dd" : "transparent" ,
+            transition: "0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = savedRows[c.id] ? "#d1e7dd" : "#f8f9fa";
+          }}    
+          onMouseLeave ={(e) => {
+            e.currentTarget.style.backgroundColor = savedRows[c.id] ? "#d1e7dd" : "transparent";
+          }}
+        >
           <td style ={tableCellStyle}>
             <input
               style={inputStyle}
@@ -1536,7 +1547,21 @@ return (
           </thead>
           <tbody>
             {finalEvaluations.map((ev, index) => (
-              <tr key={ev.id}  style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+              <tr 
+                key={ev.id} 
+                
+                style={{
+                  backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
+                  transition: "0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#eefbf3";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    index % 2 === 0 ? "#f8f9fa" : "white";    
+                }}
+              >
                 <td style={tableCellStyle}>{ev.student_name}</td>
                 <td style={tableCellStyle}>{ev.student_registration_number}</td>
                 <td style={tableCellStyle}>{ev.organization_name}</td>
@@ -1599,7 +1624,22 @@ return (
 
       <tbody>
         {staffUsers.map((user, index) => (
-          <tr key={user.id}style={{backgroundColor : index % 2 === 0 ? "#f8f9fa" : "white",}}>
+          <tr
+            key={user.id}
+            style={{
+              backgroundColor : index % 2 === 0 ? "#f8f9fa" : "white",
+              transition: "0.3s",
+            }}  
+            
+            onMouseEnter ={(e) => {
+              e.currentTarget.style.backgroundColor = "#eefbf3";
+            }}
+            
+            onMouseLeave ={(e)=> {
+              e.currentTarget.style.backgroundColor =
+                index % 2 == 0 ? "#f8f9fa" :"white";
+            }}
+          >
             <td style={tableCellStyle}>{user.username}</td>
 
             <td style={tableCellStyle}>{user.role}</td>
