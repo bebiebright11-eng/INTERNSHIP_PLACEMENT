@@ -10,10 +10,16 @@ function AdminDashboard() {
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [organizations, setOrganizations] = useState([]);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("student");
-  const [organization, setOrganization] = useState("");
+
+// Student form
+  const [studentRegNo, setStudentRegNo] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+
+// Staff form
+  const [staffEmail, setStaffEmail] = useState("");
+  const [staffRole, setStaffRole] = useState("academic");
+  const [staffOrganization, setStaffOrganization] = useState("");
+
   const [message, setMessage] = useState("");
 
   const handleMenuClick = (view) => {
@@ -85,6 +91,8 @@ function AdminDashboard() {
     }
   };
 
+
+
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/");
@@ -121,42 +129,67 @@ function AdminDashboard() {
       console.log(err);
     }
   };
-  const handleCreateUser = async (e) => {
+
+
+const handleCreateStudent = async (e) => {
   e.preventDefault();
 
-  if (role === "student" && !username) {
-      toast.error("Registration Number is required");
-      return;
-  }
-
-  if (
-      (role === "workplace" ||
-      role === "academic" ||
-      role === "admin") &&
-      !email
-  ) {
-      toast.error("Email is required");
-      return;
+  if (!studentRegNo) {
+    toast.error("Registration Number is required");
+    return;
   }
 
   try {
     await API.post("accounts/users/", {
-      username :  role === "student" ? username : email,
-      email,
-      organization: role == "workplace" ? organization : null,
-      role,
+      username: studentRegNo,
+      email: studentEmail || "",
+      role: "student",
     });
 
-     toast.success("User created successfully");
+    toast.success("Student created successfully");
 
-    // clear form
-    setUsername("");
-    setEmail("");
-    setRole("student");
+    setStudentRegNo("");
+    setStudentEmail("");
+
+    fetchSupervisors();
 
   } catch (error) {
     console.log(error.response?.data);
-    toast.error("Error creating user");
+    toast.error("Error creating student");
+  }
+};
+
+
+const handleCreateStaff = async (e) => {
+  e.preventDefault();
+
+  if (!staffEmail) {
+    toast.error("Email is required");
+    return;
+  }
+
+  try {
+    await API.post("accounts/users/", {
+      username: staffEmail,
+      email: staffEmail,
+      role: staffRole,
+      organization:
+        staffRole === "workplace"
+          ? staffOrganization
+          : null,
+    });
+
+    toast.success("Staff user created successfully");
+
+    setStaffEmail("");
+    setStaffRole("academic");
+    setStaffOrganization("");
+
+    fetchSupervisors();
+
+  } catch (error) {
+    console.log(error.response?.data);
+    toast.error("Error creating staff user");
   }
 };
 
@@ -243,8 +276,7 @@ function AdminDashboard() {
     toast.success("User deleted successfully");
 
   } catch (error) {
-    console.log("DELETE ERROR:", error.response?.data);
-    console.log("STATUS:", error.response?.status);
+    console.log(error);
 
     toast.error("Failed to delete user");
 
@@ -393,15 +425,15 @@ function AdminDashboard() {
     padding: "10px",
     zIndex: 1000,
   }; 
+
   const sectionWrapper = {
-    backgroundColor: "white",
-    borderRadius: "15px",
-    padding: "30px",
-    marginTop: "30px",
-    marginBottom: "40px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    width: "100%",
- };
+  background: "#fff",
+  borderRadius: "16px",
+  padding: "30px",
+  marginTop: "30px",
+  border: "1px solid #e5e7eb",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+};
 
 const sectionCard = {
   border: "1px solid #140961",
@@ -422,13 +454,14 @@ const sectionTitle = {
   fontWeight: "bold",
 };
   const cardStyle = {
-    backgroundColor: "white",
-    borderRadius: "15px",
-    padding: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    minWidth: "220px",
-    flex: "1",
-  };
+  background: "#fff",
+  borderRadius: "16px",
+  padding: "25px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+  border: "1px solid #e5e7eb",
+  flex: 1,
+  minWidth: "240px",
+};
 
   const cardTitleStyle = {
     color: "#666",
@@ -440,6 +473,54 @@ const sectionTitle = {
     fontWeight: "bold",
     color: "#198754",
   };
+
+  const tableContainerStyle = {
+  background: "#fff",
+  borderRadius: "16px",
+  overflow: "hidden",
+  border: "1px solid #e5e7eb",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontFamily: "Arial",
+};
+
+const tableHeaderStyle = {
+  backgroundColor: "#198754",
+  color: "#fff",
+  padding: "16px",
+  fontWeight: "600",
+  textAlign: "left",
+};
+
+const tableCellStyle = {
+  padding: "18px 16px",
+  borderBottom: "1px solid #e5e7eb",
+};
+
+const primaryButton = {
+  background: "#198754",
+  color: "#fff",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "600",
+};
+
+const deleteButtonStyle = {
+  background: "#dc3545",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "600",
+  transition: "0.3s",
+};
 
 
   const students = supervisors.filter(
@@ -672,72 +753,108 @@ return (
               />
               <br /><br />  
 
-          <button onClick ={createOrganization}>
+          <button style={primaryButton} onClick ={createOrganization}>
             Create Organization
           </button>
         </div>
       </div> 
         
 
-      <div style={sectionWrapper}>
-        <h2 style={sectionTitle}>Create User</h2>
+       <div style={sectionWrapper}>
+         <h2 style={sectionTitle}>Create Student</h2>
 
-        <div style={sectionCard}>
-          <form onSubmit={handleCreateUser}>
-              <input
-                type="text"
-                placeholder="Registration Number / Email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                
-              />
-              <br /><br />
+         <div style={sectionCard}>
+           <form onSubmit={handleCreateStudent}>
 
-              <input
-                type="email"
-                placeholder="Email (for supervisors)"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <br /><br />
+             <input
+              type="text"
+              placeholder="Registration Number"
+              value={studentRegNo}
+              onChange={(e) => setStudentRegNo(e.target.value)}
+            />
 
-              <select value={role} onChange={(e) => setRole(e.target.value)}>
-                <option value="student">Student</option>
-                <option value="admin">Admin</option>
-                <option value="workplace">Workplace Supervisor</option>
-                <option value="academic">Academic Supervisor</option>
-              </select>
-              <br /><br />
+            <br /><br />
 
-              {role === "workplace" && (
-                <>
-                 
-                  <select
-                    value={organization}
-                    onChange={(e) => setOrganization(e.target.value)}
-                  >
-                    <option value="">
-                      Select Organization
-                    </option>
+            <input
+              type="email"
+              placeholder="Email (Optional)"
+              value={studentEmail}
+              onChange={(e) => setStudentEmail(e.target.value)}
+            />
 
-                  {organizations.map((org) => (
-                    <option
-                      key={org.id}
-                      value={org.id}
-                    >
-                      {org.name}
-                    </option>
-                  ))}
-                </select>
+            <br /><br />
 
-                <br /><br />
-              </>
-            )}
+            <button style={primaryButton} type="submit">
+              Create Student
+            </button>
 
-            <button type="submit">Create User</button>
           </form>
         </div>
-      </div>  
+      </div>
+
+      <div style={sectionWrapper}>
+        <h2 style={sectionTitle}>Create Staff User</h2>
+
+        <div style={sectionCard}>
+          <form onSubmit={handleCreateStaff}>
+
+            <input
+              type="email"
+              placeholder="Email"
+              value={staffEmail}
+              onChange={(e) => setStaffEmail(e.target.value)}
+            />
+
+          <br /><br />
+
+          <select
+            value={staffRole}
+            onChange={(e) => setStaffRole(e.target.value)}
+          >
+            <option value="admin">Admin</option>
+            <option value="academic">
+              Academic Supervisor
+            </option>
+            <option value="workplace">
+              Workplace Supervisor
+            </option>
+          </select>
+
+          <br /><br />
+
+          {staffRole === "workplace" && (
+            <>
+              <select
+                value={staffOrganization}
+                onChange={(e) =>
+                  setStaffOrganization(e.target.value)
+                }
+              >
+                <option value="">
+                  Select Organization
+                </option>
+
+                {organizations.map((org) => (
+                  <option
+                    key={org.id}
+                    value={org.id}
+                  >
+                  {org.name}
+                </option>
+              ))}
+            </select>
+
+            <br /><br />
+          </>
+        )}
+
+        <button style={primaryButton} type="submit">
+          Create Staff User
+        </button>
+
+      </form>
+    </div>
+  </div>
 
     </div>      
 
@@ -750,23 +867,23 @@ return (
   </h2>
 
   <div style={sectionCard}>
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <table style={tableStyle}>
   
 
   
     <thead>
       <tr>
-        <th>Criteria</th>
-        <th>Max Score</th>
-        <th>Score</th>
-        <th>Actions</th>
+        <th style={tableHeaderStyle}>Criteria</th>
+        <th style={tableHeaderStyle}>Max Score</th>
+        <th style={tableHeaderStyle}>Score</th>
+        <th style={tableHeaderStyle}>Actions</th>
       </tr>
     </thead>
 
     <tbody>
       {criteria.map((c) => (
         <tr key={c.id}>
-          <td>
+          <td style ={tableCellStyle}>
             <input
               type="text"
               value={c.name}
@@ -779,7 +896,7 @@ return (
             />
           </td>
 
-          <td>
+          <td style ={tableCellStyle}>
             <input
               type="number"
               value={c.max_score}
@@ -794,12 +911,12 @@ return (
             />
           </td>
 
-          <td>
+          <td style ={tableCellStyle}>
             <input type="number" placeholder="-" disabled />
           </td>
 
-          <td>
-  <button
+          <td style ={tableCellStyle}>
+  <button style={primaryButton}
     onClick={async () => {
       try {
         await API.patch(`supervision/criteria/${c.id}/`, {
@@ -819,7 +936,7 @@ return (
   >
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
-    <button
+    <button style={deleteButtonStyle}
       onClick={async () => {
         try {
           await API.delete(`supervision/criteria/${c.id}/`);
@@ -842,7 +959,7 @@ return (
 
       {/* 🔥 ADD NEW ROW */}
       <tr>
-        <td>
+        <td style={tableCellStyle}>
           <input
             type="text"
             placeholder="New Criteria"
@@ -853,7 +970,7 @@ return (
           />
         </td>
 
-        <td>
+        <td style={tableCellStyle}>
           <input
             type="number"
             placeholder="Max"
@@ -864,10 +981,10 @@ return (
           />
         </td>
 
-        <td>-</td>  
+        <td style={tableCellStyle}>-</td>  
 
-        <td>
-    <button
+        <td style={tableCellStyle}>
+    <button style={primaryButton}
       onClick={async () => {
         if (!newCriteria.name || !newCriteria.max_score) {
           toast.warning("Please fill all fields");
@@ -978,8 +1095,12 @@ return (
             />
             <br /><br />
 
-            <button onClick={() => saveEdit(org.id)}>Save</button>
-            <button onClick={() => setEditingOrg(null)}>Cancel</button>
+            <button style={primaryButton} onClick={() => saveEdit(org.id)}>
+              Save
+            </button>
+            <button style={primaryButton} onClick={() => setEditingOrg(null)}>
+              Cancel
+            </button>
           </>
         ) : (
           <>
@@ -990,8 +1111,10 @@ return (
             <p>{org.description}</p>
             <p>{org.website}</p>
 
-            <button onClick={() => startEdit(org)}>Edit</button>
-            <button onClick={() => deleteOrganization(org.id)}>
+            <button style={primaryButton} onClick={() => startEdit(org)}>
+              Edit
+            </button>
+            <button style={deleteButtonStyle} onClick={() => deleteOrganization(org.id)}>
               Delete
             </button>
           </>
@@ -1380,34 +1503,26 @@ return (
       {finalEvaluations.length === 0 ? (
         <p>No evaluations yet</p>
       ) : (   
-        <table
-          border="1"
-          cellPadding="10"
-          style={{ marginTop: "20px", width: "100%", backgroundColor: "#f0f0f0", marginLeft: "30px",borderCollapse: "collapse" }}
-        >
-          <thead
-            style={{ 
-              backgroundColor: "#480303",
-              color: "white", 
-              fontWeight: "bold"
-          }}
-          >
+        <div style={tableContainerStyle}>
+          <table style={tableStyle}>
+
+          <thead>
             <tr>
-              <th>Student</th>
-              <th>Registration Number</th>
-              <th>Organization</th>
-              <th>Workplace Supervisor</th>
-              <th>Final Grade</th>
+              <th style={tableHeaderStyle}>Student</th>
+              <th style={tableHeaderStyle}>Reg No.</th>
+              <th style={tableHeaderStyle}>Organization</th>
+              <th style={tableHeaderStyle}>Workplace Supervisor</th>
+              <th style={tableHeaderStyle}>Final Grade</th>
             </tr>
           </thead>
           <tbody>
-            {finalEvaluations.map((ev) => (
-              <tr key={ev.id}>
-                <td>{ev.student_name}</td>
-                <td>{ev.student_registration_number}</td>
-                <td>{ev.organization_name}</td>
-                <td>{ev.supervisor_name}</td>
-                <td>
+            {finalEvaluations.map((ev, index) => (
+              <tr key={ev.id}  style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+                <td style={tableCellStyle}>{ev.student_name}</td>
+                <td style={tableCellStyle}>{ev.student_registration_number}</td>
+                <td style={tableCellStyle}>{ev.organization_name}</td>
+                <td style={tableCellStyle}>{ev.supervisor_name}</td>
+                <td style={tableCellStyle}>
                   <strong>
                     {ev.final_grade}
                   </strong>
@@ -1416,6 +1531,8 @@ return (
             ))}
           </tbody>
         </table>
+      </div>
+        
       )}
   </div>
   </>
@@ -1425,32 +1542,23 @@ return (
   <>
     <h2>Students</h2>
 
-    <table
-      border="1"
-      cellPadding="10"
-      style={{
-        width: "100%",
-        borderCollapse: "collapse",
-        backgroundColor: "white",
-        marginBottom: "40px",
-      }}
-    >
-      <thead>
-        <tr>
-          <th>Registration Number</th>
-          <th>Action</th>
-        </tr>
+    <div style={tableContainerStyle}>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={tableHeaderStyle}>Registration Number</th>
+            <th style={tableHeaderStyle}>Action</th>
+          </tr>
       </thead>
 
       <tbody>
-        {students.map((user) => (
-          <tr key={user.id}>
-            <td>{user.username}</td>
+        {students.map((user, index) => (
+          <tr key={user.id} style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+          
+            <td style={tableCellStyle}>{user.username}</td>
 
-            <td>
-              <button
-                onClick={() => deleteUser(user.id)}
-              >
+            <td style={tableCellStyle}>
+              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
                 Delete
               </button>
             </td>
@@ -1461,34 +1569,24 @@ return (
 
     <h2>Staff Users</h2>
 
-    <table
-      border="1"
-      cellPadding="10"
-      style={{
-        width: "100%",
-        borderCollapse: "collapse",
-        backgroundColor: "white",
-      }}
-    >
+    <table style={tableStyle}>
       <thead>
         <tr>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Action</th>
+          <th style={tableHeaderStyle}>Email</th>
+          <th style={tableHeaderStyle}>Role</th>
+          <th style={tableHeaderStyle}>Action</th>
         </tr>
       </thead>
 
       <tbody>
-        {staffUsers.map((user) => (
-          <tr key={user.id}>
-            <td>{user.username}</td>
+        {staffUsers.map((user, index) => (
+          <tr key={user.id}style={{backgroundColor : index % 2 === 0 ? "#f8f9fa" : "white",}}>
+            <td style={tableCellStyle}>{user.username}</td>
 
-            <td>{user.role}</td>
+            <td style={tableCellStyle}>{user.role}</td>
 
-            <td>
-              <button
-                onClick={() => deleteUser(user.id)}
-              >
+            <td style={tableCellStyle}>
+              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
                 Delete
               </button>
             </td>
@@ -1496,8 +1594,11 @@ return (
         ))}
       </tbody>
     </table>
+    </div>
   </>
 )}
+
+
 
    
     </div>    
