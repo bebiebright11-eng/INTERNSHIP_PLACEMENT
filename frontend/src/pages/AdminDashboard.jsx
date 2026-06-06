@@ -354,31 +354,28 @@ const handleCreateStaff = async (e) => {
       toast.error("Delete failed");
     }
   };
-  const deletePlacement = async (id) => {
 
-    const confirmDelete = window.confirm(
-      "Delete this placement?"
+const deletePlacement = async (id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this placement?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await API.delete(`internships/placements/${id}/`);
+
+    setPlacements((prev) =>
+      prev.filter((p) => p.id !== id)
     );
 
-    if (!confirmDelete) return;
+    toast.success("Placement deleted successfully");
 
-    try {
-
-      await API.delete(`internships/placements/${id}/`);
-
-      setPlacements((prev) =>
-        prev.filter((p) => p.id !== id)
-      );
-
-      toast.success("Placement deleted successfully");
-
-    } catch (error) {
-
-      console.log(error);
-
-      toast.error("Failed to delete placement");
-    }
-  };
+  } catch (error) {
+    console.log(error);
+    toast.error("Failed to delete placement");
+  }
+};
 
   
   const updateStatus = async (id, status) => {
@@ -391,28 +388,6 @@ const handleCreateStaff = async (e) => {
       console.log(error);
     }
   };
-
-
-
-  const deletePlacement = async (id) => {
-  const confirmDelete = window.confirm(
-    "Delete this placement?"
-  );
-
-  if (!confirmDelete) return;
-
-  try {
-    await API.delete(`internships/placements/${id}/`);
-
-    toast.success("Placement deleted");
-
-    fetchPlacements();
-
-  } catch (error) {
-    console.log(error);
-    toast.error("Failed to delete placement");
-  }
-};
 
   
   const handleSupervisorChange = (placementId, type, value) => {
