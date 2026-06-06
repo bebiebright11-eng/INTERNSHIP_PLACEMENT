@@ -456,6 +456,8 @@ const sectionTitle = {
   border: "1px solid #e5e7eb",
   flex: 1,
   minWidth: "240px",
+  transition: "0.3s ease",
+  cursor: "pointer",
 };
 
   const cardTitleStyle = {
@@ -685,12 +687,31 @@ return (
       flexWrap : "wrap",
     }}
   >
-   <div style={cardStyle}>
+   <div
+      style={cardStyle}
+      onMouseEnter ={(e) => {
+        e.currentTarget.style.transform = "translateY(-5px)";
+        e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
+      }} 
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+      }}  
+  >
     <h3 style={cardTitleStyle}>Organizations</h3>
     <p style={cardNumberStyle}>{organizations.length}</p>
   </div>
 
-  <div style={cardStyle}>
+  <div style={cardStyle}
+    onMouseEnter ={(e) => {
+      e.currentTarget.style.transform = "translateY(-5px)";
+      e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
+    }} 
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+    }}  
+  >
     <h3 style={cardTitleStyle}>Applications</h3>
     <p style={cardNumberStyle}>{applications.length}</p>
   </div>
