@@ -5,7 +5,12 @@ function PublicRoute({ children }) {
   const role = localStorage.getItem("role");
   const location = useLocation();
 
-  // ✅ If user is already logged in AND trying to access other public pages
+
+  if (location.pathname === "/activate") {
+  return children;
+}
+
+  // If user is already logged in AND trying to access other public pages
   // (like /activate), then redirect
   if (token && role && location.pathname !== "/") {
     if (role === "student") return <Navigate to="/student" />;

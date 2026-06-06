@@ -23,7 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Routes>
       <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/login" element={<Login />} />
-      <Route path="/activate" element={<PublicRoute><ActivateAccount /></PublicRoute>} />
+      <Route path="/activate" element={<ActivateAccount />} />
       <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/student" element={<ProtectedRoute allowedRole="student"><StudentDashboard /></ProtectedRoute>} />
       <Route path="/workplace" element={<ProtectedRoute allowedRole="workplace"><WorkplaceDashboard /></ProtectedRoute>} />

@@ -13,6 +13,7 @@ function AdminDashboard() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("student");
+  const [organization, setOrganization] = useState("");
   const [message, setMessage] = useState("");
 
   const handleMenuClick = (view) => {
@@ -123,10 +124,26 @@ function AdminDashboard() {
   const handleCreateUser = async (e) => {
   e.preventDefault();
 
+  if (role === "student" && !username) {
+      toast.error("Registration Number is required");
+      return;
+  }
+
+  if (
+      (role === "workplace" ||
+      role === "academic" ||
+      role === "admin") &&
+      !email
+  ) {
+      toast.error("Email is required");
+      return;
+  }
+
   try {
     await API.post("accounts/users/", {
-      username,
+      username :  role === "student" ? username : email,
       email,
+      organization: role == "workplace" ? organization : null,
       role,
     });
 
@@ -138,6 +155,7 @@ function AdminDashboard() {
     setRole("student");
 
   } catch (error) {
+    console.log(error.response?.data);
     toast.error("Error creating user");
   }
 };
@@ -205,6 +223,35 @@ function AdminDashboard() {
       website: org.website,
     });
   };
+
+  const deleteUser = async (id) => {
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this user?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+
+    await API.delete(`accounts/users/${id}/`);
+
+    setSupervisors((prev) =>
+      prev.filter((user) => user.id !== id)
+    );
+
+    toast.success("User deleted successfully");
+
+  } catch (error) {
+
+    console.log(error);
+
+    toast.error("Failed to delete user");
+
+  }
+};
+
+
 
   const saveEdit = async (id) => {
     try {
@@ -394,6 +441,15 @@ const sectionTitle = {
     color: "#198754",
   };
 
+
+  const students = supervisors.filter(
+    (user) => user.role === "student"
+  );
+
+  const staffUsers = supervisors.filter(
+    (user) => user.role !== "student"
+  );
+
 return (
   <div
     style={{
@@ -493,6 +549,14 @@ return (
         onClick={() => handleMenuClick("placements")}
       >
         🍭Placements
+      </div>
+
+
+      <div
+        style={menuItemStyle}
+        onClick={() => handleMenuClick("users")}
+      >
+        👥 Users
       </div>
 
       <div
@@ -625,7 +689,7 @@ return (
                 placeholder="Registration Number / Email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                required
+                
               />
               <br /><br />
 
@@ -644,6 +708,31 @@ return (
                 <option value="academic">Academic Supervisor</option>
               </select>
               <br /><br />
+
+              {role === "workplace" && (
+                <>
+                 
+                  <select
+                    value={organization}
+                    onChange={(e) => setOrganization(e.target.value)}
+                  >
+                    <option value="">
+                      Select Organization
+                    </option>
+
+                  {organizations.map((org) => (
+                    <option
+                      key={org.id}
+                      value={org.id}
+                    >
+                      {org.name}
+                    </option>
+                  ))}
+                </select>
+
+                <br /><br />
+              </>
+            )}
 
             <button type="submit">Create User</button>
           </form>
@@ -1331,6 +1420,85 @@ return (
   </div>
   </>
 )}
+
+{activeView === "users" && (
+  <>
+    <h2>Students</h2>
+
+    <table
+      border="1"
+      cellPadding="10"
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        backgroundColor: "white",
+        marginBottom: "40px",
+      }}
+    >
+      <thead>
+        <tr>
+          <th>Registration Number</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {students.map((user) => (
+          <tr key={user.id}>
+            <td>{user.username}</td>
+
+            <td>
+              <button
+                onClick={() => deleteUser(user.id)}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <h2>Staff Users</h2>
+
+    <table
+      border="1"
+      cellPadding="10"
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        backgroundColor: "white",
+      }}
+    >
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {staffUsers.map((user) => (
+          <tr key={user.id}>
+            <td>{user.username}</td>
+
+            <td>{user.role}</td>
+
+            <td>
+              <button
+                onClick={() => deleteUser(user.id)}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </>
+)}
+
    
     </div>    
   </div>
