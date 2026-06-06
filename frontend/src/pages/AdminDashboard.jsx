@@ -1597,7 +1597,19 @@ return (
 
       <tbody>
         {students.map((user, index) => (
-          <tr key={user.id} style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+          <tr 
+          key={user.id} 
+          style={{
+            backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
+            transition: "0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#eefbf3";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = index % 2 === 0 ? "#f8f9fa" : "white";
+            }}
+          >
           
             <td style={tableCellStyle}>{user.username}</td>
 
@@ -1616,9 +1628,14 @@ return (
     <table style={tableStyle}>
       <thead>
         <tr>
-          <th style={tableHeaderStyle}>Email</th>
+          <th style={{
+            tableHeaderStyle,
+            borderTopLeftRadius: "16px",
+          }}>Email</th>
           <th style={tableHeaderStyle}>Role</th>
-          <th style={tableHeaderStyle}>Action</th>
+          <th style={{
+            tableHeaderStyle, 
+            borderTopRightRadius: "16px"}}>Action</th>
         </tr>
       </thead>
 
