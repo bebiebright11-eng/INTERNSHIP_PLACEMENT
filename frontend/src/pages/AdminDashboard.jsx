@@ -516,14 +516,14 @@ const primaryButton = {
 };
 
 const deleteButtonStyle = {
-  background: "#dc3545",
+  background: "#ef4444",
   color: "white",
   border: "none",
   padding: "10px 16px",
-  borderRadius: "8px",
+  borderRadius: "10px",
   cursor: "pointer",
   fontWeight: "600",
-  transition: "0.3s",
+  transition: "0.3s ease",
 };
 
 const inputStyle = {
@@ -1535,15 +1535,14 @@ return (
       ) : (   
         <div style={tableContainerStyle}>
           <table style={tableStyle}>
-
-          <thead>
-            <tr>
-              <th style={tableHeaderStyle}>Student</th>
-              <th style={tableHeaderStyle}>Reg No.</th>
-              <th style={tableHeaderStyle}>Organization</th>
-              <th style={tableHeaderStyle}>Workplace Supervisor</th>
-              <th style={tableHeaderStyle}>Final Grade</th>
-            </tr>
+            <thead>
+              <tr>
+                <th style={{...tableHeaderStyle,borderTopLeftRadius:'16px',}}>Student</th>
+                <th style={tableHeaderStyle}>Reg No.</th>
+                <th style={tableHeaderStyle}>Organization</th>
+                <th style={tableHeaderStyle}>Workplace Supervisor</th>
+                <th style={{...tableHeaderStyle,borderTopRightRadius:'16px',}}>Final Grade</th>
+              </tr>
           </thead>
           <tbody>
             {finalEvaluations.map((ev, index) => (
@@ -1590,8 +1589,8 @@ return (
       <table style={tableStyle}>
         <thead>
           <tr>
-            <th style={tableHeaderStyle}>Registration Number</th>
-            <th style={tableHeaderStyle}>Action</th>
+            <th style={{tableHeaderStyle}}>Registration Number</th>
+            <th style={{tableHeaderStyle}}>Action</th>
           </tr>
       </thead>
 
@@ -1629,12 +1628,12 @@ return (
       <thead>
         <tr>
           <th style={{
-            tableHeaderStyle,
+            ...tableHeaderStyle,
             borderTopLeftRadius: "16px",
           }}>Email</th>
           <th style={tableHeaderStyle}>Role</th>
           <th style={{
-            tableHeaderStyle, 
+            ...tableHeaderStyle, 
             borderTopRightRadius: "16px"}}>Action</th>
         </tr>
       </thead>
