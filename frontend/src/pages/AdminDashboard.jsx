@@ -436,14 +436,9 @@ const handleCreateStaff = async (e) => {
 };
 
 const sectionCard = {
-  border: "1px solid #140961",
   padding: "20px",
-  borderRadius: "12px",
-  background: "#f4f7fb",
   width: "100%",
-  maxWidth: "900px",
-  margin: "0 auto",
-  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  background: "transparent",
 };
 
 const sectionTitle = {
@@ -520,6 +515,24 @@ const deleteButtonStyle = {
   cursor: "pointer",
   fontWeight: "600",
   transition: "0.3s",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px 14px",
+  border: "1px solid #d1d5db",
+  borderRadius: "10px",
+  fontSize: "15px",
+  backgroundColor: "#fff",
+  boxSizing: "border-box",
+  marginBottom: "12px",
+  transition: "0.2s",
+};
+
+const textareaStyle = {
+  ...inputStyle,
+  minHeight: "100px",
+  resize: "vertical",
 };
 
 
@@ -707,6 +720,7 @@ return (
             <h3>Add Organization</h3>    
 
               <input
+                style={inputStyle}
                 type="text"
                 placeholder="Name"
                 value={orgForm.name}
@@ -715,6 +729,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type ='text'
                 placeholder="Location"
                 value={orgForm.location}
@@ -723,6 +738,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type="email"
                 placeholder="Email"
                 value={orgForm.email}
@@ -731,6 +747,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type="text"
                 placeholder="Phone"
                 value={orgForm.phone}
@@ -739,6 +756,7 @@ return (
               <br /><br />
 
               <textarea
+                style={textareaStyle}
                 placeholder="Description"
                 value={orgForm.description}
                 onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
@@ -746,6 +764,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type='text'
                 placeholder ='website'
                 value={orgForm.website}
@@ -767,6 +786,7 @@ return (
            <form onSubmit={handleCreateStudent}>
 
              <input
+              style={inputStyle}
               type="text"
               placeholder="Registration Number"
               value={studentRegNo}
@@ -776,6 +796,7 @@ return (
             <br /><br />
 
             <input
+              style={inputStyle}
               type="email"
               placeholder="Email (Optional)"
               value={studentEmail}
@@ -799,6 +820,7 @@ return (
           <form onSubmit={handleCreateStaff}>
 
             <input
+              style={inputStyle}
               type="email"
               placeholder="Email"
               value={staffEmail}
@@ -808,6 +830,7 @@ return (
           <br /><br />
 
           <select
+            style={inputStyle}
             value={staffRole}
             onChange={(e) => setStaffRole(e.target.value)}
           >
@@ -825,6 +848,7 @@ return (
           {staffRole === "workplace" && (
             <>
               <select
+                style={inputStyle}
                 value={staffOrganization}
                 onChange={(e) =>
                   setStaffOrganization(e.target.value)
@@ -885,6 +909,7 @@ return (
         <tr key={c.id}>
           <td style ={tableCellStyle}>
             <input
+              style={inputStyle}
               type="text"
               value={c.name}
               onChange={(e) => {
@@ -898,6 +923,7 @@ return (
 
           <td style ={tableCellStyle}>
             <input
+              style={inputStyle}
               type="number"
               value={c.max_score}
               onChange={(e) => {
@@ -972,6 +998,7 @@ return (
 
         <td style={tableCellStyle}>
           <input
+            style={inputStyle}
             type="number"
             placeholder="Max"
             value={newCriteria.max_score}
@@ -1329,6 +1356,7 @@ return (
                 <>
                   {/* 🔧 DATE FIELDS */}
                   <input
+                    style={inputStyle}
                     type="date"
                     defaultValue={p.start_date || ""}
                     onBlur={async (e) => {
@@ -1342,6 +1370,7 @@ return (
                   <br /><br />
 
                   <input
+                    style={inputStyle}
                     type="date"
                     defaultValue={p.end_date || ""}
                     onBlur={async (e) => {
@@ -1355,120 +1384,63 @@ return (
                   <br /><br />
 
                   {/* 🔍 WORKPLACE SEARCH */}
-                  <input
-                    type="text"
-                    placeholder="Search workplace supervisor"
-                    value={selectedSupervisors[p.id]?.workplace_search || ""}
-                    onFocus={() =>
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "workplace",
-                      }))
+                  <select
+                    style={inputStyle}
+                    value={selectedSupervisors[p.id]?.workplace || ""}
+                    onChange={(e) =>
+                      handleSupervisorChange(
+                        p.id,
+                        "workplace",
+                        e.target.value
+                      )
                     }
-                    onChange={(e) => {
-                      handleSupervisorChange(p.id, "workplace_search", e.target.value);
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "workplace",
-                      }));
-                    }}
-                  />
+                  >
+                    <option value="">
+                      Select Workplace Supervisor
+                    </option>
 
-                  {showDropdown[p.id] === "workplace" && (
-                    <div style={dropdownStyle}>
-                      {workplaceSupervisors
-                        .filter((u) =>
-                          u.username
-                            .toLowerCase()
-                            .includes(
-                              (selectedSupervisors[p.id]?.workplace_search || "")
-                                .toLowerCase()
-                            )
-                        )
-                        .map((u) => (
-                          <div
-                            key={u.id}
-                            onClick={() => {
-                              handleSupervisorChange(p.id, "workplace", u.id);
-                              handleSupervisorChange(
-                                p.id,
-                                "workplace_search",
-                                u.username
-                              );
-
-                              setShowDropdown((prev) => ({
-                                ...prev,
-                                [p.id]: null,
-                              }));
-                            }}
-                            style={{ padding: "5px", cursor: "pointer" }}
-                          >
-                            {u.username}
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                    {workplaceSupervisors.map((u) => (
+                      <option
+                        key={u.id}
+                        value={u.id}
+                      >
+                        {u.username}
+                      </option>
+                    ))}
+                  </select>
 
                   <br /><br />
 
                   {/* 🔍 ACADEMIC SEARCH */}
-                  <input
-                    type="text"
-                    placeholder="Search academic supervisor"
-                    value={selectedSupervisors[p.id]?.academic_search || ""}
-                    onFocus={() =>
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "academic",
-                      }))
+                  <select
+                    style={inputStyle}
+                    value={selectedSupervisors[p.id]?.academic || ""}
+                    onChange={(e) =>
+                      handleSupervisorChange(
+                        p.id,
+                        "academic",
+                        e.target.value
+                      )
                     }
-                    onChange={(e) => {
-                      handleSupervisorChange(p.id, "academic_search", e.target.value);
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "academic",
-                      }));
-                    }}
-                  />
+                  >
+                    <option value="">
+                      Select Academic Supervisor
+                    </option>
 
-                  {showDropdown[p.id] === "academic" && (
-                    <div style={dropdownStyle}>
-                      {academicSupervisors
-                        .filter((u) =>
-                          u.username
-                            .toLowerCase()
-                            .includes(
-                              (selectedSupervisors[p.id]?.academic_search || "")
-                                .toLowerCase()
-                            )
-                        )
-                        .map((u) => (
-                          <div
-                            key={u.id}
-                            onClick={() => {
-                              handleSupervisorChange(p.id, "academic", u.id);
-                              handleSupervisorChange(
-                                p.id,
-                                "academic_search",
-                                u.username
-                              );
-
-                              setShowDropdown((prev) => ({
-                                ...prev,
-                                [p.id]: null,
-                              }));
-                            }}
-                            style={{ padding: "5px", cursor: "pointer" }}
-                          >
-                            {u.username}
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                    {academicSupervisors.map((u) => (
+                      <option
+                        key={u.id}
+                        value={u.id}
+                      >
+                        {u.username}
+                      </option>
+                    ))}
+                  </select>
 
                   <br /><br />
 
                   <button
+                    style={primaryButton}
                     onClick={() =>
                       assignSupervisors(
                         p.id,
@@ -1481,6 +1453,15 @@ return (
                   </button>
                 </>
               )}
+              <br /><br />
+
+            <button
+              style={deleteButtonStyle}
+              onClick={() => deletePlacement(p.id)}
+            >
+              Delete Placement
+            </button>
+
             </div>
           );
         })
