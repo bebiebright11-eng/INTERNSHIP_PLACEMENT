@@ -75,29 +75,43 @@ function AcademicDashboard() {
     color: "#198754",
   };
 
-  const tableContainerStyle = {
-  backgroundColor: "white",
-  borderRadius: "15px",
-  padding: "20px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-  overflowX: "auto",
+
+  const marksInputStyle = {
+  width: "120px",
+  padding: "14px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  textAlign: "center",
+  border: "2px solid #198754",
+  borderRadius: "12px",
+  outline: "none",
+  backgroundColor: "#f8fff9",
+  color: "#198754",
+  boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
 };
 
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  fontFamily: "Arial",
-};
-
-const tableHeaderStyle = {
-  backgroundColor: "#198754",
+const submitButtonStyle = {
+  background: "linear-gradient(135deg,#198754,#20c997)",
   color: "white",
-  textAlign: "left",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
-const tableCellStyle = {
-  padding: "15px",
-  borderBottom: "1px solid #ddd",
+const editButtonStyle = {
+  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
+  color: "white",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
   // --- Data Fetching Functions ---
@@ -676,17 +690,43 @@ const tableCellStyle = {
                           {!academicEval ||
                           editingPlacement === p.id ? (
                             <div>
-                              <h4>Academic Supervisor Marks</h4>
+                              <h4
+                                style={{
+                                color: "#198754",
+                                marginBottom: "10px",
+                              }}
+                            >
+                              Academic Supervisor Assessment
+                            </h4>
 
-                              <input
-                                type="number"
-                                min="0"
-                                max="20"
-                                placeholder="Enter marks out of 20"
-                                value={scores[p.id] ?? ""}
-                                onChange={(e) => {
-                                  let value =
-                                    parseInt(e.target.value) || 0;
+                            <p
+                              style={{
+                                color: "#666",
+                                marginBottom: "15px",
+                              }}
+                            >
+                              Award marks based on your supervision visit, student presentation,
+                              documentation quality, and overall internship performance.
+                            </p>
+
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "15px",
+                                  marginBottom: "20px",
+                                  marginTop: "15px",
+                                }}
+                              >
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="20"
+                                  value={scores[p.id] ?? ""}
+                                  placeholder="0 - 20"
+                                  style={marksInputStyle}
+                                  onChange={(e) => {
+                                  let value = parseInt(e.target.value) || 0;
 
                                   if (value < 0) value = 0;
                                   if (value > 20) value = 20;
@@ -698,6 +738,17 @@ const tableCellStyle = {
                                 }}
                               />
 
+                              <span
+                                style={{
+                                  fontSize: "20px",
+                                  fontWeight: "bold",
+                                  color: "#198754",
+                                }}
+                              >
+                                / 20
+                              </span>
+                            </div>
+
                               <h4>Final Score</h4>
 
                               <p>{finalScore} / 100</p>
@@ -706,8 +757,9 @@ const tableCellStyle = {
 
                               <button
                                 onClick={() => submitEvaluation(p.id)}
+                                style={submitButtonStyle}
                               >
-                                Submit Final Evaluation
+                                ✅ Submit Final Evaluation
                               </button>
                             </div>
                           ) : (
@@ -734,6 +786,7 @@ const tableCellStyle = {
                               </p>
 
                               <button
+                                style={editButtonStyle}
                                 onClick={() => {
                                   setEditingPlacement(p.id);
 
@@ -743,7 +796,7 @@ const tableCellStyle = {
                                   }));
                                 }}
                               >
-                                Edit Evaluation
+                                ✏️ Edit Evaluation
                               </button>
                             </div>
                           )}

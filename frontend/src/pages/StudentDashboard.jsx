@@ -697,20 +697,107 @@ return (
 
 {activeView === "applications" && (
   <>
-            {/* APPLICATIONS */}
-      <h2 style={{textAlign: "center"}}>My Applications</h2>
-      {applications.length === 0 ? (
-        <p style={{textAlign: "center"}}>No applications yet</p>
-      ) : (
-        applications.map((app) => (
-          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
-            <p style={{textAlign: "center"}}><strong>Organization:</strong> {app.organization_name || app.organization}</p>
-            <p style={{textAlign: "center"}}><strong>Status:</strong> {app.status}</p>
-          </div>
-        ))
-      )}
-        </>
-)} 
+    <h2 style={{ textAlign: "center" }}>My Applications</h2>
+
+    {applications.length === 0 ? (
+      <p style={{ textAlign: "center" }}>
+        No applications yet
+      </p>
+    ) : (
+      <div
+        style={{
+          backgroundColor: "white",
+          borderRadius: "15px",
+          overflow: "hidden",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          marginTop: "20px",
+        }}
+      >
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+          }}
+        >
+          <thead>
+            <tr
+              style={{
+                backgroundColor: "#198754",
+                color: "white",
+              }}
+            >
+              <th
+                style={{
+                  padding: "15px",
+                  textAlign: "left",
+                }}
+              >
+                Organization
+              </th>
+
+              <th
+                style={{
+                  padding: "15px",
+                  textAlign: "left",
+                }}
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {applications.map((app, index) => (
+              <tr
+                key={app.id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 0
+                      ? "#f8f9fa"
+                      : "white",
+                }}
+              >
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {app.organization_name ||
+                    app.organization}
+                </td>
+
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <span
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                      color: "white",
+                      backgroundColor:
+                        app.status === "approved"
+                          ? "#198754"
+                          : app.status === "rejected"
+                          ? "#dc3545"
+                          : "#ffc107",
+                    }}
+                  >
+                    {app.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </>
+)}
 
 {activeView === "evaluations" && (
   <>
