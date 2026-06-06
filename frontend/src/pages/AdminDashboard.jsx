@@ -298,7 +298,10 @@ const handleCreateStaff = async (e) => {
   } catch (error) {
     console.log(error);
 
-    toast.error("Failed to delete user");
+    toast.error(
+      error.response?.data?.error ||
+      "Failed to delete user"
+    );
 
   }
 };
@@ -1106,21 +1109,32 @@ return (
   >
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
-    <button style={deleteButtonStyle}
+    <button
+      style={deleteButtonStyle}
       onClick={async () => {
+
+        const confirmDelete = window.confirm(
+          "Are you sure you want to delete this criteria?"
+        );
+
+        if (!confirmDelete) return;
+
         try {
-          await API.delete(`supervision/criteria/${c.id}/`);
+        await API.delete(`supervision/criteria/${c.id}/`);
 
-          // ✅ remove instantly from UI
-          setCriteria((prev) => prev.filter((item) => item.id !== c.id));
+        setCriteria((prev) =>
+          prev.filter((item) => item.id !== c.id)
+        );
 
-        } catch {
-          toast.error("Delete failed");
-        }
-      }}
-    >
-      Delete
-    </button>
+        toast.success("Criteria deleted successfully");
+
+      } catch {
+        toast.error("Delete failed");
+      }
+    }}
+  >
+   Delete
+  </button>
 
 
           </td>
@@ -1353,7 +1367,7 @@ return (
   {app.status === "approved" && (
     placements.some((p) => p.student === app.student) ? (
       <p style={{ color: "green", fontWeight: "bold" }}>
-        ✅ Placement Created
+        ✅ Placement Created Go to Placements Tab in menu Assign supervisors and confirm placement
       </p>
     ) : (
       <button
