@@ -556,10 +556,11 @@ return (
    <div>
       <h1
         style={{
-          margin:0,
-          color: "#198754ee",
-          fontSize: "36px",
-          fontWeight:"bold"
+          background:"white",
+          padding:"25px",
+          borderRadius:"16px",
+          marginBottom:"25px",
+          boxShadow:"0 2px 8px rgba(0,0,0,0.06)",
         }}
       >
         INTERNSHIP PLACEMENT SYSTEM(ILES)
