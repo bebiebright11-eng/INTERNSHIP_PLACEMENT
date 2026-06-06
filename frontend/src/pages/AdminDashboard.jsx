@@ -318,6 +318,31 @@ const handleCreateStaff = async (e) => {
       toast.error("Delete failed");
     }
   };
+  const deletePlacement = async (id) => {
+
+    const confirmDelete = window.confirm(
+      "Delete this placement?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      await API.delete(`internships/placements/${id}/`);
+
+      setPlacements((prev) =>
+        prev.filter((p) => p.id !== id)
+      );
+
+      toast.success("Placement deleted successfully");
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error("Failed to delete placement");
+    }
+  };
 
   
   const updateStatus = async (id, status) => {
@@ -482,7 +507,7 @@ const sectionTitle = {
 
 const tableStyle = {
   width: "100%",
-  borderCollapse: "seperate",
+  borderCollapse: "separate",
   borderSpacing : 0,
   fontFamily: "Arial",
 };
@@ -499,7 +524,7 @@ const tableHeaderStyle = {
 
 const tableCellStyle = {
   padding: "18px 16px",
-  borderBottom: "1px solid #|1|5|9",
+  borderBottom: "1px solid #f1f5f9",
   fontSize: "15px",
   color:"#374151",
   verticalAlign:"middle",
@@ -1011,7 +1036,17 @@ return (
   >
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
-    <button style={deleteButtonStyle}
+    <button 
+      style={deleteButtonStyle}
+
+      onMouseEnter = {(e) => {
+        e.currentTarget.style.backgroundColor = "#dc2626";
+      }}
+
+      onMouseLeave = {(e) => {
+        e.currentTarget.style.backgroundColor = "#ef4444";
+      }}
+
       onClick={async () => {
         try {
           await API.delete(`supervision/criteria/${c.id}/`);
@@ -1190,7 +1225,15 @@ return (
             <button style={primaryButton} onClick={() => startEdit(org)}>
               Edit
             </button>
-            <button style={deleteButtonStyle} onClick={() => deleteOrganization(org.id)}>
+            <button  
+              style={deleteButtonStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#dc2626";
+              }}  
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#ef4444";
+              }}
+              onClick={() => deleteOrganization(org.id)}>
               Delete
             </button>
           </>
@@ -1355,7 +1398,19 @@ return (
       <h2>Placements</h2>
 
       {placements.length === 0 ? (
-        <p>No placements yet</p>
+        <div
+          style={{
+            padding: "50px",
+            textAlign: "center",
+            color: "#9ca3af",
+            background: "white",
+            borderRadius: "16px",
+            marginTop: "20px",
+          }}
+        >
+          <h3>No Placements Yet 📭</h3>
+          <p>Placements will appear here once assigned.</p>
+        </div>
       ) : (
         placements.map((p) => {
 
@@ -1506,6 +1561,14 @@ return (
 
             <button
               style={deleteButtonStyle}
+              
+              onMouseEnter ={(e) => {
+                e.currentTarget.style.backgroundColor = "#dc2626";
+              }}
+
+              onMouseLeave ={(e) => {
+                e.currentTarget.style.backgroundColor = "#ef4444";
+              }}  
               onClick={() => deletePlacement(p.id)}
             >
               Delete Placement
@@ -1589,8 +1652,8 @@ return (
       <table style={tableStyle}>
         <thead>
           <tr>
-            <th style={{tableHeaderStyle}}>Registration Number</th>
-            <th style={{tableHeaderStyle}}>Action</th>
+            <th style={tableHeaderStyle}>Registration Number</th>
+            <th style={tableHeaderStyle}>Action</th>
           </tr>
       </thead>
 
