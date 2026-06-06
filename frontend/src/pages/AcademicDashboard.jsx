@@ -75,6 +75,31 @@ function AcademicDashboard() {
     color: "#198754",
   };
 
+  const tableContainerStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "20px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+  overflowX: "auto",
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontFamily: "Arial",
+};
+
+const tableHeaderStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  textAlign: "left",
+};
+
+const tableCellStyle = {
+  padding: "15px",
+  borderBottom: "1px solid #ddd",
+};
+
   // --- Data Fetching Functions ---
 
   const fetchPlacements = async () => {

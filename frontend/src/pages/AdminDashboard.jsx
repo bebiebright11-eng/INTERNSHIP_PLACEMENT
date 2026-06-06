@@ -10,9 +10,16 @@ function AdminDashboard() {
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [organizations, setOrganizations] = useState([]);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("student");
+
+// Student form
+  const [studentRegNo, setStudentRegNo] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+
+// Staff form
+  const [staffEmail, setStaffEmail] = useState("");
+  const [staffRole, setStaffRole] = useState("academic");
+  const [staffOrganization, setStaffOrganization] = useState("");
+
   const [message, setMessage] = useState("");
 
   const handleMenuClick = (view) => {
@@ -84,6 +91,8 @@ function AdminDashboard() {
     }
   };
 
+
+
   const fetchPlacements = async () => {
     try {
       const res = await API.get("internships/placements/");
@@ -120,25 +129,67 @@ function AdminDashboard() {
       console.log(err);
     }
   };
-  const handleCreateUser = async (e) => {
+
+
+const handleCreateStudent = async (e) => {
   e.preventDefault();
+
+  if (!studentRegNo) {
+    toast.error("Registration Number is required");
+    return;
+  }
 
   try {
     await API.post("accounts/users/", {
-      username,
-      email,
-      role,
+      username: studentRegNo,
+      email: studentEmail || "",
+      role: "student",
     });
 
-     toast.success("User created successfully");
+    toast.success("Student created successfully");
 
-    // clear form
-    setUsername("");
-    setEmail("");
-    setRole("student");
+    setStudentRegNo("");
+    setStudentEmail("");
+
+    fetchSupervisors();
 
   } catch (error) {
-    toast.error("Error creating user");
+    console.log(error.response?.data);
+    toast.error("Error creating student");
+  }
+};
+
+
+const handleCreateStaff = async (e) => {
+  e.preventDefault();
+
+  if (!staffEmail) {
+    toast.error("Email is required");
+    return;
+  }
+
+  try {
+    await API.post("accounts/users/", {
+      username: staffEmail,
+      email: staffEmail,
+      role: staffRole,
+      organization:
+        staffRole === "workplace"
+          ? staffOrganization
+          : null,
+    });
+
+    toast.success("Staff user created successfully");
+
+    setStaffEmail("");
+    setStaffRole("academic");
+    setStaffOrganization("");
+
+    fetchSupervisors();
+
+  } catch (error) {
+    console.log(error.response?.data);
+    toast.error("Error creating staff user");
   }
 };
 
@@ -205,6 +256,34 @@ function AdminDashboard() {
       website: org.website,
     });
   };
+
+  const deleteUser = async (id) => {
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this user?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+
+    await API.delete(`accounts/users/${id}/`);
+
+    setSupervisors((prev) =>
+      prev.filter((user) => user.id !== id)
+    );
+
+    toast.success("User deleted successfully");
+
+  } catch (error) {
+    console.log(error);
+
+    toast.error("Failed to delete user");
+
+  }
+};
+
+
 
   const saveEdit = async (id) => {
     try {
@@ -346,25 +425,20 @@ function AdminDashboard() {
     padding: "10px",
     zIndex: 1000,
   }; 
+
   const sectionWrapper = {
-    backgroundColor: "white",
-    borderRadius: "15px",
-    padding: "30px",
-    marginTop: "30px",
-    marginBottom: "40px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    width: "100%",
- };
+  background: "#fff",
+  borderRadius: "16px",
+  padding: "30px",
+  marginTop: "30px",
+  border: "1px solid #e5e7eb",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+};
 
 const sectionCard = {
-  border: "1px solid #140961",
   padding: "20px",
-  borderRadius: "12px",
-  background: "#f4f7fb",
   width: "100%",
-  maxWidth: "900px",
-  margin: "0 auto",
-  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  background: "transparent",
 };
 
 const sectionTitle = {
@@ -375,13 +449,14 @@ const sectionTitle = {
   fontWeight: "bold",
 };
   const cardStyle = {
-    backgroundColor: "white",
-    borderRadius: "15px",
-    padding: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    minWidth: "220px",
-    flex: "1",
-  };
+  background: "#fff",
+  borderRadius: "16px",
+  padding: "25px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+  border: "1px solid #e5e7eb",
+  flex: 1,
+  minWidth: "240px",
+};
 
   const cardTitleStyle = {
     color: "#666",
@@ -393,6 +468,81 @@ const sectionTitle = {
     fontWeight: "bold",
     color: "#198754",
   };
+
+  const tableContainerStyle = {
+  background: "#fff",
+  borderRadius: "16px",
+  overflow: "hidden",
+  border: "1px solid #e5e7eb",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontFamily: "Arial",
+};
+
+const tableHeaderStyle = {
+  backgroundColor: "#198754",
+  color: "#fff",
+  padding: "16px",
+  fontWeight: "600",
+  textAlign: "left",
+};
+
+const tableCellStyle = {
+  padding: "18px 16px",
+  borderBottom: "1px solid #e5e7eb",
+};
+
+const primaryButton = {
+  background: "#198754",
+  color: "#fff",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "600",
+};
+
+const deleteButtonStyle = {
+  background: "#dc3545",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "600",
+  transition: "0.3s",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px 14px",
+  border: "1px solid #d1d5db",
+  borderRadius: "10px",
+  fontSize: "15px",
+  backgroundColor: "#fff",
+  boxSizing: "border-box",
+  marginBottom: "12px",
+  transition: "0.2s",
+};
+
+const textareaStyle = {
+  ...inputStyle,
+  minHeight: "100px",
+  resize: "vertical",
+};
+
+
+  const students = supervisors.filter(
+    (user) => user.role === "student"
+  );
+
+  const staffUsers = supervisors.filter(
+    (user) => user.role !== "student"
+  );
 
 return (
   <div
@@ -495,6 +645,14 @@ return (
         🍭Placements
       </div>
 
+
+      <div
+        style={menuItemStyle}
+        onClick={() => handleMenuClick("users")}
+      >
+        👥 Users
+      </div>
+
       <div
         style={menuItemStyle}
         onClick={() => handleMenuClick("finalEvaluations")}
@@ -562,6 +720,7 @@ return (
             <h3>Add Organization</h3>    
 
               <input
+                style={inputStyle}
                 type="text"
                 placeholder="Name"
                 value={orgForm.name}
@@ -570,6 +729,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type ='text'
                 placeholder="Location"
                 value={orgForm.location}
@@ -578,6 +738,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type="email"
                 placeholder="Email"
                 value={orgForm.email}
@@ -586,6 +747,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type="text"
                 placeholder="Phone"
                 value={orgForm.phone}
@@ -594,6 +756,7 @@ return (
               <br /><br />
 
               <textarea
+                style={textareaStyle}
                 placeholder="Description"
                 value={orgForm.description}
                 onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
@@ -601,6 +764,7 @@ return (
               <br /><br />
 
               <input
+                style={inputStyle}
                 type='text'
                 placeholder ='website'
                 value={orgForm.website}
@@ -608,47 +772,113 @@ return (
               />
               <br /><br />  
 
-          <button onClick ={createOrganization}>
+          <button style={primaryButton} onClick ={createOrganization}>
             Create Organization
           </button>
         </div>
       </div> 
         
 
-      <div style={sectionWrapper}>
-        <h2 style={sectionTitle}>Create User</h2>
+       <div style={sectionWrapper}>
+         <h2 style={sectionTitle}>Create Student</h2>
 
-        <div style={sectionCard}>
-          <form onSubmit={handleCreateUser}>
-              <input
-                type="text"
-                placeholder="Registration Number / Email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <br /><br />
+         <div style={sectionCard}>
+           <form onSubmit={handleCreateStudent}>
 
-              <input
-                type="email"
-                placeholder="Email (for supervisors)"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <br /><br />
+             <input
+              style={inputStyle}
+              type="text"
+              placeholder="Registration Number"
+              value={studentRegNo}
+              onChange={(e) => setStudentRegNo(e.target.value)}
+            />
 
-              <select value={role} onChange={(e) => setRole(e.target.value)}>
-                <option value="student">Student</option>
-                <option value="admin">Admin</option>
-                <option value="workplace">Workplace Supervisor</option>
-                <option value="academic">Academic Supervisor</option>
-              </select>
-              <br /><br />
+            <br /><br />
 
-            <button type="submit">Create User</button>
+            <input
+              style={inputStyle}
+              type="email"
+              placeholder="Email (Optional)"
+              value={studentEmail}
+              onChange={(e) => setStudentEmail(e.target.value)}
+            />
+
+            <br /><br />
+
+            <button style={primaryButton} type="submit">
+              Create Student
+            </button>
+
           </form>
         </div>
-      </div>  
+      </div>
+
+      <div style={sectionWrapper}>
+        <h2 style={sectionTitle}>Create Staff User</h2>
+
+        <div style={sectionCard}>
+          <form onSubmit={handleCreateStaff}>
+
+            <input
+              style={inputStyle}
+              type="email"
+              placeholder="Email"
+              value={staffEmail}
+              onChange={(e) => setStaffEmail(e.target.value)}
+            />
+
+          <br /><br />
+
+          <select
+            style={inputStyle}
+            value={staffRole}
+            onChange={(e) => setStaffRole(e.target.value)}
+          >
+            <option value="admin">Admin</option>
+            <option value="academic">
+              Academic Supervisor
+            </option>
+            <option value="workplace">
+              Workplace Supervisor
+            </option>
+          </select>
+
+          <br /><br />
+
+          {staffRole === "workplace" && (
+            <>
+              <select
+                style={inputStyle}
+                value={staffOrganization}
+                onChange={(e) =>
+                  setStaffOrganization(e.target.value)
+                }
+              >
+                <option value="">
+                  Select Organization
+                </option>
+
+                {organizations.map((org) => (
+                  <option
+                    key={org.id}
+                    value={org.id}
+                  >
+                  {org.name}
+                </option>
+              ))}
+            </select>
+
+            <br /><br />
+          </>
+        )}
+
+        <button style={primaryButton} type="submit">
+          Create Staff User
+        </button>
+
+      </form>
+    </div>
+  </div>
 
     </div>      
 
@@ -661,24 +891,25 @@ return (
   </h2>
 
   <div style={sectionCard}>
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <table style={tableStyle}>
   
 
   
     <thead>
       <tr>
-        <th>Criteria</th>
-        <th>Max Score</th>
-        <th>Score</th>
-        <th>Actions</th>
+        <th style={tableHeaderStyle}>Criteria</th>
+        <th style={tableHeaderStyle}>Max Score</th>
+        <th style={tableHeaderStyle}>Score</th>
+        <th style={tableHeaderStyle}>Actions</th>
       </tr>
     </thead>
 
     <tbody>
       {criteria.map((c) => (
         <tr key={c.id}>
-          <td>
+          <td style ={tableCellStyle}>
             <input
+              style={inputStyle}
               type="text"
               value={c.name}
               onChange={(e) => {
@@ -690,8 +921,9 @@ return (
             />
           </td>
 
-          <td>
+          <td style ={tableCellStyle}>
             <input
+              style={inputStyle}
               type="number"
               value={c.max_score}
               onChange={(e) => {
@@ -705,12 +937,12 @@ return (
             />
           </td>
 
-          <td>
+          <td style ={tableCellStyle}>
             <input type="number" placeholder="-" disabled />
           </td>
 
-          <td>
-  <button
+          <td style ={tableCellStyle}>
+  <button style={primaryButton}
     onClick={async () => {
       try {
         await API.patch(`supervision/criteria/${c.id}/`, {
@@ -730,7 +962,7 @@ return (
   >
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
-    <button
+    <button style={deleteButtonStyle}
       onClick={async () => {
         try {
           await API.delete(`supervision/criteria/${c.id}/`);
@@ -753,7 +985,7 @@ return (
 
       {/* 🔥 ADD NEW ROW */}
       <tr>
-        <td>
+        <td style={tableCellStyle}>
           <input
             type="text"
             placeholder="New Criteria"
@@ -764,8 +996,9 @@ return (
           />
         </td>
 
-        <td>
+        <td style={tableCellStyle}>
           <input
+            style={inputStyle}
             type="number"
             placeholder="Max"
             value={newCriteria.max_score}
@@ -775,10 +1008,10 @@ return (
           />
         </td>
 
-        <td>-</td>  
+        <td style={tableCellStyle}>-</td>  
 
-        <td>
-    <button
+        <td style={tableCellStyle}>
+    <button style={primaryButton}
       onClick={async () => {
         if (!newCriteria.name || !newCriteria.max_score) {
           toast.warning("Please fill all fields");
@@ -889,8 +1122,12 @@ return (
             />
             <br /><br />
 
-            <button onClick={() => saveEdit(org.id)}>Save</button>
-            <button onClick={() => setEditingOrg(null)}>Cancel</button>
+            <button style={primaryButton} onClick={() => saveEdit(org.id)}>
+              Save
+            </button>
+            <button style={primaryButton} onClick={() => setEditingOrg(null)}>
+              Cancel
+            </button>
           </>
         ) : (
           <>
@@ -901,8 +1138,10 @@ return (
             <p>{org.description}</p>
             <p>{org.website}</p>
 
-            <button onClick={() => startEdit(org)}>Edit</button>
-            <button onClick={() => deleteOrganization(org.id)}>
+            <button style={primaryButton} onClick={() => startEdit(org)}>
+              Edit
+            </button>
+            <button style={deleteButtonStyle} onClick={() => deleteOrganization(org.id)}>
               Delete
             </button>
           </>
@@ -1117,6 +1356,7 @@ return (
                 <>
                   {/* 🔧 DATE FIELDS */}
                   <input
+                    style={inputStyle}
                     type="date"
                     defaultValue={p.start_date || ""}
                     onBlur={async (e) => {
@@ -1130,6 +1370,7 @@ return (
                   <br /><br />
 
                   <input
+                    style={inputStyle}
                     type="date"
                     defaultValue={p.end_date || ""}
                     onBlur={async (e) => {
@@ -1143,120 +1384,63 @@ return (
                   <br /><br />
 
                   {/* 🔍 WORKPLACE SEARCH */}
-                  <input
-                    type="text"
-                    placeholder="Search workplace supervisor"
-                    value={selectedSupervisors[p.id]?.workplace_search || ""}
-                    onFocus={() =>
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "workplace",
-                      }))
+                  <select
+                    style={inputStyle}
+                    value={selectedSupervisors[p.id]?.workplace || ""}
+                    onChange={(e) =>
+                      handleSupervisorChange(
+                        p.id,
+                        "workplace",
+                        e.target.value
+                      )
                     }
-                    onChange={(e) => {
-                      handleSupervisorChange(p.id, "workplace_search", e.target.value);
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "workplace",
-                      }));
-                    }}
-                  />
+                  >
+                    <option value="">
+                      Select Workplace Supervisor
+                    </option>
 
-                  {showDropdown[p.id] === "workplace" && (
-                    <div style={dropdownStyle}>
-                      {workplaceSupervisors
-                        .filter((u) =>
-                          u.username
-                            .toLowerCase()
-                            .includes(
-                              (selectedSupervisors[p.id]?.workplace_search || "")
-                                .toLowerCase()
-                            )
-                        )
-                        .map((u) => (
-                          <div
-                            key={u.id}
-                            onClick={() => {
-                              handleSupervisorChange(p.id, "workplace", u.id);
-                              handleSupervisorChange(
-                                p.id,
-                                "workplace_search",
-                                u.username
-                              );
-
-                              setShowDropdown((prev) => ({
-                                ...prev,
-                                [p.id]: null,
-                              }));
-                            }}
-                            style={{ padding: "5px", cursor: "pointer" }}
-                          >
-                            {u.username}
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                    {workplaceSupervisors.map((u) => (
+                      <option
+                        key={u.id}
+                        value={u.id}
+                      >
+                        {u.username}
+                      </option>
+                    ))}
+                  </select>
 
                   <br /><br />
 
                   {/* 🔍 ACADEMIC SEARCH */}
-                  <input
-                    type="text"
-                    placeholder="Search academic supervisor"
-                    value={selectedSupervisors[p.id]?.academic_search || ""}
-                    onFocus={() =>
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "academic",
-                      }))
+                  <select
+                    style={inputStyle}
+                    value={selectedSupervisors[p.id]?.academic || ""}
+                    onChange={(e) =>
+                      handleSupervisorChange(
+                        p.id,
+                        "academic",
+                        e.target.value
+                      )
                     }
-                    onChange={(e) => {
-                      handleSupervisorChange(p.id, "academic_search", e.target.value);
-                      setShowDropdown((prev) => ({
-                        ...prev,
-                        [p.id]: "academic",
-                      }));
-                    }}
-                  />
+                  >
+                    <option value="">
+                      Select Academic Supervisor
+                    </option>
 
-                  {showDropdown[p.id] === "academic" && (
-                    <div style={dropdownStyle}>
-                      {academicSupervisors
-                        .filter((u) =>
-                          u.username
-                            .toLowerCase()
-                            .includes(
-                              (selectedSupervisors[p.id]?.academic_search || "")
-                                .toLowerCase()
-                            )
-                        )
-                        .map((u) => (
-                          <div
-                            key={u.id}
-                            onClick={() => {
-                              handleSupervisorChange(p.id, "academic", u.id);
-                              handleSupervisorChange(
-                                p.id,
-                                "academic_search",
-                                u.username
-                              );
-
-                              setShowDropdown((prev) => ({
-                                ...prev,
-                                [p.id]: null,
-                              }));
-                            }}
-                            style={{ padding: "5px", cursor: "pointer" }}
-                          >
-                            {u.username}
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                    {academicSupervisors.map((u) => (
+                      <option
+                        key={u.id}
+                        value={u.id}
+                      >
+                        {u.username}
+                      </option>
+                    ))}
+                  </select>
 
                   <br /><br />
 
                   <button
+                    style={primaryButton}
                     onClick={() =>
                       assignSupervisors(
                         p.id,
@@ -1269,6 +1453,15 @@ return (
                   </button>
                 </>
               )}
+              <br /><br />
+
+            <button
+              style={deleteButtonStyle}
+              onClick={() => deletePlacement(p.id)}
+            >
+              Delete Placement
+            </button>
+
             </div>
           );
         })
@@ -1291,34 +1484,26 @@ return (
       {finalEvaluations.length === 0 ? (
         <p>No evaluations yet</p>
       ) : (   
-        <table
-          border="1"
-          cellPadding="10"
-          style={{ marginTop: "20px", width: "100%", backgroundColor: "#f0f0f0", marginLeft: "30px",borderCollapse: "collapse" }}
-        >
-          <thead
-            style={{ 
-              backgroundColor: "#480303",
-              color: "white", 
-              fontWeight: "bold"
-          }}
-          >
+        <div style={tableContainerStyle}>
+          <table style={tableStyle}>
+
+          <thead>
             <tr>
-              <th>Student</th>
-              <th>Registration Number</th>
-              <th>Organization</th>
-              <th>Workplace Supervisor</th>
-              <th>Final Grade</th>
+              <th style={tableHeaderStyle}>Student</th>
+              <th style={tableHeaderStyle}>Reg No.</th>
+              <th style={tableHeaderStyle}>Organization</th>
+              <th style={tableHeaderStyle}>Workplace Supervisor</th>
+              <th style={tableHeaderStyle}>Final Grade</th>
             </tr>
           </thead>
           <tbody>
-            {finalEvaluations.map((ev) => (
-              <tr key={ev.id}>
-                <td>{ev.student_name}</td>
-                <td>{ev.student_registration_number}</td>
-                <td>{ev.organization_name}</td>
-                <td>{ev.supervisor_name}</td>
-                <td>
+            {finalEvaluations.map((ev, index) => (
+              <tr key={ev.id}  style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+                <td style={tableCellStyle}>{ev.student_name}</td>
+                <td style={tableCellStyle}>{ev.student_registration_number}</td>
+                <td style={tableCellStyle}>{ev.organization_name}</td>
+                <td style={tableCellStyle}>{ev.supervisor_name}</td>
+                <td style={tableCellStyle}>
                   <strong>
                     {ev.final_grade}
                   </strong>
@@ -1327,10 +1512,75 @@ return (
             ))}
           </tbody>
         </table>
+      </div>
+        
       )}
   </div>
   </>
 )}
+
+{activeView === "users" && (
+  <>
+    <h2>Students</h2>
+
+    <div style={tableContainerStyle}>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={tableHeaderStyle}>Registration Number</th>
+            <th style={tableHeaderStyle}>Action</th>
+          </tr>
+      </thead>
+
+      <tbody>
+        {students.map((user, index) => (
+          <tr key={user.id} style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+          
+            <td style={tableCellStyle}>{user.username}</td>
+
+            <td style={tableCellStyle}>
+              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <h2>Staff Users</h2>
+
+    <table style={tableStyle}>
+      <thead>
+        <tr>
+          <th style={tableHeaderStyle}>Email</th>
+          <th style={tableHeaderStyle}>Role</th>
+          <th style={tableHeaderStyle}>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {staffUsers.map((user, index) => (
+          <tr key={user.id}style={{backgroundColor : index % 2 === 0 ? "#f8f9fa" : "white",}}>
+            <td style={tableCellStyle}>{user.username}</td>
+
+            <td style={tableCellStyle}>{user.role}</td>
+
+            <td style={tableCellStyle}>
+              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    </div>
+  </>
+)}
+
+
+
    
     </div>    
   </div>
