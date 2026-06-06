@@ -129,7 +129,10 @@ class EvaluationSerializer(serializers.ModelSerializer):
     supervisor_type = serializers.CharField()
     #  ADD THIS LINE
     supervisor = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    criteria_scores = CriteriaScoreSerializer(many=True)
+    criteria_scores = CriteriaScoreSerializer(
+        many=True,
+        required=False
+    )
 
     class Meta:
         model = Evaluation
@@ -239,6 +242,25 @@ class EvaluationSerializer(serializers.ModelSerializer):
             'score',
             instance.score
         )
+
+        if instance.supervisor_type == "academic":
+
+            log_score = self.get_log_score(instance.placement)
+
+            workplace_eval = Evaluation.objects.filter(
+                placement=instance.placement,
+                supervisor_type="workplace"
+            ).first()
+
+            workplace_score = workplace_eval.score if workplace_eval else 0
+
+            instance.final_grade = (
+                workplace_score +
+                log_score +
+                instance.score
+            )
+
+            instance.is_final = True
 
         instance.save()
 

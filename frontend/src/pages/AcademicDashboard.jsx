@@ -218,6 +218,7 @@ function AcademicDashboard() {
     } catch (error) {
       console.log("FULL ERROR:", error);
       console.log("RESPONSE:", error.response);
+      toast.error(JSON.stringify(error.response?.data));
       console.log("DATA:", error.response?.data);
 
       toast.error("Failed to submit evaluation ❌");
