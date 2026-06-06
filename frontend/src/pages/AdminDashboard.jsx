@@ -243,8 +243,8 @@ function AdminDashboard() {
     toast.success("User deleted successfully");
 
   } catch (error) {
-
-    console.log(error);
+    console.log("DELETE ERROR:", error.response?.data);
+    console.log("STATUS:", error.response?.status);
 
     toast.error("Failed to delete user");
 
