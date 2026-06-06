@@ -338,6 +338,31 @@ const handleCreateStaff = async (e) => {
       toast.error("Delete failed");
     }
   };
+  const deletePlacement = async (id) => {
+
+    const confirmDelete = window.confirm(
+      "Delete this placement?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      await API.delete(`internships/placements/${id}/`);
+
+      setPlacements((prev) =>
+        prev.filter((p) => p.id !== id)
+      );
+
+      toast.success("Placement deleted successfully");
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error("Failed to delete placement");
+    }
+  };
 
   
   const updateStatus = async (id, status) => {
@@ -584,10 +609,11 @@ const pinkCard = {
 
 const tableStyle = {
   width: "100%",
-  borderCollapse: "collapse",
+  borderCollapse: "separate",
+  borderSpacing : 0,
   fontFamily: "Arial",
 };
-
+ 
 const tableHeaderStyle = {
   background:
     "linear-gradient(135deg,#198754,#157347)",
@@ -599,6 +625,8 @@ const tableHeaderStyle = {
   fontWeight: "bold",
 
   textAlign: "left",
+  fontSize: "15px",
+  letterSpacing:"0.5px",
 };
 
 const tableCellStyle = {
@@ -691,10 +719,11 @@ return (
    <div>
       <h1
         style={{
-          margin:0,
-          color: "#198754ee",
-          fontSize: "36px",
-          fontWeight:"bold"
+          background:"white",
+          padding:"25px",
+          borderRadius:"16px",
+          marginBottom:"25px",
+          boxShadow:"0 2px 8px rgba(0,0,0,0.06)",
         }}
       >
         INTERNSHIP PLACEMENT SYSTEM(ILES)
@@ -1050,7 +1079,18 @@ return (
 
     <tbody>
       {criteria.map((c) => (
-        <tr key={c.id}>
+        <tr key={c.id}
+          style ={{ 
+            backgroundColor: savedRows[c.id] ? "#d1e7dd" : "transparent" ,
+            transition: "0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = savedRows[c.id] ? "#d1e7dd" : "#f8f9fa";
+          }}    
+          onMouseLeave ={(e) => {
+            e.currentTarget.style.backgroundColor = savedRows[c.id] ? "#d1e7dd" : "transparent";
+          }}
+        >
           <td style ={tableCellStyle}>
             <input
               style={inputStyle}
@@ -1106,7 +1146,17 @@ return (
   >
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
-    <button style={deleteButtonStyle}
+    <button 
+      style={deleteButtonStyle}
+
+      onMouseEnter = {(e) => {
+        e.currentTarget.style.backgroundColor = "#701010";
+      }}
+
+      onMouseLeave = {(e) => {
+        e.currentTarget.style.backgroundColor = "#4f0909";
+      }}
+
       onClick={async () => {
         try {
           await API.delete(`supervision/criteria/${c.id}/`);
@@ -1289,7 +1339,15 @@ return (
             <button style={primaryButton} onClick={() => startEdit(org)}>
               Edit
             </button>
-            <button style={deleteButtonStyle} onClick={() => deleteOrganization(org.id)}>
+            <button  
+              style={deleteButtonStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#dc2626";
+              }}  
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#ef4444";
+              }}
+              onClick={() => deleteOrganization(org.id)}>
               Delete
             </button>
           </>
@@ -1747,6 +1805,14 @@ return (
 
             <button
               style={deleteButtonStyle}
+              
+              onMouseEnter ={(e) => {
+                e.currentTarget.style.backgroundColor = "#dc2626";
+              }}
+
+              onMouseLeave ={(e) => {
+                e.currentTarget.style.backgroundColor = "#ef4444";
+              }}  
               onClick={() => deletePlacement(p.id)}
             >
               Delete Placement
@@ -1776,19 +1842,32 @@ return (
       ) : (   
         <div style={tableContainerStyle}>
           <table style={tableStyle}>
-
-          <thead>
-            <tr>
-              <th style={tableHeaderStyle}>Student</th>
-              <th style={tableHeaderStyle}>Reg No.</th>
-              <th style={tableHeaderStyle}>Organization</th>
-              <th style={tableHeaderStyle}>Workplace Supervisor</th>
-              <th style={tableHeaderStyle}>Final Grade</th>
-            </tr>
+            <thead>
+              <tr>
+                <th style={{...tableHeaderStyle,borderTopLeftRadius:'16px',}}>Student</th>
+                <th style={tableHeaderStyle}>Reg No.</th>
+                <th style={tableHeaderStyle}>Organization</th>
+                <th style={tableHeaderStyle}>Workplace Supervisor</th>
+                <th style={{...tableHeaderStyle,borderTopRightRadius:'16px',}}>Final Grade</th>
+              </tr>
           </thead>
           <tbody>
             {finalEvaluations.map((ev, index) => (
-              <tr key={ev.id}  style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+              <tr 
+                key={ev.id} 
+                
+                style={{
+                  backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
+                  transition: "0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#eefbf3";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    index % 2 === 0 ? "#f8f9fa" : "white";    
+                }}
+              >
                 <td style={tableCellStyle}>{ev.student_name}</td>
                 <td style={tableCellStyle}>{ev.student_registration_number}</td>
                 <td style={tableCellStyle}>{ev.organization_name}</td>
@@ -1824,7 +1903,19 @@ return (
 
       <tbody>
         {students.map((user, index) => (
-          <tr key={user.id} style={{backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",}}>
+          <tr 
+          key={user.id} 
+          style={{
+            backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
+            transition: "0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#eefbf3";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = index % 2 === 0 ? "#f8f9fa" : "white";
+            }}
+          >
           
             <td style={tableCellStyle}>{user.username}</td>
 
@@ -1843,15 +1934,35 @@ return (
     <table style={tableStyle}>
       <thead>
         <tr>
-          <th style={tableHeaderStyle}>Email</th>
+          <th style={{
+            ...tableHeaderStyle,
+            borderTopLeftRadius: "16px",
+          }}>Email</th>
           <th style={tableHeaderStyle}>Role</th>
-          <th style={tableHeaderStyle}>Action</th>
+          <th style={{
+            ...tableHeaderStyle, 
+            borderTopRightRadius: "16px"}}>Action</th>
         </tr>
       </thead>
 
       <tbody>
         {staffUsers.map((user, index) => (
-          <tr key={user.id}style={{backgroundColor : index % 2 === 0 ? "#f8f9fa" : "white",}}>
+          <tr
+            key={user.id}
+            style={{
+              backgroundColor : index % 2 === 0 ? "#f8f9fa" : "white",
+              transition: "0.3s",
+            }}  
+            
+            onMouseEnter ={(e) => {
+              e.currentTarget.style.backgroundColor = "#eefbf3";
+            }}
+            
+            onMouseLeave ={(e)=> {
+              e.currentTarget.style.backgroundColor =
+                index % 2 == 0 ? "#f8f9fa" :"white";
+            }}
+          >
             <td style={tableCellStyle}>{user.username}</td>
 
             <td style={tableCellStyle}>{user.role}</td>
