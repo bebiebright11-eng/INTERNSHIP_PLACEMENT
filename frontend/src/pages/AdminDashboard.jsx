@@ -1040,11 +1040,11 @@ return (
       style={deleteButtonStyle}
 
       onMouseEnter = {(e) => {
-        e.currentTarget.style.backgroundColor = "#dc2626";
+        e.currentTarget.style.backgroundColor = "#701010";
       }}
 
       onMouseLeave = {(e) => {
-        e.currentTarget.style.backgroundColor = "#ef4444";
+        e.currentTarget.style.backgroundColor = "#4f0909";
       }}
 
       onClick={async () => {
