@@ -1991,6 +1991,7 @@ return (
                 <th style={tableHeaderStyle}>Reg No.</th>
                 <th style={tableHeaderStyle}>Organization</th>
                 <th style={tableHeaderStyle}>Workplace Supervisor</th>
+                <th style={tableHeaderStyle}>Academic Supervisor</th>
                 <th style={{...tableHeaderStyle,borderTopRightRadius:'16px',}}>Final Grade</th>
               </tr>
           </thead>
@@ -2014,7 +2015,8 @@ return (
                 <td style={tableCellStyle}>{ev.student_name}</td>
                 <td style={tableCellStyle}>{ev.student_registration_number}</td>
                 <td style={tableCellStyle}>{ev.organization_name}</td>
-                <td style={tableCellStyle}>{ev.supervisor_name}</td>
+                <td style={tableCellStyle}>{ev.workplace_supervisor_name}</td>
+                <td style={tableCellStyle}>{ev.academic_supervisor_name}</td>
                 <td style={tableCellStyle}>
                   <strong>
                     {ev.final_grade}

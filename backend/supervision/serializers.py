@@ -119,7 +119,16 @@ class EvaluationSerializer(serializers.ModelSerializer):
     #  ADD: organization name
     organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
 
-    supervisor_name = serializers.CharField(source='supervisor.username', read_only=True)
+    workplace_supervisor_name = serializers.CharField(
+        source='placement.workplace_supervisor.username',
+        read_only=True
+    )
+
+    academic_supervisor_name = serializers.CharField(
+        source='placement.academic_supervisor.username',
+        read_only=True
+    )
+
     supervisor_type_display = serializers.CharField(
     source='get_supervisor_type_display',
     read_only=True
@@ -151,7 +160,11 @@ class EvaluationSerializer(serializers.ModelSerializer):
             'student_registration_number',
             'student_name',
             'organization_name',
-            'supervisor_name'
+        
+
+            'workplace_supervisor_name',
+            'academic_supervisor_name',
+
         ]
 
     def get_student_name(self, obj):
