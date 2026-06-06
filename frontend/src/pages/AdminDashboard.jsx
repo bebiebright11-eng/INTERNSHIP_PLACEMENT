@@ -437,6 +437,7 @@ const handleCreateStaff = async (e) => {
     textAlign: "center",
     flex: "1",
     minWidth: "220px",
+
   };
 
   const dropdownStyle = {
@@ -528,6 +529,7 @@ const tableCellStyle = {
   fontSize: "15px",
   color:"#374151",
   verticalAlign:"middle",
+  backgroundColor: "#fff",
 };
 
 const primaryButton = {
