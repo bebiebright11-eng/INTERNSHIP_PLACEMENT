@@ -789,8 +789,117 @@ return (
       ) : (
         organizations.map((org) => (
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
-            <p style={{textAlign: "center"}}><strong>Name:</strong> {org.name}</p>
-            <p style={{textAlign: "center"}}><strong>Location:</strong> {org.location}</p>
+            <div
+              key={org.id}
+              style={{
+                backgroundColor: "white",
+                borderRadius: "15px",
+                padding: "20px",
+                marginBottom: "20px",
+                boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                borderLeft: "5px solid #198754",
+              }}
+            >
+              <h3 style={{ color: "#198754" }}>
+                🏢 {org.name}
+              </h3>
+
+              <p>
+                <strong>📍 Location:</strong> {org.location}
+              </p>
+
+              {org.description && (
+                <>
+                  <p>
+                    <strong>📖 About Organization</strong>
+                  </p>
+
+                  <div
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    marginBottom: "15px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {org.description}
+                </div>
+              </>
+            )}
+
+              {org.contact_email && (
+                <p>
+                  <strong>📧 Email:</strong> {org.contact_email}
+                </p>
+              )}
+
+              {org.phone && (
+                <p>
+                  <strong>📞 Phone:</strong> {org.phone}
+                </p>
+              )}
+
+              {org.website && (
+                <p>
+                  <strong>🌐 Website:</strong>{" "}
+                  <a
+                    href={org.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "#198754",
+                      fontWeight: "bold",
+                    }}
+                  >
+                  Visit Website
+                 </a>
+                </p>
+              )}
+
+              <div style={{ marginTop: "15px" }}>
+                {placement ? (
+                  <button
+                    disabled
+                    style={{
+                      backgroundColor: "gray",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    Already Placed
+                  </button>
+                ) : hasApplied(org.id) ? (
+                  <button
+                    disabled
+                    style={{
+                      backgroundColor: "#edf0f5",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    Applied ✅
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => applyToOrganization(org.id)}
+                    style={{
+                      backgroundColor: "#198754",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Apply
+                  </button>
+                )}
+              </div>
+            </div>
       
             {placement ? (
   <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>

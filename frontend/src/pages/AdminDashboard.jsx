@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
 
 function AdminDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('home');
+  const navigate = useNavigate();
   
   const [applications, setApplications] = useState([]);
   const [placements, setPlacements] = useState([]);
@@ -22,10 +24,28 @@ function AdminDashboard() {
 
   const [message, setMessage] = useState("");
 
+  const [activePlacementForm, setActivePlacementForm] = useState(null);
+
+
+  const [showConfirmedPlacements, setShowConfirmedPlacements] = useState(false);
+  const [placementSearch, setPlacementSearch] = useState("");
+
+
+  const firstName = localStorage.getItem("first_name");
+
   const handleMenuClick = (view) => {
   setActiveView(view);
   setMenuOpen(false);
 };
+  
+  const handleLogout = () => {
+  localStorage.clear();
+
+  toast.success("Logged out successfully 👋");
+
+  navigate("/");
+};
+
 
   const [orgForm, setOrgForm] = useState({
     name: "",
@@ -47,7 +67,7 @@ function AdminDashboard() {
     website: "",
   });
 
-  const [activePlacementForm, setActivePlacementForm] = useState(null);
+
 
   const [placementFormData, setPlacementFormData] = useState({
     start_date: "",
@@ -356,6 +376,28 @@ const handleCreateStaff = async (e) => {
     }
   };
 
+
+
+  const deletePlacement = async (id) => {
+  const confirmDelete = window.confirm(
+    "Delete this placement?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await API.delete(`internships/placements/${id}/`);
+
+    toast.success("Placement deleted");
+
+    fetchPlacements();
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Failed to delete placement");
+  }
+};
+
   
   const handleSupervisorChange = (placementId, type, value) => {
     setSelectedSupervisors((prev) => ({
@@ -398,6 +440,25 @@ const handleCreateStaff = async (e) => {
     }
   };
 
+  const pendingPlacements = placements.filter(
+  (p) => !p.is_fully_assigned
+);
+
+const confirmedPlacements = placements.filter(
+  (p) => p.is_fully_assigned
+);
+
+const filteredConfirmedPlacements =
+  confirmedPlacements.filter((p) =>
+    p.student_name
+      ?.toLowerCase()
+      .includes(placementSearch.toLowerCase()) ||
+
+    p.organization_name
+      ?.toLowerCase()
+      .includes(placementSearch.toLowerCase())
+  );
+
   // ---------------- LOAD DATA ON MOUNT ----------------
   useEffect(() => {
     fetchApplications();
@@ -408,16 +469,27 @@ const handleCreateStaff = async (e) => {
     fetchFinalEvaluations();
   }, []); 
 
-  const menuButtonStyle = {
-    backgroundColor: "#198754",
-    color: "white",
-    border: "none",
-    padding: "12px 18px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "15px",
-  };
+const menuButtonStyle = {
+  background: "linear-gradient(135deg,#198754,#157347)",
+  color: "white",
+  border: "none",
+
+  padding: "12px 18px",
+
+  borderRadius: "12px",
+  cursor: "pointer",
+
+  fontWeight: "600",
+  fontSize: "16px",
+
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+
+  transition: "0.3s ease",
+};
   
 
   const menuItemStyle = {
@@ -451,13 +523,18 @@ const handleCreateStaff = async (e) => {
     zIndex: 1000,
   }; 
 
-  const sectionWrapper = {
-  background: "#fff",
-  borderRadius: "18px",
+const sectionWrapper = {
+  background: "#ffffff",
+  borderRadius: "20px",
   padding: "30px",
   marginTop: "30px",
-  border: "1px solid #e5e7eb",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+
+  borderLeft: "5px solid #198754",
+
+  boxShadow:
+    "0 8px 25px rgba(0,0,0,0.08)",
+
+  transition: "0.3s",
 };
 
 const sectionCard = {
@@ -473,16 +550,36 @@ const sectionTitle = {
   textAlign: "center",
   fontWeight: "bold",
 };
-  const cardStyle = {
-  background: "#fff",
-  borderRadius: "18px",
-  padding: "25px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-  border: "1px solid #e5e7eb",
+
+
+const purpleCard = {
   flex: 1,
   minWidth: "240px",
-  transition: "0.3s ease",
-  cursor: "pointer",
+  padding: "25px",
+  borderRadius: "20px",
+  color: "white",
+  background: "linear-gradient(135deg, #6a11cb, #2575fc)",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+};
+
+const greenCard = {
+  flex: 1,
+  minWidth: "240px",
+  padding: "25px",
+  borderRadius: "20px",
+  color: "white",
+  background: "linear-gradient(135deg, #11998e, #38ef7d)",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+};
+
+const pinkCard = {
+  flex: 1,
+  minWidth: "240px",
+  padding: "25px",
+  borderRadius: "20px",
+  color: "white",
+  background: "linear-gradient(135deg, #ff4ecd, #b5179e)",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
 };
 
   const cardTitleStyle = {
@@ -498,10 +595,15 @@ const sectionTitle = {
 
   const tableContainerStyle = {
   background: "#fff",
-  borderRadius: "18px",
-  overflow: "auto",
+
+  borderRadius: "20px",
+
+  overflow: "hidden",
+
   border: "1px solid #e5e7eb",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+
+  boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+
   marginTop: "20px",
 };
 
@@ -513,54 +615,81 @@ const tableStyle = {
 };
  
 const tableHeaderStyle = {
-  backgroundColor: "#198754",
+  background:
+    "linear-gradient(135deg,#198754,#157347)",
+
   color: "#fff",
+
   padding: "18px",
+
   fontWeight: "bold",
+
   textAlign: "left",
   fontSize: "15px",
   letterSpacing:"0.5px",
 };
 
 const tableCellStyle = {
-  padding: "18px 16px",
+  padding: "18px",
+
   borderBottom: "1px solid #f1f5f9",
-  fontSize: "15px",
-  color:"#374151",
-  verticalAlign:"middle",
 };
 
 const primaryButton = {
-  background: "#198754",
+  background:
+    "linear-gradient(135deg,#198754,#157347)",
+
   color: "#fff",
+
   border: "none",
+
   padding: "12px 20px",
+
   borderRadius: "10px",
+
   cursor: "pointer",
+
   fontWeight: "600",
+
+  boxShadow:
+    "0 4px 10px rgba(25,135,84,0.25)",
 };
 
 const deleteButtonStyle = {
-  background: "#ef4444",
+  background:
+    "linear-gradient(135deg,#dc3545,#b02a37)",
+
   color: "white",
+
   border: "none",
+
   padding: "10px 16px",
+
   borderRadius: "10px",
+
   cursor: "pointer",
+
   fontWeight: "600",
-  transition: "0.3s ease",
 };
 
 const inputStyle = {
   width: "100%",
-  padding: "12px 14px",
+
+  padding: "14px",
+
   border: "1px solid #d1d5db",
-  borderRadius: "10px",
+
+  borderRadius: "12px",
+
+  background: "#fafafa",
+
   fontSize: "15px",
-  backgroundColor: "#fff",
+
+  outline: "none",
+
   boxSizing: "border-box",
+
   marginBottom: "12px",
-  transition: "0.2s",
 };
 
 const textareaStyle = {
@@ -616,23 +745,18 @@ return (
           fontWeight: "bold",
         }}
       >
-        Welcome, Admin 👋
+        Welcome,  {firstName || "Admin"}  👋
       </p>
     </div>
 
     {/* MENU */}
-    <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
+    <div ref={menuRef}style={{display: "flex",position: "relative",marginBottom: "40px",}}>
       <button
         onClick={() => setMenuOpen(!menuOpen)}
-        style={{
-          fontSize : '24px',
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-
-        }}
+        style={menuButtonStyle}
       >
-        ☰ menu
+        <span style={{ fontSize: "18px" }}>☰</span>
+        <span>Menu</span>
       </button>
 
 
@@ -695,7 +819,15 @@ return (
         🎓 Final Report
       </div>    
 
-     
+       <div
+          style={{
+            ...menuItemStyle,
+            color: "#dc3545",
+          }}
+          onClick={handleLogout}
+        >
+          🚪 Logout
+        </div>
 
       
 
@@ -706,11 +838,6 @@ return (
   
     <div>
       
-
-      
-{activeView === "home" && ( 
-
-  <> 
   <div
     style={{
       display: "flex",
@@ -719,51 +846,34 @@ return (
       flexWrap : "wrap",
     }}
   >
-   <div
-      style={cardStyle}
-      onMouseEnter ={(e) => {
-        e.currentTarget.style.transform = "translateY(-5px)";
-        e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
-      }} 
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-      }}  
-  >
-    <h3 style={cardTitleStyle}>Organizations</h3>
-    <p style={cardNumberStyle}>{organizations.length}</p>
-  </div>
+<div style={purpleCard}>
+  <div style={{ fontSize: "30px" }}>🏢</div>
+  <h3>Organizations</h3>
+  <p style={{ fontSize: "40px", fontWeight: "bold" }}>
+    {organizations.length}
+  </p>
+</div>
 
-  <div style={cardStyle}
-    onMouseEnter ={(e) => {
-      e.currentTarget.style.transform = "translateY(-5px)";
-      e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
-    }} 
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-    }}  
-  >
-    <h3 style={cardTitleStyle}>Applications</h3>
-    <p style={cardNumberStyle}>{applications.length}</p>
-  </div>
+<div style={greenCard}>
+  <div style={{ fontSize: "30px" }}>📝</div>
+  <h3>Applications</h3>
+  <p style={{ fontSize: "40px", fontWeight: "bold" }}>
+    {applications.length}
+  </p>
+</div>
 
-  <div style={cardStyle}
-    onMouseEnter ={(e) => {
-      e.currentTarget.style.transform = "translateY(-5px)";
-      e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
-    }} 
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-    }}  
-  >
-    <h3 style={cardTitleStyle}>Placements</h3>
-    <p style={cardNumberStyle}>
-      {placements.filter((p) => p.is_fully_assigned).length}
-    </p>  
-    </div>
-  </div>   
+<div style={pinkCard}>
+  <div style={{ fontSize: "30px" }}>🎓</div>
+  <h3>Placements</h3>
+  <p style={{ fontSize: "40px", fontWeight: "bold" }}>
+    {placements.filter((p) => p.is_fully_assigned).length}
+  </p>
+</div>
+  </div> 
+      
+{activeView === "home" && ( 
+
+  <>    
     <div
       style={{
         display: "flex",
@@ -1149,11 +1259,15 @@ return (
       <div
         key={org.id}
         style={{
-          border: "1px solid #ddd",
-          padding: "10px",
-          marginBottom: "10px",
-          borderRadius: "6px",
           background: "#fff",
+          padding: "20px",
+          marginBottom: "20px",
+
+          borderRadius: "16px",
+
+          borderLeft: "5px solid #198754",
+
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
         }}
       >
         {editingOrg === org.id ? (
@@ -1397,22 +1511,143 @@ return (
     >
       <h2>Placements</h2>
 
-      {placements.length === 0 ? (
-        <div
-          style={{
-            padding: "50px",
-            textAlign: "center",
-            color: "#9ca3af",
-            background: "white",
-            borderRadius: "16px",
-            marginTop: "20px",
-          }}
-        >
-          <h3>No Placements Yet 📭</h3>
-          <p>Placements will appear here once assigned.</p>
-        </div>
+      <button
+        style={{
+          ...primaryButton,
+          marginBottom: "20px",
+        }}
+        onClick={() =>
+          setShowConfirmedPlacements(
+          !showConfirmedPlacements
+        )
+      }
+    >
+      {showConfirmedPlacements
+        ? "Hide Confirmed Placements"
+        : "View Confirmed Placements"}
+      </button>
+
+
+      {showConfirmedPlacements && (
+  <div
+    style={{
+      width: "100%",
+      marginBottom: "30px",
+    }}
+  >
+    <input
+      style={{
+        ...inputStyle,
+        maxWidth: "400px",
+        marginBottom: "15px",
+      }}
+      placeholder="Search student or organization..."
+      value={placementSearch}
+      onChange={(e) =>
+        setPlacementSearch(e.target.value)
+      }
+    />
+
+    <div style={tableContainerStyle}>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={tableHeaderStyle}>
+              Student
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Organization
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Workplace Supervisor
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Academic Supervisor
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Start / End Date
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Status
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Action
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {filteredConfirmedPlacements.map(
+            (p, index) => (
+              <tr
+                key={p.id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 0
+                      ? "#f8f9fa"
+                      : "white",
+                }}
+              >
+                <td style={tableCellStyle}>
+                  {p.student_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.organization_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.workplace_supervisor_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.academic_supervisor_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.start_date} → {p.end_date}
+                </td>
+
+                <td style={tableCellStyle}>
+                  <span
+                    style={{
+                      color: "#198754",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Confirmed
+                  </span>
+                </td>
+
+                <td style={tableCellStyle}>
+                  <button
+                    style={deleteButtonStyle}
+                    onClick={() =>
+                      deletePlacement(p.id)
+                    }
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            )
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
+      {pendingPlacements.length === 0 ? (
+        <p>No placements yet</p>
       ) : (
-        placements.map((p) => {
+        pendingPlacements.map((p) => {
 
           // 🔥 FILTER SUPERVISORS (IMPORTANT — KEEP THIS)
           const workplaceSupervisors = supervisors.filter(
@@ -1430,13 +1665,22 @@ return (
               key={p.id}
               style={{
                 width: "100%",
-                maxWidth: "600px",
+                maxWidth: "700px",
+
                 margin: "0 auto 20px",
-                border: "1px solid #05072c",
-                padding: "15px",
-                borderRadius: "10px",
-                background: "#b8bfe179",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+
+                background: "#fff",
+
+                border: "1px solid #e5e7eb",
+
+                borderLeft: "5px solid #2575fc",
+
+                padding: "20px",
+
+                borderRadius: "16px",
+
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+
                 textAlign: "left",
               }}
             >
