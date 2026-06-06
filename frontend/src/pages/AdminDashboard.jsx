@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
 
 function AdminDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('home');
+  const navigate = useNavigate();
   
   const [applications, setApplications] = useState([]);
   const [placements, setPlacements] = useState([]);
@@ -35,6 +37,15 @@ function AdminDashboard() {
   setActiveView(view);
   setMenuOpen(false);
 };
+  
+  const handleLogout = () => {
+  localStorage.clear();
+
+  toast.success("Logged out successfully 👋");
+
+  navigate("/");
+};
+
 
   const [orgForm, setOrgForm] = useState({
     name: "",
@@ -779,7 +790,15 @@ return (
         🎓 Final Report
       </div>    
 
-     
+       <div
+          style={{
+            ...menuItemStyle,
+            color: "#dc3545",
+          }}
+          onClick={handleLogout}
+        >
+          🚪 Logout
+        </div>
 
       
 
