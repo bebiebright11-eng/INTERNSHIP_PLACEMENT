@@ -25,13 +25,19 @@ const handleLogout = () => {
   navigate("/");
 };
 
-  const getReviewedLogsCount = () => {
-    return logs.filter(log => log.status === "reviewed").length;
+  const getApprovedLogsCount = () => {
+    return logs.filter(
+      log => log.status === "approved"
+    ).length;
   };
 
   const getLogScore = () => {
-    const reviewed = getReviewedLogsCount();
-    return Math.min(reviewed * 2.5, 20);
+    const approved = getApprovedLogsCount();
+
+    return Math.min(
+      approved * 2.5,
+      20
+   );
   };
 
 
@@ -234,6 +240,28 @@ const handleChange = (e) => {
       );
     }
   };
+
+
+  const workplaceEvaluation = evaluations.find(
+  ev => ev.supervisor_type === "workplace"
+);
+
+const academicEvaluation = evaluations.find(
+  ev => ev.supervisor_type === "academic"
+);
+
+const workplaceScore = workplaceEvaluation?.score || 0;
+
+const logScore = getLogScore();
+
+const academicScore = academicEvaluation?.score || 0;
+
+const totalScore =
+  workplaceScore +
+  logScore +
+  academicScore;
+
+const finalPercentage = totalScore;
 
   const menuButtonStyle = {
   backgroundColor: "#198754",
@@ -658,6 +686,7 @@ return (
         <p style={{textAlign: "center"}}>No logs yet</p>
       ) : (
         logs.map((log) => (
+          
           <div key={log.id} style={logCardStyle}>
             <p style={{ fontSize: "18px", fontWeight: "bold" }}>
              📅 Week {log.week_number}
@@ -673,20 +702,30 @@ return (
   <span
     style={{
       backgroundColor:
-        log.status === "reviewed" ? "#3bad56" : "#fff3cd",
-      color:
-        log.status === "reviewed" ? "#155724" : "#856404",
+        log.status === "approved"
+          ? "#198754"
+          : log.status === "rejected"
+          ? "#dc3545"
+          : "#ffc107",
+
+      color: "white",
+
       padding: "6px 12px",
       borderRadius: "20px",
       fontWeight: "bold",
-      display: "inline-block",
     }}
   >
-    {log.status === "reviewed"
-      ? "Reviewed ✅"
-      : "Pending ⏳"}
+    {log.status}
   </span>
 </p>
+
+{log.supervisor_feedback && (
+  <p>
+    <strong>Supervisor Feedback:</strong>{" "}
+    {log.supervisor_feedback}
+  </p>
+)}
+
           </div>
         ))
       )}
@@ -895,39 +934,100 @@ return (
   {/* WORKPLACE SCORE */}
   {ev.supervisor_type === "workplace" && (
     <>
-      <h4>🔵 Workplace Evaluation</h4>
+      <h4>📋 Workplace Evaluation Breakdown</h4>
 
+      <table
+        style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        marginTop: "10px",
+      }}
+    >
+    <thead>
+      <tr style={{ backgroundColor: "#198754", color: "white" }}>
+        <th style={{ padding: "10px" }}>Criteria</th>
+        <th style={{ padding: "10px" }}>Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
       {ev.criteria_scores?.map((cs, index) => (
-        <p key={index}>
-          {cs.criteria_name || cs.criteria}: {cs.score}
-        </p>
-      ))}
+        <tr key={index}>
+          <td
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            {cs.criteria_name || cs.criteria}
+          </td>
 
-      <p><strong>Total:</strong> {ev.score} / 60</p>
+          <td
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+              textAlign: "center",
+              fontWeight: "bold",
+            }}
+          >
+            {cs.score}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <p style={{ marginTop: "15px" }}>
+    <strong>Total Workplace Score:</strong> {ev.score}/60
+  </p>
     </>
   )}
 
   {/* ACADEMIC SCORE */}
   {ev.supervisor_type === "academic" && (
     <>
-      <h4>🧑‍🏫 Academic Evaluation</h4>
+      <div
+        style={{
+          backgroundColor: "#fff3cd",
+          padding: "15px",
+          borderRadius: "10px",
+          marginTop: "15px",
+        }}
+      >
+        <h3>📊 Final Internship Result</h3>
 
-      <p><strong>Logs Score:</strong> {getLogScore()} / 20</p>
-      <p><strong>Reviewed Logs:</strong> {getReviewedLogsCount()}</p>
+      <p>
+        Workplace Evaluation:
+        <strong> {workplaceScore}/60</strong>
+      </p>
 
-      <p><strong>Academic Score:</strong> {ev.score} / 20</p>
+      <p>
+        Weekly Logs:
+        <strong> {logScore}/20</strong>
+      </p>
+
+      <p>
+        Academic Evaluation:
+        <strong> {academicScore}/20</strong>
+      </p>
 
       <hr />
 
-      <h3>🎯 Final Score: {ev.final_grade}%</h3>
+      <h2>
+        Final Grade:
+        <span style={{ color: "#198754" }}>
+          {" "}
+          {finalPercentage}%
+        </span>
+      </h2>
+     </div>
     </>
   )}
 
   <p><strong>Comments:</strong> {ev.comments}</p>
 
 </div>
-            <p style={{textAlign: "center"}}>Comments: {ev.comments}</p>
-            <p style={{textAlign: "center"}}>Final Grade: {ev.final_grade || "Not finalised"}</p>
+
           </div>
         ))
       )}
