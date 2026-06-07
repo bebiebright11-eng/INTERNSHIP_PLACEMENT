@@ -10,25 +10,18 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
 
     # show organization name
     organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
-    status = serializers.SerializerMethodField()
+    
+    attachment = serializers.FileField(
+        required=False,
+        allow_null=True
+    )
 
 
     class Meta:
         model = WeeklyLog
         fields = '__all__'
     
-    def get_status(self, obj):
-
-        placement_logs = WeeklyLog.objects.filter(
-            placement=obj.placement
-        ).order_by("submitted_at")
-
-        reviewed_ids = placement_logs[:8].values_list("id", flat=True)
-
-        if obj.id in reviewed_ids:
-            return "reviewed"
-
-        return "pending"
+    
      
     def validate(self, data):
 
@@ -185,9 +178,10 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
     def get_log_score(self, placement):
 
-        reviewed_logs = WeeklyLog.objects.filter(
-            placement=placement
-        ).order_by("submitted_at", "id")[:8]
+        approved_logs = WeeklyLog.objects.filter(
+            placement=placement,
+            status="approved"
+        )
 
         count = reviewed_logs.count()
 

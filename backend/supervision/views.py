@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from .models import WeeklyLog, Evaluation, EvaluationCriteria, CriteriaScore 
 from .serializers import WeeklyLogSerializer, EvaluationSerializer
 from .serializers import (
@@ -22,18 +23,25 @@ class WeeklyLogViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if user.role == 'student':
-            return WeeklyLog.objects.filter(placement__student=user)
-
-
-    # 🔹 ACADEMIC SUPERVISOR → only logs of their assigned students
-        if user.role == 'academic':
+    # Student
+        if user.role == "student":
             return WeeklyLog.objects.filter(
-                placement__academic_supervisor=user
+                placement__student=user
            )
 
-    #   Everyone else sees nothing
-        return WeeklyLog.objects.none()      
+    # Workplace Supervisor
+        if user.role == "workplace":
+            return WeeklyLog.objects.filter(
+                placement__workplace_supervisor=user
+            )
+
+    # Academic Supervisor
+        if user.role == "academic":
+            return WeeklyLog.objects.filter(
+                placement__academic_supervisor=user
+            )
+
+        return WeeklyLog.objects.none()
     
 
     def perform_create(self, serializer):
@@ -42,6 +50,73 @@ class WeeklyLogViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Only students can submit weekly logs")
 
         serializer.save()
+
+    def perform_update(self, serializer):
+
+        log = self.get_object()
+
+        if (
+            self.request.user.role == "student"
+            and log.status == "approved"
+        ):
+            raise PermissionDenied(
+                "Approved logs cannot be edited."
+            )
+
+        serializer.save()
+    
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+
+        log = self.get_object()
+
+        if request.user.role != "workplace":
+            raise PermissionDenied(
+               "Only workplace supervisors can approve logs."
+            )
+        
+        if log.placement.workplace_supervisor != request.user:
+           raise PermissionDenied(
+               "You are not assigned to this student."
+        )
+
+        log.status = "approved"
+        log.save()
+
+        return Response({
+            "message": "Weekly log approved."
+        })
+        
+
+    
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+
+        log = self.get_object()
+
+        if request.user.role != "workplace":
+            raise PermissionDenied(
+                "Only workplace supervisors can reject logs."
+            )
+        
+        if log.placement.workplace_supervisor != request.user:
+           raise PermissionDenied(
+               "You are not assigned to this student."
+        )
+
+        feedback = request.data.get(
+            "supervisor_feedback",
+            ""
+        )
+
+        log.status = "rejected"
+        log.supervisor_feedback = feedback
+
+        log.save()
+
+        return Response({
+            "message": "Weekly log rejected."
+        })
 
 class EvaluationViewSet(viewsets.ModelViewSet):
     queryset = Evaluation.objects.all()
