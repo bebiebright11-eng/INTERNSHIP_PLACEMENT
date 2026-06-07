@@ -19,6 +19,7 @@ function StudentDashboard() {
   const navigate = useNavigate();
 
 
+
 const handleLogout = () => {
   localStorage.clear();
   toast.success("Logged out successfully 👋");
@@ -57,6 +58,7 @@ const handleLogout = () => {
     tasks: "",
     challenges: "",
     attendance_days: 5,
+    attachment: null,
   });
 
 
@@ -208,27 +210,45 @@ const handleChange = (e) => {
   });
 };
 
+const handleFileChange = (e) => {
+  setFormData({
+    ...formData,
+    attachment: e.target.files[0],
+  });
+};
+
   const submitLog = async (e) => {
     e.preventDefault();
     try {
+      const data = new FormData();
+
+      data.append("week_number", formData.week_number);
+      data.append("tasks", formData.tasks);
+      data.append("challenges", formData.challenges);
+      data.append("attendance_days", formData.attendance_days);
+      data.append("placement", placement?.id);
+
+      if (formData.attachment) {
+        data.append("attachment", formData.attachment);
+      }
+
       await API.post(
         "supervision/weeklylogs/",
-        {
-          ...formData,
-          placement: placement?.id,
+        data,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      }
+    );
       toast.success("Weekly log submitted successfully ✅");
       setFormData({
         week_number: "",
         tasks: "",
         challenges: "",
         attendance_days: 5,
+        attachment: null,
       });
       fetchLogs();
     } catch (error) {
@@ -664,6 +684,16 @@ return (
           style={inputStyle}
         />
         <br /><br />
+
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+          style={inputStyle}
+        />
+
+        <br /><br />
+
         <button
   type="submit"
   disabled={!placement}
