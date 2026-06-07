@@ -551,6 +551,15 @@ return (
              
             <p style={{textAlign: "center"}}><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
             <p style={{textAlign: "center"}}><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
+            <p style={{ textAlign: "center" }}>
+              <strong>Workplace Supervisor:</strong>{" "}
+              {placement.workplace_supervisor_name || "Not Assigned"}
+            </p>
+
+            <p style={{ textAlign: "center" }}>
+              <strong>Academic Supervisor:</strong>{" "}
+              {placement.academic_supervisor_name || "Not Assigned"}
+            </p>
           </>
         ) : (
           <p style={{textAlign: "center"}}>You have not been placed yet.</p>

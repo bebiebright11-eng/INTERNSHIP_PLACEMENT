@@ -119,15 +119,22 @@ class EvaluationSerializer(serializers.ModelSerializer):
     #  ADD: organization name
     organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
 
+    workplace_supervisor_name = serializers.SerializerMethodField()
+    academic_supervisor_name = serializers.SerializerMethodField()
+    
     workplace_supervisor_name = serializers.CharField(
-        source='placement.workplace_supervisor.username',
+        source='placement.workplace_supervisor.get_full_name',
         read_only=True
     )
 
     academic_supervisor_name = serializers.CharField(
-        source='placement.academic_supervisor.username',
+        source='placement.academic_supervisor.get_full_name',
         read_only=True
     )
+
+
+
+
 
     supervisor_type_display = serializers.CharField(
     source='get_supervisor_type_display',
