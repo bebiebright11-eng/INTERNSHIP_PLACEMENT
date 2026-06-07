@@ -240,14 +240,16 @@ const dropdownItemStyle = {
   backgroundColor: "#f8f9fa",
 };
 
-const cardStyle = {
-  backgroundColor: "white",
-  borderRadius: "15px",
-  padding: "20px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+const summaryCardStyle = (gradient) => ({
+  background: gradient,
+  borderRadius: "20px",
+  padding: "25px",
+  color: "white",
   minWidth: "220px",
   flex: "1",
-};
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+  transition: "transform 0.2s ease",
+});
 
 const cardTitleStyle = {
   color: "#666",
@@ -305,6 +307,15 @@ const logCardStyle = {
   padding: "20px",
   marginBottom: "20px",
   boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+  borderLeft: "6px solid #198754",
+};
+
+const evaluationCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "25px",
+  marginBottom: "20px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
   borderLeft: "6px solid #198754",
 };
 
@@ -453,37 +464,37 @@ return (
   flexWrap: "wrap",
 }}>
   
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {logs.length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #4e54c8, #3b82f6)")}>
+  <h4>📘 Logs</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {logs.length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #11998e, #38ef7d)")}>
+  <h4>📝 Applications</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {applications.length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.filter(a => a.status === "approved").length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #ff9966, #ff5e62)")}>
+  <h4>✅ Approved</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {applications.filter(a => a.status === "approved").length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
-    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
-      {
-        evaluations.filter(
-          ev => ev.supervisor_type === "academic"
-       ).length
-      }
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #c94bff, #8f44fd)")}>
+  <h4>📊 Evaluations</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {
+      evaluations.filter(
+        ev => ev.supervisor_type === "academic"
+      ).length
+    }
+  </p>
+</div>
   </div>
 
 
@@ -817,19 +828,28 @@ return (
         <p style={{textAlign: "center"}}>No evaluations yet</p>
       ) : (
         evaluations.map((ev) => (
-          <div key={ev.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
+          <div key={ev.id} style={evaluationCardStyle}>
             <p style={{textAlign: "center"}}>Supervisor: {ev.supervisor_name} ({ev.supervisor_type})</p>
-            <div key={ev.id} style={{
-  border: "1px solid #4caf50",
-  margin: "15px",
-  padding: "15px",
-  borderRadius: "10px",
-  backgroundColor: "#f9fff9"
-}}>
+            <div
+              style={{
+                backgroundColor: "#f8f9fa",
+                padding: "15px",
+                borderRadius: "10px",
+                marginTop: "10px"
+              }}
+            >               
+  <h3
+    style={{
+      color: "#198754",
+      marginBottom: "15px",
+      textAlign: "center"
+    }}
+  >
+    {ev.supervisor_type === "workplace"
+      ? "🏢 Workplace Evaluation"
+      : "🎓 Academic Evaluation"}
+  </h3>
 
-  <p style={{textAlign: "center"}}>
-    Supervisor: {ev.supervisor_name} ({ev.supervisor_type})
-  </p>
 
   {/* WORKPLACE SCORE */}
   {ev.supervisor_type === "workplace" && (
