@@ -133,6 +133,34 @@ const handleLogout = () => {
     }
   };
 
+  const deleteApplication = async (applicationId) => {
+
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this application?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await API.delete(
+      `internships/applications/${applicationId}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    toast.success("Application deleted successfully");
+
+    fetchApplications();
+
+  } catch (error) {
+    console.log(error.response?.data);
+    toast.error("Failed to delete application");
+  }
+};
+
   const hasApplied = (orgId) => {
   return applications.some(app => app.organization === orgId);
 };
@@ -433,16 +461,6 @@ return (
           }}
         >
           Evaluations
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActiveView("logs");
-            setMenuOpen(false);
-          }}
-        >
-          Weekly Logs
         </div>
 
         <div
@@ -763,6 +781,7 @@ return (
               >
                 Status
               </th>
+              {!placement && <th>Action</th>}
             </tr>
           </thead>
 
@@ -809,6 +828,28 @@ return (
                   >
                     {app.status}
                   </span>
+                </td>
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {!placement && (
+                    <button
+                      onClick={() => deleteApplication(app.id)}
+                      style={{
+                        backgroundColor: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
