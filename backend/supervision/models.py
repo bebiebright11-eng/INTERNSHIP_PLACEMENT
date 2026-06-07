@@ -9,8 +9,8 @@ User = settings.AUTH_USER_MODEL
 class WeeklyLog(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending'),
-        ('submitted','Submitted'),
-        ('reviewed','Reviewed')
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
     )
 
     placement = models.ForeignKey(Placement, on_delete=models.CASCADE)

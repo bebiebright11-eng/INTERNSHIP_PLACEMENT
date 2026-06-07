@@ -55,13 +55,21 @@ class WeeklyLogViewSet(viewsets.ModelViewSet):
 
         log = self.get_object()
 
-        if (
-            self.request.user.role == "student"
-            and log.status == "approved"
-        ):
-            raise PermissionDenied(
-                "Approved logs cannot be edited."
-            )
+        if self.request.user.role == "student":
+
+            if log.placement.student != self.request.user:
+                raise PermissionDenied(
+                   "You cannot edit another student's log."
+                )
+
+            if log.status == "approved":
+                raise PermissionDenied(
+                   "Approved logs cannot be edited."
+                )
+
+            if log.status == "rejected":
+                serializer.save(status="pending")
+                return
 
         serializer.save()
     

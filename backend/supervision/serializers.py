@@ -183,7 +183,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
             status="approved"
         )
 
-        count = reviewed_logs.count()
+        count = approved_logs.count()
 
         score = count * 2.5
 
