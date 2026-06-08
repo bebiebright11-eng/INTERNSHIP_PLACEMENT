@@ -35,6 +35,14 @@ function AdminDashboard() {
 
   const firstName = localStorage.getItem("first_name");
 
+  const [showModal, setShowModal] = useState(false);
+
+  const [modalConfig, setModalConfig] = useState({
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
   const handleMenuClick = (view) => {
   setActiveView(view);
   setMenuOpen(false);
@@ -292,12 +300,6 @@ const handleCreateStaff = async (e) => {
 
   const deleteUser = async (id) => {
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this user?"
-  );
-
-  if (!confirmDelete) return;
-
   try {
 
     await API.delete(`accounts/users/${id}/`);
@@ -337,30 +339,30 @@ const handleCreateStaff = async (e) => {
     }
   };
 
-  const deleteOrganization = async (id) => {
-    const confirmDelete = window.confirm("Delete this organization?");
-    if (!confirmDelete) return;
+const deleteOrganization = async (id) => {
 
-    try {
-      await API.delete(`internships/organizations/${id}/`);
+  try {
 
-      setOrganizations((prev) =>
-        prev.filter((org) => org.id !== id)
-      );
+    await API.delete(`internships/organizations/${id}/`);
 
-      toast.success("Organization deleted!");
-    } catch (err) {
-      console.log(err);
-      toast.error("Delete failed");
-    }
-  };
+    setOrganizations((prev) =>
+      prev.filter((org) => org.id !== id)
+    );
+
+    toast.success("Organization deleted successfully");
+
+  } catch (error) {
+
+    console.log(error);
+
+    toast.error(
+      error.response?.data?.error ||
+      "Failed to delete organization"
+    );
+  }
+};
 
 const deletePlacement = async (id) => {
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this placement?"
-  );
-
-  if (!confirmDelete) return;
 
   try {
     await API.delete(`internships/placements/${id}/`);
@@ -374,6 +376,22 @@ const deletePlacement = async (id) => {
   } catch (error) {
     console.log(error);
     toast.error("Failed to delete placement");
+  }
+};
+
+const deleteCriteria = async (id) => {
+  try {
+    await API.delete(`supervision/criteria/${id}/`);
+
+    setCriteria((prev) =>
+      prev.filter((item) => item.id !== id)
+    );
+
+    toast.success("Criteria deleted successfully");
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Delete failed");
   }
 };
 
@@ -449,6 +467,21 @@ const filteredConfirmedPlacements =
       ?.toLowerCase()
       .includes(placementSearch.toLowerCase())
   );
+
+
+  const openConfirmationModal = (
+    title,
+    message,
+    onConfirm
+  ) => {
+    setModalConfig({
+      title,
+      message,
+      onConfirm,
+    });
+
+  setShowModal(true);
+};
 
   // ---------------- LOAD DATA ON MOUNT ----------------
   useEffect(() => {
@@ -1137,41 +1170,24 @@ return (
   >
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
-    <button 
+    <button
       style={deleteButtonStyle}
-
-      onMouseEnter = {(e) => {
+      onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = "#701010";
       }}
-
-      onMouseLeave = {(e) => {
+      onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = "#4f0909";
       }}
-
-      onClick={async () => {
-
-        const confirmDelete = window.confirm(
-          "Are you sure you want to delete this criteria?"
-        );
-
-        if (!confirmDelete) return;
-
-        try {
-        await API.delete(`supervision/criteria/${c.id}/`);
-
-        setCriteria((prev) =>
-          prev.filter((item) => item.id !== c.id)
-        );
-
-        toast.success("Criteria deleted successfully");
-
-      } catch {
-        toast.error("Delete failed");
-      }
-    }}
-  >
-   Delete
-  </button>
+      onClick={() =>
+        openConfirmationModal(
+          "Delete Criteria",
+          "Are you sure you want to delete this criteria?",
+          () => deleteCriteria(c.id)
+        )
+     }
+   >
+    Delete
+   </button>
 
 
           </td>
@@ -1348,7 +1364,14 @@ return (
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = "#ef4444";
               }}
-              onClick={() => deleteOrganization(org.id)}>
+              onClick={() =>
+                openConfirmationModal(
+                  "Delete Organization",
+                  "Are you sure you want to delete this organization?",
+                  () => deleteOrganization(org.id)
+               )
+              }
+              >
               Delete
             </button>
           </>
@@ -1772,7 +1795,11 @@ return (
                   <button
                     style={deleteButtonStyle}
                     onClick={() =>
-                      deletePlacement(p.id)
+                      openConfirmationModal(
+                        "Delete Placement",
+                        "Are you sure you want to delete this placement?",
+                        () => deletePlacement(p.id)
+                      )
                     }
                   >
                     Delete
@@ -1956,7 +1983,13 @@ return (
               onMouseLeave ={(e) => {
                 e.currentTarget.style.backgroundColor = "#ef4444";
               }}  
-              onClick={() => deletePlacement(p.id)}
+              onClick={() =>
+                openConfirmationModal(
+                  "Delete Placement",
+                  "Are you sure you want to delete this placement?",
+                  () => deletePlacement(p.id)
+                )
+              }
             >
               Delete Placement
             </button>
@@ -2065,8 +2098,17 @@ return (
             <td style={tableCellStyle}>{user.username}</td>
 
             <td style={tableCellStyle}>
-              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
-                Delete
+              <button
+                style={deleteButtonStyle}
+                onClick={() =>
+                  openConfirmationModal(
+                    "Delete User",
+                    "Are you sure you want to delete this user?",
+                    () => deleteUser(user.id)
+                  )
+                }
+              >
+               Delete
               </button>
             </td>
           </tr>
@@ -2113,7 +2155,16 @@ return (
             <td style={tableCellStyle}>{user.role}</td>
 
             <td style={tableCellStyle}>
-              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
+              <button
+                style={deleteButtonStyle}
+                onClick={() =>
+                  openConfirmationModal(
+                    "Delete User",
+                    "Are you sure you want to delete this user?",
+                    () => deleteUser(user.id)
+                  )
+                }
+              >
                 Delete
               </button>
             </td>
@@ -2125,10 +2176,84 @@ return (
   </>
 )}
 
+    </div> 
+  {showModal && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.5)",
+
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        background: "white",
+        padding: "30px",
+        borderRadius: "20px",
+        width: "400px",
+        textAlign: "center",
+
+        boxShadow:
+          "0 10px 30px rgba(0,0,0,0.2)",
+      }}
+    >
+      <h2
+        style={{
+          color: "#198754",
+          marginBottom: "15px",
+        }}
+      >
+        {modalConfig.title}
+      </h2>
+
+      <p
+        style={{
+          marginBottom: "25px",
+        }}
+      >
+        {modalConfig.message}
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "15px",
+        }}
+      >
+        <button
+          style={deleteButtonStyle}
+          onClick={() => {
+            modalConfig.onConfirm();
+            setShowModal(false);
+          }}
+        >
+          Delete
+        </button>
+
+        <button
+          style={primaryButton}
+          onClick={() =>
+            setShowModal(false)
+          }
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 
-   
-    </div>    
   </div>
 );
 }

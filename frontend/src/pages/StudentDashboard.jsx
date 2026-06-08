@@ -19,19 +19,26 @@ function StudentDashboard() {
   const navigate = useNavigate();
 
 
+
 const handleLogout = () => {
   localStorage.clear();
   toast.success("Logged out successfully 👋");
   navigate("/");
 };
 
-  const getReviewedLogsCount = () => {
-    return logs.filter(log => log.status === "reviewed").length;
+  const getApprovedLogsCount = () => {
+    return logs.filter(
+      log => log.status === "approved"
+    ).length;
   };
 
   const getLogScore = () => {
-    const reviewed = getReviewedLogsCount();
-    return Math.min(reviewed * 2.5, 20);
+    const approved = getApprovedLogsCount();
+
+    return Math.min(
+      approved * 2.5,
+      20
+   );
   };
 
 
@@ -51,6 +58,7 @@ const handleLogout = () => {
     tasks: "",
     challenges: "",
     attendance_days: 5,
+    attachment: null,
   });
 
 
@@ -133,6 +141,34 @@ const handleLogout = () => {
     }
   };
 
+  const deleteApplication = async (applicationId) => {
+
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this application?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await API.delete(
+      `internships/applications/${applicationId}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    toast.success("Application deleted successfully");
+
+    fetchApplications();
+
+  } catch (error) {
+    console.log(error.response?.data);
+    toast.error("Failed to delete application");
+  }
+};
+
   const hasApplied = (orgId) => {
   return applications.some(app => app.organization === orgId);
 };
@@ -174,27 +210,45 @@ const handleChange = (e) => {
   });
 };
 
+const handleFileChange = (e) => {
+  setFormData({
+    ...formData,
+    attachment: e.target.files[0],
+  });
+};
+
   const submitLog = async (e) => {
     e.preventDefault();
     try {
+      const data = new FormData();
+
+      data.append("week_number", formData.week_number);
+      data.append("tasks", formData.tasks);
+      data.append("challenges", formData.challenges);
+      data.append("attendance_days", formData.attendance_days);
+      data.append("placement", placement?.id);
+
+      if (formData.attachment) {
+        data.append("attachment", formData.attachment);
+      }
+
       await API.post(
         "supervision/weeklylogs/",
-        {
-          ...formData,
-          placement: placement?.id,
+        data,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      }
+    );
       toast.success("Weekly log submitted successfully ✅");
       setFormData({
         week_number: "",
         tasks: "",
         challenges: "",
         attendance_days: 5,
+        attachment: null,
       });
       fetchLogs();
     } catch (error) {
@@ -206,6 +260,28 @@ const handleChange = (e) => {
       );
     }
   };
+
+
+  const workplaceEvaluation = evaluations.find(
+  ev => ev.supervisor_type === "workplace"
+);
+
+const academicEvaluation = evaluations.find(
+  ev => ev.supervisor_type === "academic"
+);
+
+const workplaceScore = workplaceEvaluation?.score || 0;
+
+const logScore = getLogScore();
+
+const academicScore = academicEvaluation?.score || 0;
+
+const totalScore =
+  workplaceScore +
+  logScore +
+  academicScore;
+
+const finalPercentage = totalScore;
 
   const menuButtonStyle = {
   backgroundColor: "#198754",
@@ -240,14 +316,16 @@ const dropdownItemStyle = {
   backgroundColor: "#f8f9fa",
 };
 
-const cardStyle = {
-  backgroundColor: "white",
-  borderRadius: "15px",
-  padding: "20px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+const summaryCardStyle = (gradient) => ({
+  background: gradient,
+  borderRadius: "20px",
+  padding: "25px",
+  color: "white",
   minWidth: "220px",
   flex: "1",
-};
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+  transition: "transform 0.2s ease",
+});
 
 const cardTitleStyle = {
   color: "#666",
@@ -305,6 +383,15 @@ const logCardStyle = {
   padding: "20px",
   marginBottom: "20px",
   boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+  borderLeft: "6px solid #198754",
+};
+
+const evaluationCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "25px",
+  marginBottom: "20px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
   borderLeft: "6px solid #198754",
 };
 
@@ -426,16 +513,6 @@ return (
 
         <div
           style={dropdownItemStyle}
-          onClick={() => {
-            setActiveView("logs");
-            setMenuOpen(false);
-          }}
-        >
-          Weekly Logs
-        </div>
-
-        <div
-          style={dropdownItemStyle}
           onClick={handleLogout}
         >
           Logout
@@ -453,37 +530,37 @@ return (
   flexWrap: "wrap",
 }}>
   
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {logs.length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #4e54c8, #3b82f6)")}>
+  <h4>📘 Logs</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {logs.length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #11998e, #38ef7d)")}>
+  <h4>📝 Applications</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {applications.length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.filter(a => a.status === "approved").length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #ff9966, #ff5e62)")}>
+  <h4>✅ Approved</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {applications.filter(a => a.status === "approved").length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
-    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
-      {
-        evaluations.filter(
-          ev => ev.supervisor_type === "academic"
-       ).length
-      }
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #c94bff, #8f44fd)")}>
+  <h4>📊 Evaluations</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {
+      evaluations.filter(
+        ev => ev.supervisor_type === "academic"
+      ).length
+    }
+  </p>
+</div>
   </div>
 
 
@@ -551,6 +628,15 @@ return (
              
             <p style={{textAlign: "center"}}><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
             <p style={{textAlign: "center"}}><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
+            <p style={{ textAlign: "center" }}>
+              <strong>Workplace Supervisor:</strong>{" "}
+              {placement.workplace_supervisor_name || "Not Assigned"}
+            </p>
+
+            <p style={{ textAlign: "center" }}>
+              <strong>Academic Supervisor:</strong>{" "}
+              {placement.academic_supervisor_name || "Not Assigned"}
+            </p>
           </>
         ) : (
           <p style={{textAlign: "center"}}>You have not been placed yet.</p>
@@ -598,6 +684,16 @@ return (
           style={inputStyle}
         />
         <br /><br />
+
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+          style={inputStyle}
+        />
+
+        <br /><br />
+
         <button
   type="submit"
   disabled={!placement}
@@ -620,6 +716,7 @@ return (
         <p style={{textAlign: "center"}}>No logs yet</p>
       ) : (
         logs.map((log) => (
+          
           <div key={log.id} style={logCardStyle}>
             <p style={{ fontSize: "18px", fontWeight: "bold" }}>
              📅 Week {log.week_number}
@@ -635,20 +732,30 @@ return (
   <span
     style={{
       backgroundColor:
-        log.status === "reviewed" ? "#3bad56" : "#fff3cd",
-      color:
-        log.status === "reviewed" ? "#155724" : "#856404",
+        log.status === "approved"
+          ? "#198754"
+          : log.status === "rejected"
+          ? "#dc3545"
+          : "#ffc107",
+
+      color: "white",
+
       padding: "6px 12px",
       borderRadius: "20px",
       fontWeight: "bold",
-      display: "inline-block",
     }}
   >
-    {log.status === "reviewed"
-      ? "Reviewed ✅"
-      : "Pending ⏳"}
+    {log.status}
   </span>
 </p>
+
+{log.supervisor_feedback && (
+  <p>
+    <strong>Supervisor Feedback:</strong>{" "}
+    {log.supervisor_feedback}
+  </p>
+)}
+
           </div>
         ))
       )}
@@ -743,6 +850,7 @@ return (
               >
                 Status
               </th>
+              {!placement && <th>Action</th>}
             </tr>
           </thead>
 
@@ -790,6 +898,28 @@ return (
                     {app.status}
                   </span>
                 </td>
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {!placement && (
+                    <button
+                      onClick={() => deleteApplication(app.id)}
+                      style={{
+                        backgroundColor: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -808,56 +938,126 @@ return (
         <p style={{textAlign: "center"}}>No evaluations yet</p>
       ) : (
         evaluations.map((ev) => (
-          <div key={ev.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
+          <div key={ev.id} style={evaluationCardStyle}>
             <p style={{textAlign: "center"}}>Supervisor: {ev.supervisor_name} ({ev.supervisor_type})</p>
-            <div key={ev.id} style={{
-  border: "1px solid #4caf50",
-  margin: "15px",
-  padding: "15px",
-  borderRadius: "10px",
-  backgroundColor: "#f9fff9"
-}}>
+            <div
+              style={{
+                backgroundColor: "#f8f9fa",
+                padding: "15px",
+                borderRadius: "10px",
+                marginTop: "10px"
+              }}
+            >               
+  <h3
+    style={{
+      color: "#198754",
+      marginBottom: "15px",
+      textAlign: "center"
+    }}
+  >
+    {ev.supervisor_type === "workplace"
+      ? "🏢 Workplace Evaluation"
+      : "🎓 Academic Evaluation"}
+  </h3>
 
-  <p style={{textAlign: "center"}}>
-    Supervisor: {ev.supervisor_name} ({ev.supervisor_type})
-  </p>
 
   {/* WORKPLACE SCORE */}
   {ev.supervisor_type === "workplace" && (
     <>
-      <h4>🔵 Workplace Evaluation</h4>
+      <h4>📋 Workplace Evaluation Breakdown</h4>
 
+      <table
+        style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        marginTop: "10px",
+      }}
+    >
+    <thead>
+      <tr style={{ backgroundColor: "#198754", color: "white" }}>
+        <th style={{ padding: "10px" }}>Criteria</th>
+        <th style={{ padding: "10px" }}>Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
       {ev.criteria_scores?.map((cs, index) => (
-        <p key={index}>
-          {cs.criteria_name || cs.criteria}: {cs.score}
-        </p>
-      ))}
+        <tr key={index}>
+          <td
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            {cs.criteria_name || cs.criteria}
+          </td>
 
-      <p><strong>Total:</strong> {ev.score} / 60</p>
+          <td
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+              textAlign: "center",
+              fontWeight: "bold",
+            }}
+          >
+            {cs.score}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <p style={{ marginTop: "15px" }}>
+    <strong>Total Workplace Score:</strong> {ev.score}/60
+  </p>
     </>
   )}
 
   {/* ACADEMIC SCORE */}
   {ev.supervisor_type === "academic" && (
     <>
-      <h4>🧑‍🏫 Academic Evaluation</h4>
+      <div
+        style={{
+          backgroundColor: "#fff3cd",
+          padding: "15px",
+          borderRadius: "10px",
+          marginTop: "15px",
+        }}
+      >
+        <h3>📊 Final Internship Result</h3>
 
-      <p><strong>Logs Score:</strong> {getLogScore()} / 20</p>
-      <p><strong>Reviewed Logs:</strong> {getReviewedLogsCount()}</p>
+      <p>
+        Workplace Evaluation:
+        <strong> {workplaceScore}/60</strong>
+      </p>
 
-      <p><strong>Academic Score:</strong> {ev.score} / 20</p>
+      <p>
+        Weekly Logs:
+        <strong> {logScore}/20</strong>
+      </p>
+
+      <p>
+        Academic Evaluation:
+        <strong> {academicScore}/20</strong>
+      </p>
 
       <hr />
 
-      <h3>🎯 Final Score: {ev.final_grade}%</h3>
+      <h2>
+        Final Grade:
+        <span style={{ color: "#198754" }}>
+          {" "}
+          {finalPercentage}%
+        </span>
+      </h2>
+     </div>
     </>
   )}
 
   <p><strong>Comments:</strong> {ev.comments}</p>
 
 </div>
-            <p style={{textAlign: "center"}}>Comments: {ev.comments}</p>
-            <p style={{textAlign: "center"}}>Final Grade: {ev.final_grade || "Not finalised"}</p>
+
           </div>
         ))
       )}
