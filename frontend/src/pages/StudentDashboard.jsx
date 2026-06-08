@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
 
 function StudentDashboard() {
   // Adding a menu
+  const formRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState("home");
 
@@ -13,6 +14,8 @@ function StudentDashboard() {
   const [evaluations, setEvaluations] = useState([]);
   const [organizations, setOrganizations] = useState([]);
   const [notification, setNotification] = useState(null);
+
+  const [editingLog, setEditingLog] = useState(null);
   // NEW: Store student's placement
   const [placement, setPlacement] = useState(null);
   const firstName = localStorage.getItem("first_name");
@@ -60,6 +63,28 @@ const handleLogout = () => {
     attendance_days: 5,
     attachment: null,
   });
+
+
+const handleEdit = (log) => {
+  console.log("EDIT CLICKED:", log);
+
+  setEditingLog(log);
+
+  setFormData({
+    week_number: log.week_number,
+    tasks: log.tasks,
+    challenges: log.challenges,
+    attendance_days: log.attendance_days,
+    attachment: null,
+  });
+
+  setTimeout(() => {
+    formRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, 100);
+};
 
 
   useEffect(() => {
@@ -232,17 +257,39 @@ const handleFileChange = (e) => {
         data.append("attachment", formData.attachment);
       }
 
-      await API.post(
-        "supervision/weeklylogs/",
-        data,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
-        },
+      if (editingLog) {
+
+        await API.patch(
+          `supervision/weeklylogs/${editingLog.id}/`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+      } else {
+
+        await API.post(
+          "supervision/weeklylogs/",
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
       }
-    );
-      toast.success("Weekly log submitted successfully ✅");
+      toast.success(
+        editingLog
+          ? "Weekly log updated successfully ✅"
+          : "Weekly log submitted successfully ✅"
+      );
+
       setFormData({
         week_number: "",
         tasks: "",
@@ -250,6 +297,9 @@ const handleFileChange = (e) => {
         attendance_days: 5,
         attachment: null,
       });
+
+      setEditingLog(null);
+
       fetchLogs();
     } catch (error) {
        console.log(error.response?.data);
@@ -646,8 +696,12 @@ return (
       <hr />
 
       {/* WEEKLY LOGS FORM */}
-      <h2 style={{textAlign: "center"}}>Add Weekly Log</h2>
-      <div style={sectionCardStyle}>
+      <h2 style={{ textAlign: "center" }}>
+        {editingLog
+          ? `Edit Week ${editingLog.week_number} Log`
+          : "Add Weekly Log"}
+      </h2>
+      <div ref={formRef} style={sectionCardStyle}>
       <form onSubmit={submitLog} style={{ textAlign: "center" }}>
         <input
           type="number"
@@ -692,6 +746,48 @@ return (
           style={inputStyle}
         />
 
+        {editingLog && editingLog.attachment && (
+          <div
+            style={{
+              marginTop: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <strong>📄 Current PDF:</strong>{" "}
+            <a
+              href={editingLog.attachment}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: "#198754",
+                fontWeight: "bold",
+              }}
+            >
+              View Current PDF
+            </a>
+          </div>
+        )}
+
+        {editingLog && (
+          <div
+            style={{
+              backgroundColor: "#fff3cd",
+              border: "2px solid #ffc107",
+              color: "#856404",
+              padding: "12px",
+              borderRadius: "10px",
+              marginBottom: "15px",
+              fontWeight: "bold",
+              fontSize: "16px",
+              textAlign: "center",
+            }}
+          >
+            ⚠️ Leave the file field empty to keep the current PDF.
+            <br />
+            Upload a new PDF only if you want to replace it.
+          </div>
+        )}
+
         <br /><br />
 
         <button
@@ -703,7 +799,7 @@ return (
     cursor: !placement ? "not-allowed" : "pointer",
   }}
 >
-          Submit Log
+          {editingLog ? "Update Log" : "Submit Log"}
         </button>
       </form>
       </div>
@@ -754,6 +850,23 @@ return (
     <strong>Supervisor Feedback:</strong>{" "}
     {log.supervisor_feedback}
   </p>
+)}
+
+{log.status === "rejected" && (
+  <button
+    onClick={() => handleEdit(log)}
+    style={{
+      backgroundColor: "#0d6efd",
+      color: "white",
+      border: "none",
+      padding: "8px 15px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      marginTop: "10px",
+    }}
+  >
+    Edit & Resubmit
+  </button>
 )}
 
           </div>

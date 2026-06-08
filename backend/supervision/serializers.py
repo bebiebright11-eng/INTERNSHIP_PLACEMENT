@@ -20,6 +20,18 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeeklyLog
         fields = '__all__'
+
+
+    def update(self, instance, validated_data):
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.status = "pending"
+
+        instance.save()
+
+        return instance
     
     
      
@@ -29,7 +41,13 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
         if self.instance:
             return data
 
-        placement = data.get("placement")
+        placement = data.get(
+            "placement",
+            getattr(self.instance, "placement", None)
+        )
+
+        if not placement:
+            return data
 
         if not placement:
             raise serializers.ValidationError(
