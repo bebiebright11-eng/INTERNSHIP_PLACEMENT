@@ -25,29 +25,34 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
      
     def validate(self, data):
 
+    # Supervisor is reviewing an existing log
+        if self.instance:
+            return data
+
         placement = data.get("placement")
+
+        if not placement:
+            raise serializers.ValidationError(
+                "Placement is required."
+            )
 
         today = timezone.now().date()
 
-    # Prevent submission before placement starts
+        # Prevent submission before placement starts
         if placement.start_date and today < placement.start_date:
             raise serializers.ValidationError(
                 f"You cannot submit logs before {placement.start_date}"
             )
 
-    # Prevent submission after placement ends
+        # Prevent submission after placement ends
         if placement.end_date and today > placement.end_date:
             raise serializers.ValidationError(
                 "This placement has already ended"
             )
 
-    # Monday of current week
         start_of_week = today - timedelta(days=today.weekday())
-
-    # Sunday of current week
         end_of_week = start_of_week + timedelta(days=6)
 
-    # Prevent more than one submission in same week
         existing_log = WeeklyLog.objects.filter(
             placement=placement,
             submitted_at__date__gte=start_of_week,
