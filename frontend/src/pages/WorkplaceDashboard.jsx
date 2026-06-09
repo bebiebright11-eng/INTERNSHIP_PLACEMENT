@@ -255,13 +255,21 @@ setActiveEvaluation(null);
 
   console.log("ERROR DATA:", error.response?.data)
 
-toast.error(
-  error.response?.data?.detail ||
-  error.message ||
-  "Failed to submit evaluation ❌"
-);
+  const errorData = error.response?.data;
 
-} 
+  let message = "Failed to submit evaluation ❌";
+
+  if (Array.isArray(errorData)) {
+    message = errorData[0];
+  }
+  else if (typeof errorData === "object") {
+    message =
+      errorData.detail ||
+      Object.values(errorData)[0];
+  }
+
+  toast.error(message);
+  } 
   };
 
 const reviewLog = async (
@@ -682,9 +690,52 @@ const renderWeeklyLogs = () => {
                           View
                         </button>
                       ) : (
-                        <button onClick={() => setActiveEvaluation(p.id)}>
-                          Evaluate
-                        </button>
+                        <button
+                          onClick={() => {
+
+                            const studentLogs = weeklyLogs.filter(
+                              log => log.placement === p.id
+                            );
+
+                            const hasPending = studentLogs.some(
+                              log => log.status === "pending"
+                            );
+
+                            const hasRejected = studentLogs.some(
+                              log => log.status === "rejected"
+                            );
+
+                            const hasApproved = studentLogs.some(
+                              log => log.status === "approved"
+                            );
+
+                            if (hasPending) {
+                              toast.warning(
+                                "Please approve the student's weekly logs before evaluating."
+                              );
+                              return;
+                            }
+
+                            if (hasRejected) {
+                              toast.warning(
+                                "The student has rejected weekly logs. Evaluation is not allowed."
+                              );
+                              return;
+                            }
+
+                          if (!hasApproved) {
+                            toast.warning(
+                              "No approved weekly logs found."
+                            );
+                          return;
+                        }
+
+                        setActiveEvaluation(p.id);
+
+                      }}
+                    >
+                      Evaluate
+                    </button>
                       )}
                     </td>
                   </tr>
@@ -1150,14 +1201,64 @@ return (
                       <strong>Organization:</strong> {p.organization_name}
                       </p>
 
-                      {!submittedEvaluations[p.id] ? (
-                        <button 
-                        style={primaryButton}
-                        onClick={() => setActiveEvaluation(p.id)}
+                      {!submittedEvaluations[p.id] ? (() => {
+
+                        const studentLogs = weeklyLogs.filter(
+                          log => log.placement === p.id
+                        );
+
+                        const hasPending = studentLogs.some(
+                          log => log.status === "pending"
+                        );
+
+                        const hasRejected = studentLogs.some(
+                          log => log.status === "rejected"
+                        );
+
+                        const hasApproved = studentLogs.some(
+                          log => log.status === "approved"
+                        );
+
+                        const canEvaluate =
+                          !hasPending &&
+                          !hasRejected &&
+                          hasApproved;
+
+                        return (
+                          <>
+                           <button
+                        disabled={!canEvaluate}
+                        style={{
+                          ...primaryButton,
+                          opacity: canEvaluate ? 1 : 0.5,
+                          cursor: canEvaluate
+                            ? "pointer"
+                            : "not-allowed",
+                          }}
+                          onClick={() => {
+                            if (canEvaluate) {
+                              setActiveEvaluation(p.id);
+                            }
+                          }}
                         >
                           Add Evaluation
                         </button>
-                      ) : (
+
+                        {!canEvaluate && (
+                          <p
+                            style={{
+                              color: "#dc3545",
+                              marginTop: "10px",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Weekly logs must be approved before evaluation.
+                          </p>
+                        )}
+                     </>
+                    );
+
+                  })() : (
                         <>
                           <p 
                             style={{

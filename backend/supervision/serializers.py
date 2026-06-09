@@ -215,10 +215,50 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+
         criteria_data = validated_data.pop('criteria_scores', [])
+
+        placement = validated_data['placement']
+        supervisor_type = validated_data['supervisor_type']
+
+    # WORKPLACE SUPERVISOR VALIDATION
+        if supervisor_type == "workplace":
+
+            pending_logs = WeeklyLog.objects.filter(
+                placement=placement,
+                status="pending"
+            ).exists()
+
+            rejected_logs = WeeklyLog.objects.filter(
+                placement=placement,
+                status="rejected"
+            ).exists()
+
+            approved_logs = WeeklyLog.objects.filter(
+                placement=placement,
+                status="approved"
+            ).exists()
+
+            if pending_logs:
+                raise serializers.ValidationError(
+                   "Please approve all weekly logs before evaluating the student."
+                )
+
+            if rejected_logs:
+                raise serializers.ValidationError(
+                   "This student has rejected weekly logs. Evaluation cannot be submitted until they are corrected and approved."
+               )
+
+            if not approved_logs:
+                raise serializers.ValidationError(
+                    "No approved weekly logs found for this student."
+                )
+
         evaluation = Evaluation.objects.create(**validated_data)
 
         total = 0
+
+    
 
     #  Workplace Supervisor → Criteria scoring (60)
         if evaluation.supervisor_type == 'workplace':
