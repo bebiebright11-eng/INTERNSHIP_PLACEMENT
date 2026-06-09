@@ -1141,6 +1141,7 @@ const editButtonStyle = {
     )}
   </div>
 )}
+<Footer />
     </div>
   );
 }
