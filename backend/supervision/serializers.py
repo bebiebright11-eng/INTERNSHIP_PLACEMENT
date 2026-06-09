@@ -27,8 +27,6 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
-        instance.status = "pending"
-
         instance.save()
 
         return instance

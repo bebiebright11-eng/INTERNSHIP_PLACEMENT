@@ -255,13 +255,22 @@ const editButtonStyle = {
       fetchEvaluations();
       setEditingPlacement(null);
     } catch (error) {
-      console.log("FULL ERROR:", error);
-      console.log("RESPONSE:", error.response);
-      toast.error(JSON.stringify(error.response?.data));
-      console.log("DATA:", error.response?.data);
+  console.log("FULL ERROR:", error);
 
-      toast.error("Failed to submit evaluation ❌");
-    }
+  console.log("STATUS:", error.response?.status);
+  console.log(
+    JSON.stringify(res.data, null, 2)
+  );
+
+  console.log(
+    "ERROR DATA:",
+    JSON.stringify(error.response?.data, null, 2)
+  );
+
+  toast.error(
+    JSON.stringify(error.response?.data)
+  );
+}
   };
 
   // --- Lifecycle ---

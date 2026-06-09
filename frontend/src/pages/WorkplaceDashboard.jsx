@@ -140,8 +140,9 @@ const fetchWeeklyLogs = async () => {
       }
     );
 
-    const supervisorId = parseInt(
-      localStorage.getItem("user_id")
+    console.log(
+      "WEEKLY LOGS:",
+      res.data
     );
 
     setWeeklyLogs(res.data);
@@ -263,7 +264,6 @@ toast.error(
 } 
   };
 
-
 const reviewLog = async (
   logId,
   status,
@@ -272,47 +272,52 @@ const reviewLog = async (
 
   try {
 
-    await API.patch(
-      `supervision/weeklylogs/${logId}/`,
-      {
-        status: status,
-        supervisor_feedback: feedback,
-      },
-      {
-        headers: {
-          Authorization:
-            `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
+    const response = await API.patch(
+  `supervision/weeklylogs/${logId}/`,
+  {
+    status: status,
+    supervisor_feedback: feedback,
+  },
+  {
+    headers: {
+      Authorization:
+        `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+);
+
+console.log(
+  "PATCH RESPONSE:",
+  response.data
+);
+
+    // Update UI immediately
+    setWeeklyLogs(prev =>
+      prev.map(log =>
+        log.id === logId
+          ? {
+              ...log,
+              status,
+              supervisor_feedback: feedback,
+            }
+          : log
+      )
     );
 
     toast.success(
       `Log ${status} successfully`
     );
 
-    fetchWeeklyLogs();
-
   } catch (error) {
 
-  console.log("REVIEW LOG ERROR:", error);
+    console.log(error.response?.data);
 
-  console.log(
-    "RESPONSE:",
-    error.response
-  );
-
-  console.log(
-    "DATA:",
-    error.response?.data
-  );
-
-  toast.error(
-    JSON.stringify(error.response?.data) ||
-    "Failed to review log"
-  );
-
-}
+    toast.error(
+      "Failed to review log"
+    );
+  }
 };
+
 
 
   const editButtonStyle = {
@@ -433,10 +438,12 @@ const actionButtonStyle = {
 
 const detailsCardStyle = {
   marginTop: "20px",
-  backgroundColor: "white",
-  padding: "20px",
-  borderRadius: "12px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  background: "linear-gradient(145deg, #ffffff, #f8f9fa)",
+  padding: "25px",
+  borderRadius: "18px",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+  borderLeft: "6px solid #198754",
+  transition: "all 0.3s ease",
 };
 
 
@@ -460,24 +467,31 @@ const renderWeeklyLogs = () => {
             style={detailsCardStyle}
           >
 
-            <h3>
-              {log.student_name}
+            <h3
+              style={{
+                color: "#198754",
+                marginBottom: "15px",
+                fontSize: "24px",
+                fontWeight: "bold",
+              }}
+            >
+             👨‍🎓 {log.student_name}
             </h3>
 
-            <p>
-              <strong>Week:</strong>
+            <p style={{ marginBottom: "10px" }}>
+              <strong> 📅 Week:</strong>
               {" "}
               {log.week_number}
             </p>
 
-            <p>
-              <strong>Tasks:</strong>
+            <p style={{ marginBottom: "10px" }}>
+              <strong> 🛠 Tasks:</strong>
               {" "}
               {log.tasks}
             </p>
 
-            <p>
-              <strong>Challenges:</strong>
+            <p style={{ marginBottom: "10px" }}>
+              <strong> ⚠ Challenges:</strong>
               {" "}
               {log.challenges}
             </p>
@@ -486,9 +500,12 @@ const renderWeeklyLogs = () => {
               <strong>Status:</strong>{" "}
               <span
                 style={{
-                  padding: "6px 12px",
-                  borderRadius: "20px",
+                  display: "inline-block",
+                  padding: "8px 16px",
+                  borderRadius: "25px",
                   fontWeight: "bold",
+                  fontSize: "14px",
+                  letterSpacing: "0.5px",
                   backgroundColor:
                     log.status === "approved"
                       ? "#d1e7dd"
@@ -503,12 +520,16 @@ const renderWeeklyLogs = () => {
                       : "#856404",
                 }}
               >
-                {log.status}
+                {log.status === "approved"
+                  ? "✅ Approved"
+                  : log.status === "rejected"
+                  ? "❌ Rejected"
+                  : "⏳ Pending"}
               </span>
             </p>
 
-            <p>
-              <strong>Submitted:</strong>{" "}
+            <p style={{ marginBottom: "10px" }}> 
+              <strong>📤 Submitted:</strong>{" "}
               {new Date(log.submitted_at).toLocaleDateString()}
             </p>
 
@@ -519,6 +540,16 @@ const renderWeeklyLogs = () => {
                   href={log.attachment}
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: "#0d6efd",
+                    color: "white",
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                    marginTop: "5px",
+                  }}
                 >
                   View Uploaded PDF
                 </a>
@@ -526,20 +557,6 @@ const renderWeeklyLogs = () => {
                 "No attachment uploaded"
               )}
             </p>
-
-            {log.supervisor_feedback && (
-              <p>
-                <strong>Supervisor Feedback:</strong>{" "}
-                {log.supervisor_feedback}
-              </p>
-            )}
-
-            {log.supervisor_feedback && (
-              <p>
-                <strong>Supervisor Feedback:</strong>{" "}
-                  {log.supervisor_feedback}
-              </p>
-            )}
 
             {log.status === "pending" && (
               <>
