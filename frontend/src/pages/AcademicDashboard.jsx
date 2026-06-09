@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
+import Footer from "../components/Footer";
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
