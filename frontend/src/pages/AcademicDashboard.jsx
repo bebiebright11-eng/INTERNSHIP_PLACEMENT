@@ -476,7 +476,40 @@ const editButtonStyle = {
                   <h3>Student: {p.student_name}</h3>
                   <p>Organization: {p.organization_name}</p>
 
-                  <button
+                  {academicEval ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        alignItems: "center",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          backgroundColor: "#d1e7dd",
+                          color: "#0f5132",
+                          padding: "10px 15px",
+                          borderRadius: "20px",
+                          fontWeight: "bold",
+                       }}
+                      >
+                        ✅ Evaluated
+                      </span>
+
+                      <button
+                        onClick={() =>
+                          setExpandedStudent(
+                            expandedStudent === p.id ? null : p.id
+                          )
+                        }
+                        style={editButtonStyle}
+                      >
+                        Edit Evaluation
+                      </button>
+                    </div>
+                  ) : (
+                    <button
                     onClick={() =>
                       setExpandedStudent(
                         expandedStudent === p.id ? null : p.id
@@ -495,6 +528,7 @@ const editButtonStyle = {
                   >
                     Evaluate Student
                   </button>
+                )}
 
                   {expandedStudent === p.id && (
                     <div style={{ marginTop: "20px" }}>
