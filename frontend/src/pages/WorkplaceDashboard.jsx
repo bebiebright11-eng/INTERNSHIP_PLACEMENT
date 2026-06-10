@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import API from "../api";
 import Footer from "../components/Footer";
 
+
 function WorkplaceDashboard() {
   const navigate = useNavigate();
   const [placements, setPlacements] = useState([]);
