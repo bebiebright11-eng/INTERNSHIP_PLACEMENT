@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
 
+
 function WorkplaceDashboard() {
   const navigate = useNavigate();
   const [placements, setPlacements] = useState([]);
