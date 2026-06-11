@@ -17,6 +17,9 @@ function StudentDashboard() {
   const [organizations, setOrganizations] = useState([]);
   const [notification, setNotification] = useState(null);
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+
   const [editingLog, setEditingLog] = useState(null);
   // NEW: Store student's placement
   const [placement, setPlacement] = useState(null);
@@ -168,14 +171,7 @@ const handleEdit = (log) => {
     }
   };
 
-  const deleteApplication = async (applicationId) => {
-
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this application?"
-  );
-
-  if (!confirmed) return;
-
+const deleteApplication = async (applicationId) => {
   try {
     await API.delete(
       `internships/applications/${applicationId}/`,
@@ -1021,7 +1017,10 @@ return (
                 >
                   {!placement && (
                     <button
-                      onClick={() => deleteApplication(app.id)}
+                      onClick={() => {
+                        setSelectedApplication(app.id);
+                        setShowDeleteModal(true);
+                      }}
                       style={{
                         backgroundColor: "#dc3545",
                         color: "white",
@@ -1321,6 +1320,80 @@ return (
       )}
      </>
 )} 
+
+{showDeleteModal && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.5)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: "white",
+        padding: "25px",
+        borderRadius: "12px",
+        width: "400px",
+        textAlign: "center",
+      }}
+    >
+      <h3>Delete Application</h3>
+
+      <p>
+        Are you sure you want to delete this application?
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "15px",
+          marginTop: "20px",
+        }}
+      >
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          style={{
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={async () => {
+            await deleteApplication(selectedApplication);
+            setShowDeleteModal(false);
+          }}
+          style={{
+            backgroundColor: "#dc3545",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 <Footer />
     </div>
   );
