@@ -1394,6 +1394,7 @@ return (
       </div>
   </div>   
 
+{/* APPLICATION STATUS BAR CHART */}
   <div style={sectionWrapper}>
     <h2 style={sectionTitle}>
       Applications Status
@@ -1416,6 +1417,7 @@ return (
     </ResponsiveContainer>
   </div>
 
+{/* PLACEMENTS BY ORGANIZATION */}
   <div style={sectionWrapper}>
     <h2 style={sectionTitle}>
       Placements By Organization
@@ -1440,6 +1442,7 @@ return (
     </ResponsiveContainer>
   </div>
 
+ {/* USER DISTRIBUTION PIE CHART */}
   <div style={sectionWrapper}>
     <h2 style={sectionTitle}>
       User Distribution
