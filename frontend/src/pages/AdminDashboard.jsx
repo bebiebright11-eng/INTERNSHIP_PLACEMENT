@@ -497,6 +497,10 @@ const applicationStats = [
     ).length,
   },
 ];
+const organizationChartData = organizations.map((org) => ({
+  name: org.name,
+  placements: placements.filter((p) => p.organization === org.id).length,
+}));
 
 const filteredConfirmedPlacements =
   confirmedPlacements.filter((p) =>
