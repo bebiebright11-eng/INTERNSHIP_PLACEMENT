@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
 import Footer from "../components/Footer";
-import { PieChart, Pie,Tooltip, Cell} from "recharts";
+import { PieChart, Pie,Tooltip, Cell, BarChart,Bar,
+  XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer,
+} from "recharts";
 
 function AdminDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -475,6 +477,26 @@ const deleteCriteria = async (id) => {
 const confirmedPlacements = placements.filter(
   (p) => p.is_fully_assigned
 );
+const applicationStats = [
+  {
+    status: "Pending",
+    count: applications.filter(
+      (a) => a.status === "pending"
+    ).length,
+  },
+  {
+    status: "Approved",
+    count: applications.filter(
+      (a) => a.status === "approved"
+    ).length,
+  },
+  {
+    status: "Rejected",
+    count: applications.filter(
+      (a) => a.status === "rejected"
+    ).length,
+  },
+];
 
 const filteredConfirmedPlacements =
   confirmedPlacements.filter((p) =>
