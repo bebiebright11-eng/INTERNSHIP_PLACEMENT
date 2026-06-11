@@ -39,7 +39,7 @@ function Footer() {
           <h3>Contact Us</h3>
 
           <p>Email: support@iles.com</p>
-          <p>Phone: +256 XXX XXX XXX</p>
+          <p>Phone: +256 744 329 151</p>
         </div>
       </div>
 

@@ -452,8 +452,16 @@ const deleteCriteria = async (id) => {
   };
 
   const pendingPlacements = placements.filter(
-  (p) => !p.is_fully_assigned
-);
+    (p) => !p.is_fully_assigned
+  );
+
+  const pendingStudents = [
+    ...new Set(
+      applications
+        .filter((app) => app.status === "pending")
+        .map((app) => app.student)
+    )
+  ];
 
 const confirmedPlacements = placements.filter(
   (p) => p.is_fully_assigned
@@ -899,7 +907,24 @@ return (
       
 {activeView === "home" && ( 
 
-  <>    
+  <>
+
+    {pendingStudents.length > 0 && (
+      <div
+        style={{
+          background: "#fff3cd",
+          color: "#856404",
+          padding: "15px",
+          borderRadius: "12px",
+          marginBottom: "20px",
+          border: "1px solid #ffeeba",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        🔔 {pendingStudents.length} student(s) have new applications waiting for review.
+      </div>
+    )}
     <div
       style={{
         display: "flex",
