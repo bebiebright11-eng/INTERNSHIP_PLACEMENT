@@ -39,6 +39,15 @@ function AdminDashboard() {
 
   const [showModal, setShowModal] = useState(false);
 
+  const [editingPlacement, setEditingPlacement] = useState(null);
+
+const [editPlacementData, setEditPlacementData] = useState({
+  start_date: "",
+  end_date: "",
+  workplace_supervisor: "",
+  academic_supervisor: "",
+});
+
   const [modalConfig, setModalConfig] = useState({
     title: "",
     message: "",
@@ -452,8 +461,16 @@ const deleteCriteria = async (id) => {
   };
 
   const pendingPlacements = placements.filter(
-  (p) => !p.is_fully_assigned
-);
+    (p) => !p.is_fully_assigned
+  );
+
+  const pendingStudents = [
+    ...new Set(
+      applications
+        .filter((app) => app.status === "pending")
+        .map((app) => app.student)
+    )
+  ];
 
 const confirmedPlacements = placements.filter(
   (p) => p.is_fully_assigned
@@ -733,6 +750,45 @@ const textareaStyle = {
     (user) => user.role !== "student"
   );
 
+
+  const handleEditPlacement = (placement) => {
+  setEditingPlacement(placement.id);
+
+  setEditPlacementData({
+    start_date: placement.start_date || "",
+    end_date: placement.end_date || "",
+    workplace_supervisor:
+      placement.workplace_supervisor || "",
+    academic_supervisor:
+      placement.academic_supervisor || "",
+  });
+};
+
+
+const savePlacementChanges = async (id) => {
+  try {
+    await API.patch(`internships/placements/${id}/`, {
+      start_date: editPlacementData.start_date,
+      end_date: editPlacementData.end_date,
+      workplace_supervisor:
+        editPlacementData.workplace_supervisor,
+      academic_supervisor:
+        editPlacementData.academic_supervisor,
+    });
+
+    toast.success("Placement updated successfully");
+
+    setEditingPlacement(null);
+
+    fetchPlacements();
+
+  } catch (error) {
+    console.log(error);
+
+    toast.error("Failed to update placement");
+  }
+};
+
 return (
   <div
     style={{
@@ -899,7 +955,24 @@ return (
       
 {activeView === "home" && ( 
 
-  <>    
+  <>
+
+    {pendingStudents.length > 0 && (
+      <div
+        style={{
+          background: "#fff3cd",
+          color: "#856404",
+          padding: "15px",
+          borderRadius: "12px",
+          marginBottom: "20px",
+          border: "1px solid #ffeeba",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        🔔 {pendingStudents.length} student(s) have new applications waiting for review.
+      </div>
+    )}
     <div
       style={{
         display: "flex",
@@ -1792,22 +1865,159 @@ return (
                     Confirmed
                   </span>
                 </td>
-
                 <td style={tableCellStyle}>
-                  <button
-                    style={deleteButtonStyle}
-                    onClick={() =>
-                      openConfirmationModal(
-                        "Delete Placement",
-                        "Are you sure you want to delete this placement?",
-                        () => deletePlacement(p.id)
-                      )
-                    }
-                  >
-                    Delete
-                  </button>
-                </td>
+  <button
+    style={{
+      ...primaryButton,
+      marginRight: "10px",
+    }}
+    onClick={() => handleEditPlacement(p)}
+  >
+    Edit
+  </button>
+
+  <button
+    style={deleteButtonStyle}
+    onClick={() =>
+      openConfirmationModal(
+        "Delete Placement",
+        "Are you sure you want to delete this placement?",
+        () => deletePlacement(p.id)
+      )
+    }
+  >
+    Delete
+  </button>
+
+  {editingPlacement === p.id && (
+    <div
+      style={{
+        marginTop: "15px",
+        padding: "15px",
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        background: "#f8f9fa",
+      }}
+    >
+      <input
+        type="date"
+        value={editPlacementData.start_date}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            start_date: e.target.value,
+          })
+        }
+      />
+
+      <br /><br />
+
+      <input
+        type="date"
+        value={editPlacementData.end_date}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            end_date: e.target.value,
+          })
+        }
+      />
+
+      <br /><br />
+
+      <select
+        value={editPlacementData.workplace_supervisor}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            workplace_supervisor: e.target.value,
+          })
+        }
+      >
+        <option value="">
+          Select Workplace Supervisor
+        </option>
+
+        {supervisors
+          .filter(
+            (u) =>
+              u.role === "workplace" &&
+              u.organization === p.organization
+          )
+          .map((u) => (
+            <option
+              key={u.id}
+              value={u.id}
+            >
+              {u.first_name && u.last_name
+                ? `${u.first_name} ${u.last_name}`
+                : u.username}
+            </option>
+          ))}
+      </select>
+
+      <br /><br />
+
+      <select
+        value={editPlacementData.academic_supervisor}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            academic_supervisor: e.target.value,
+          })
+        }
+      >
+        <option value="">
+          Select Academic Supervisor
+        </option>
+
+        {supervisors
+          .filter(
+            (u) => u.role === "academic"
+          )
+          .map((u) => (
+            <option
+              key={u.id}
+              value={u.id}
+            >
+              {u.first_name && u.last_name
+                ? `${u.first_name} ${u.last_name}`
+                : u.username}
+            </option>
+          ))}
+      </select>
+
+      <br /><br />
+
+      <button
+        style={primaryButton}
+        onClick={() =>
+          savePlacementChanges(p.id)
+        }
+      >
+        Save Changes
+      </button>
+
+      <button
+        style={{
+          ...deleteButtonStyle,
+          marginLeft: "10px",
+        }}
+        onClick={() =>
+          setEditingPlacement(null)
+        }
+      >
+        Cancel
+      </button>
+    </div>
+  )}
+</td>
+
+                
+                
+              
               </tr>
+              
             )
           )}
         </tbody>
@@ -1924,7 +2134,9 @@ return (
                         key={u.id}
                         value={u.id}
                       >
-                        {u.username}
+                        {u.first_name && u.last_name
+                          ? `${u.first_name} ${u.last_name}`
+                           : u.username}
                       </option>
                     ))}
                   </select>
@@ -1952,7 +2164,9 @@ return (
                         key={u.id}
                         value={u.id}
                       >
-                        {u.username}
+                        {u.first_name && u.last_name
+                          ? `${u.first_name} ${u.last_name}`
+                           : u.username}
                       </option>
                     ))}
                   </select>
