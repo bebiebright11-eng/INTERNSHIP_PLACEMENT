@@ -502,6 +502,33 @@ const organizationChartData = organizations.map((org) => ({
   placements: placements.filter((p) => p.organization === org.id).length,
 }));
 
+const userRoleData = [
+  {
+    name: "Students",
+    value: supervisors.filter(
+      (u) => u.role === "student"
+    ).length,
+  },
+  {
+    name: "Academic",
+    value: supervisors.filter(
+      (u) => u.role === "academic"
+    ).length,
+  },
+  {
+    name: "Workplace",
+    value: supervisors.filter(
+      (u) => u.role === "workplace"
+    ).length,
+  },
+  {
+    name: "Admins",
+    value: supervisors.filter(
+      (u) => u.role === "admin"
+    ).length,
+  },
+]; 
+
 const filteredConfirmedPlacements =
   confirmedPlacements.filter((p) =>
     p.student_name
