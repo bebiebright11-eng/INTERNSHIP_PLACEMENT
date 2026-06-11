@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
+import Footer from "../components/Footer";
+
 
 function WorkplaceDashboard() {
   const navigate = useNavigate();
@@ -19,6 +21,9 @@ const [evaluations, setEvaluations] = useState([]);
 const assignedCount = placements.length;
 const evaluatedCount = Object.keys(submittedEvaluations).length;
 const pendingCount = assignedCount - evaluatedCount;
+
+const [weeklyLogs, setWeeklyLogs] = useState([]);
+const [feedbacks, setFeedbacks] = useState({});
 
 const firstName = localStorage.getItem("first_name");
 const handleLogout = () => {
@@ -56,7 +61,7 @@ const handleLogout = () => {
   };
 
   
-   const fetchEvaluations = async () => {
+const fetchEvaluations = async () => {
 
   try {
 
@@ -126,10 +131,35 @@ const handleLogout = () => {
   }
 };
 
+const fetchWeeklyLogs = async () => {
+  try {
+    const res = await API.get(
+      "supervision/weeklylogs/",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    console.log(
+      "WEEKLY LOGS:",
+      res.data
+    );
+
+    setWeeklyLogs(res.data);
+
+  } catch (error) {
+    toast.error("Failed to load weekly logs");
+  }
+};
+
+
   useEffect(() => {
     fetchPlacements();
     fetchCriteria();
     fetchEvaluations();
+    fetchWeeklyLogs()
   }, []);
 
   // 3. Handle Score Changes
@@ -227,14 +257,77 @@ setActiveEvaluation(null);
 
   console.log("ERROR DATA:", error.response?.data)
 
-toast.error(
-  error.response?.data?.detail ||
-  error.message ||
-  "Failed to submit evaluation ❌"
+  const errorData = error.response?.data;
+
+  let message = "Failed to submit evaluation ❌";
+
+  if (Array.isArray(errorData)) {
+    message = errorData[0];
+  }
+  else if (typeof errorData === "object") {
+    message =
+      errorData.detail ||
+      Object.values(errorData)[0];
+  }
+
+  toast.error(message);
+  } 
+  };
+
+const reviewLog = async (
+  logId,
+  status,
+  feedback
+) => {
+
+  try {
+
+    const response = await API.patch(
+  `supervision/weeklylogs/${logId}/`,
+  {
+    status: status,
+    supervisor_feedback: feedback,
+  },
+  {
+    headers: {
+      Authorization:
+        `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
 );
 
-} 
-  };
+console.log(
+  "PATCH RESPONSE:",
+  response.data
+);
+
+    // Update UI immediately
+    setWeeklyLogs(prev =>
+      prev.map(log =>
+        log.id === logId
+          ? {
+              ...log,
+              status,
+              supervisor_feedback: feedback,
+            }
+          : log
+      )
+    );
+
+    toast.success(
+      `Log ${status} successfully`
+    );
+
+  } catch (error) {
+
+    console.log(error.response?.data);
+
+    toast.error(
+      "Failed to review log"
+    );
+  }
+};
+
 
 
   const editButtonStyle = {
@@ -355,11 +448,194 @@ const actionButtonStyle = {
 
 const detailsCardStyle = {
   marginTop: "20px",
-  backgroundColor: "white",
-  padding: "20px",
-  borderRadius: "12px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  background: "linear-gradient(145deg, #ffffff, #f8f9fa)",
+  padding: "25px",
+  borderRadius: "18px",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+  borderLeft: "6px solid #198754",
+  transition: "all 0.3s ease",
 };
+
+
+const renderWeeklyLogs = () => {
+
+  return (
+    <div>
+
+      <h2>Weekly Logs Review</h2>
+
+      {weeklyLogs.length === 0 ? (
+
+        <p>No weekly logs found</p>
+
+      ) : (
+
+        weeklyLogs.map((log) => (
+
+          <div
+            key={log.id}
+            style={detailsCardStyle}
+          >
+
+            <h3
+              style={{
+                color: "#198754",
+                marginBottom: "15px",
+                fontSize: "24px",
+                fontWeight: "bold",
+              }}
+            >
+             👨‍🎓 {log.student_name}
+            </h3>
+
+            <p style={{ marginBottom: "10px" }}>
+              <strong> 📅 Week:</strong>
+              {" "}
+              {log.week_number}
+            </p>
+
+            <p style={{ marginBottom: "10px" }}>
+              <strong> 🛠 Tasks:</strong>
+              {" "}
+              {log.tasks}
+            </p>
+
+            <p style={{ marginBottom: "10px" }}>
+              <strong> ⚠ Challenges:</strong>
+              {" "}
+              {log.challenges}
+            </p>
+
+            <p>
+              <strong>Status:</strong>{" "}
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "8px 16px",
+                  borderRadius: "25px",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  letterSpacing: "0.5px",
+                  backgroundColor:
+                    log.status === "approved"
+                      ? "#d1e7dd"
+                      : log.status === "rejected"
+                      ? "#f8d7da"
+                      : "#fff3cd",
+                  color:
+                    log.status === "approved"
+                      ? "#0f5132"
+                      : log.status === "rejected"
+                      ? "#842029"
+                      : "#856404",
+                }}
+              >
+                {log.status === "approved"
+                  ? "✅ Approved"
+                  : log.status === "rejected"
+                  ? "❌ Rejected"
+                  : "⏳ Pending"}
+              </span>
+            </p>
+
+            <p style={{ marginBottom: "10px" }}> 
+              <strong>📤 Submitted:</strong>{" "}
+              {new Date(log.submitted_at).toLocaleDateString()}
+            </p>
+
+            <p>
+              <strong>Attachment:</strong>{" "}
+              {log.attachment ? (
+                <a
+                  href={log.attachment}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: "#0d6efd",
+                    color: "white",
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                    marginTop: "5px",
+                  }}
+                >
+                  View Uploaded PDF
+                </a>
+              ) : (
+                "No attachment uploaded"
+              )}
+            </p>
+
+            {log.status === "pending" && (
+              <>
+
+              <textarea
+                rows="3"
+                placeholder="Enter feedback or rejection reason if you reject log..."
+                value={feedbacks[log.id] || ""}
+                onChange={(e) =>
+                  setFeedbacks((prev) => ({
+                  ...prev,
+                  [log.id]: e.target.value,
+               }))
+              }
+              style={{
+                width: "100%",
+                marginBottom: "15px",
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1px solid #ddd",
+              }}
+            />
+                <button
+                  style={primaryButton}
+                  onClick={() =>
+                    reviewLog(
+                      log.id,
+                      "approved",
+                      feedbacks[log.id] || "Approved by supervisor"
+                      )
+                    }
+                  >
+                    Approve
+                  </button>
+
+                <button
+                  style={{
+                    ...editButtonStyle,
+                    marginLeft: "10px",
+                  }}
+                  onClick={() => {
+                    if (!feedbacks[log.id]) {
+                      toast.warning(
+                        "Please provide rejection reason"
+                      );
+                      return;
+                    }
+
+                    reviewLog(
+                      log.id,
+                      "rejected",
+                      feedbacks[log.id]
+                    );
+                  }}
+                >
+                  Reject
+                </button>
+              </>
+            )}
+
+          </div>
+        ))
+
+      )}
+
+    </div>
+  );
+};
+
 
  const renderStudents = () => {
   return (
@@ -416,9 +692,52 @@ const detailsCardStyle = {
                           View
                         </button>
                       ) : (
-                        <button onClick={() => setActiveEvaluation(p.id)}>
-                          Evaluate
-                        </button>
+                        <button
+                          onClick={() => {
+
+                            const studentLogs = weeklyLogs.filter(
+                              log => log.placement === p.id
+                            );
+
+                            const hasPending = studentLogs.some(
+                              log => log.status === "pending"
+                            );
+
+                            const hasRejected = studentLogs.some(
+                              log => log.status === "rejected"
+                            );
+
+                            const hasApproved = studentLogs.some(
+                              log => log.status === "approved"
+                            );
+
+                            if (hasPending) {
+                              toast.warning(
+                                "Please approve the student's weekly logs before evaluating."
+                              );
+                              return;
+                            }
+
+                            if (hasRejected) {
+                              toast.warning(
+                                "The student has rejected weekly logs. Evaluation is not allowed."
+                              );
+                              return;
+                            }
+
+                          if (!hasApproved) {
+                            toast.warning(
+                              "No approved weekly logs found."
+                            );
+                          return;
+                        }
+
+                        setActiveEvaluation(p.id);
+
+                      }}
+                    >
+                      Evaluate
+                    </button>
                       )}
                     </td>
                   </tr>
@@ -755,6 +1074,16 @@ return (
 
         <div
           style={dropdownItemStyle}
+          onClick={() => {
+            setActivePage("weeklylogs");
+            setShowMenu(false);
+          }}
+        >
+          Weekly Logs
+        </div>
+
+        <div
+          style={dropdownItemStyle}
           onClick={handleLogout}
         >
          Logout
@@ -874,14 +1203,64 @@ return (
                       <strong>Organization:</strong> {p.organization_name}
                       </p>
 
-                      {!submittedEvaluations[p.id] ? (
-                        <button 
-                        style={primaryButton}
-                        onClick={() => setActiveEvaluation(p.id)}
+                      {!submittedEvaluations[p.id] ? (() => {
+
+                        const studentLogs = weeklyLogs.filter(
+                          log => log.placement === p.id
+                        );
+
+                        const hasPending = studentLogs.some(
+                          log => log.status === "pending"
+                        );
+
+                        const hasRejected = studentLogs.some(
+                          log => log.status === "rejected"
+                        );
+
+                        const hasApproved = studentLogs.some(
+                          log => log.status === "approved"
+                        );
+
+                        const canEvaluate =
+                          !hasPending &&
+                          !hasRejected &&
+                          hasApproved;
+
+                        return (
+                          <>
+                           <button
+                        disabled={!canEvaluate}
+                        style={{
+                          ...primaryButton,
+                          opacity: canEvaluate ? 1 : 0.5,
+                          cursor: canEvaluate
+                            ? "pointer"
+                            : "not-allowed",
+                          }}
+                          onClick={() => {
+                            if (canEvaluate) {
+                              setActiveEvaluation(p.id);
+                            }
+                          }}
                         >
                           Add Evaluation
                         </button>
-                      ) : (
+
+                        {!canEvaluate && (
+                          <p
+                            style={{
+                              color: "#dc3545",
+                              marginTop: "10px",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Weekly logs must be approved before evaluation.
+                          </p>
+                        )}
+                     </>
+                    );
+
+                  })() : (
                         <>
                           <p 
                             style={{
@@ -1074,8 +1453,15 @@ return (
   </div>
 )}
 
+{activePage === "weeklylogs" && (
+  <div style={{ padding: "20px" }}>
+    {renderWeeklyLogs()}
+  </div>
+)}
+
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
+import Footer from "../components/Footer";
+
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -75,29 +77,43 @@ function AcademicDashboard() {
     color: "#198754",
   };
 
-  const tableContainerStyle = {
-  backgroundColor: "white",
-  borderRadius: "15px",
-  padding: "20px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-  overflowX: "auto",
+
+  const marksInputStyle = {
+  width: "120px",
+  padding: "14px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  textAlign: "center",
+  border: "2px solid #198754",
+  borderRadius: "12px",
+  outline: "none",
+  backgroundColor: "#f8fff9",
+  color: "#198754",
+  boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
 };
 
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  fontFamily: "Arial",
-};
-
-const tableHeaderStyle = {
-  backgroundColor: "#198754",
+const submitButtonStyle = {
+  background: "linear-gradient(135deg,#198754,#20c997)",
   color: "white",
-  textAlign: "left",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
-const tableCellStyle = {
-  padding: "15px",
-  borderBottom: "1px solid #ddd",
+const editButtonStyle = {
+  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
+  color: "white",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
   // --- Data Fetching Functions ---
@@ -241,13 +257,22 @@ const tableCellStyle = {
       fetchEvaluations();
       setEditingPlacement(null);
     } catch (error) {
-      console.log("FULL ERROR:", error);
-      console.log("RESPONSE:", error.response);
-      toast.error(JSON.stringify(error.response?.data));
-      console.log("DATA:", error.response?.data);
+  console.log("FULL ERROR:", error);
 
-      toast.error("Failed to submit evaluation ❌");
-    }
+  console.log("STATUS:", error.response?.status);
+  console.log(
+    JSON.stringify(res.data, null, 2)
+  );
+
+  console.log(
+    "ERROR DATA:",
+    JSON.stringify(error.response?.data, null, 2)
+  );
+
+  toast.error(
+    JSON.stringify(error.response?.data)
+  );
+}
   };
 
   // --- Lifecycle ---
@@ -453,7 +478,40 @@ const tableCellStyle = {
                   <h3>Student: {p.student_name}</h3>
                   <p>Organization: {p.organization_name}</p>
 
-                  <button
+                  {academicEval ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        alignItems: "center",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          backgroundColor: "#d1e7dd",
+                          color: "#0f5132",
+                          padding: "10px 15px",
+                          borderRadius: "20px",
+                          fontWeight: "bold",
+                       }}
+                      >
+                        ✅ Evaluated
+                      </span>
+
+                      <button
+                        onClick={() =>
+                          setExpandedStudent(
+                            expandedStudent === p.id ? null : p.id
+                          )
+                        }
+                        style={editButtonStyle}
+                      >
+                        Edit Evaluation
+                      </button>
+                    </div>
+                  ) : (
+                    <button
                     onClick={() =>
                       setExpandedStudent(
                         expandedStudent === p.id ? null : p.id
@@ -472,6 +530,7 @@ const tableCellStyle = {
                   >
                     Evaluate Student
                   </button>
+                )}
 
                   {expandedStudent === p.id && (
                     <div style={{ marginTop: "20px" }}>
@@ -676,17 +735,43 @@ const tableCellStyle = {
                           {!academicEval ||
                           editingPlacement === p.id ? (
                             <div>
-                              <h4>Academic Supervisor Marks</h4>
+                              <h4
+                                style={{
+                                color: "#198754",
+                                marginBottom: "10px",
+                              }}
+                            >
+                              Academic Supervisor Assessment
+                            </h4>
 
-                              <input
-                                type="number"
-                                min="0"
-                                max="20"
-                                placeholder="Enter marks out of 20"
-                                value={scores[p.id] ?? ""}
-                                onChange={(e) => {
-                                  let value =
-                                    parseInt(e.target.value) || 0;
+                            <p
+                              style={{
+                                color: "#666",
+                                marginBottom: "15px",
+                              }}
+                            >
+                              Award marks based on your supervision visit, student presentation,
+                              documentation quality, and overall internship performance.
+                            </p>
+
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "15px",
+                                  marginBottom: "20px",
+                                  marginTop: "15px",
+                                }}
+                              >
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="20"
+                                  value={scores[p.id] ?? ""}
+                                  placeholder="0 - 20"
+                                  style={marksInputStyle}
+                                  onChange={(e) => {
+                                  let value = parseInt(e.target.value) || 0;
 
                                   if (value < 0) value = 0;
                                   if (value > 20) value = 20;
@@ -698,6 +783,17 @@ const tableCellStyle = {
                                 }}
                               />
 
+                              <span
+                                style={{
+                                  fontSize: "20px",
+                                  fontWeight: "bold",
+                                  color: "#198754",
+                                }}
+                              >
+                                / 20
+                              </span>
+                            </div>
+
                               <h4>Final Score</h4>
 
                               <p>{finalScore} / 100</p>
@@ -706,8 +802,9 @@ const tableCellStyle = {
 
                               <button
                                 onClick={() => submitEvaluation(p.id)}
+                                style={submitButtonStyle}
                               >
-                                Submit Final Evaluation
+                                ✅ Submit Final Evaluation
                               </button>
                             </div>
                           ) : (
@@ -734,6 +831,7 @@ const tableCellStyle = {
                               </p>
 
                               <button
+                                style={editButtonStyle}
                                 onClick={() => {
                                   setEditingPlacement(p.id);
 
@@ -743,7 +841,7 @@ const tableCellStyle = {
                                   }));
                                 }}
                               >
-                                Edit Evaluation
+                                ✏️ Edit Evaluation
                               </button>
                             </div>
                           )}
@@ -1078,6 +1176,7 @@ const tableCellStyle = {
     )}
   </div>
 )}
+<Footer />
     </div>
   );
 }

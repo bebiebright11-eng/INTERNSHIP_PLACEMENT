@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
+import Footer from "../components/Footer";
+
 
 function StudentDashboard() {
   // Adding a menu
+  const formRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState("home");
 
@@ -13,10 +16,16 @@ function StudentDashboard() {
   const [evaluations, setEvaluations] = useState([]);
   const [organizations, setOrganizations] = useState([]);
   const [notification, setNotification] = useState(null);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+
+  const [editingLog, setEditingLog] = useState(null);
   // NEW: Store student's placement
   const [placement, setPlacement] = useState(null);
   const firstName = localStorage.getItem("first_name");
   const navigate = useNavigate();
+
 
 
 const handleLogout = () => {
@@ -25,13 +34,19 @@ const handleLogout = () => {
   navigate("/");
 };
 
-  const getReviewedLogsCount = () => {
-    return logs.filter(log => log.status === "reviewed").length;
+  const getApprovedLogsCount = () => {
+    return logs.filter(
+      log => log.status === "approved"
+    ).length;
   };
 
   const getLogScore = () => {
-    const reviewed = getReviewedLogsCount();
-    return Math.min(reviewed * 2.5, 20);
+    const approved = getApprovedLogsCount();
+
+    return Math.min(
+      approved * 2.5,
+      20
+   );
   };
 
 
@@ -51,7 +66,30 @@ const handleLogout = () => {
     tasks: "",
     challenges: "",
     attendance_days: 5,
+    attachment: null,
   });
+
+
+const handleEdit = (log) => {
+  console.log("EDIT CLICKED:", log);
+
+  setEditingLog(log);
+
+  setFormData({
+    week_number: log.week_number,
+    tasks: log.tasks,
+    challenges: log.challenges,
+    attendance_days: log.attendance_days,
+    attachment: null,
+  });
+
+  setTimeout(() => {
+    formRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, 100);
+};
 
 
   useEffect(() => {
@@ -133,6 +171,27 @@ const handleLogout = () => {
     }
   };
 
+const deleteApplication = async (applicationId) => {
+  try {
+    await API.delete(
+      `internships/applications/${applicationId}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    toast.success("Application deleted successfully");
+
+    fetchApplications();
+
+  } catch (error) {
+    console.log(error.response?.data);
+    toast.error("Failed to delete application");
+  }
+};
+
   const hasApplied = (orgId) => {
   return applications.some(app => app.organization === orgId);
 };
@@ -174,28 +233,71 @@ const handleChange = (e) => {
   });
 };
 
+const handleFileChange = (e) => {
+  setFormData({
+    ...formData,
+    attachment: e.target.files[0],
+  });
+};
+
   const submitLog = async (e) => {
     e.preventDefault();
     try {
-      await API.post(
-        "supervision/weeklylogs/",
-        {
-          ...formData,
-          placement: placement?.id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+      const data = new FormData();
+
+      data.append("week_number", formData.week_number);
+      data.append("tasks", formData.tasks);
+      data.append("challenges", formData.challenges);
+      data.append("attendance_days", formData.attendance_days);
+      data.append("placement", placement?.id);
+
+      if (formData.attachment) {
+        data.append("attachment", formData.attachment);
+      }
+
+      if (editingLog) {
+
+        await API.patch(
+          `supervision/weeklylogs/${editingLog.id}/`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+      } else {
+
+        await API.post(
+          "supervision/weeklylogs/",
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+      }
+      toast.success(
+        editingLog
+          ? "Weekly log updated successfully ✅"
+          : "Weekly log submitted successfully ✅"
       );
-      toast.success("Weekly log submitted successfully ✅");
+
       setFormData({
         week_number: "",
         tasks: "",
         challenges: "",
         attendance_days: 5,
+        attachment: null,
       });
+
+      setEditingLog(null);
+
       fetchLogs();
     } catch (error) {
        console.log(error.response?.data);
@@ -206,6 +308,28 @@ const handleChange = (e) => {
       );
     }
   };
+
+
+  const workplaceEvaluation = evaluations.find(
+  ev => ev.supervisor_type === "workplace"
+);
+
+const academicEvaluation = evaluations.find(
+  ev => ev.supervisor_type === "academic"
+);
+
+const workplaceScore = workplaceEvaluation?.score || 0;
+
+const logScore = getLogScore();
+
+const academicScore = academicEvaluation?.score || 0;
+
+const totalScore =
+  workplaceScore +
+  logScore +
+  academicScore;
+
+const finalPercentage = totalScore;
 
   const menuButtonStyle = {
   backgroundColor: "#198754",
@@ -240,14 +364,16 @@ const dropdownItemStyle = {
   backgroundColor: "#f8f9fa",
 };
 
-const cardStyle = {
-  backgroundColor: "white",
-  borderRadius: "15px",
-  padding: "20px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+const summaryCardStyle = (gradient) => ({
+  background: gradient,
+  borderRadius: "20px",
+  padding: "25px",
+  color: "white",
   minWidth: "220px",
   flex: "1",
-};
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+  transition: "transform 0.2s ease",
+});
 
 const cardTitleStyle = {
   color: "#666",
@@ -305,6 +431,15 @@ const logCardStyle = {
   padding: "20px",
   marginBottom: "20px",
   boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+  borderLeft: "6px solid #198754",
+};
+
+const evaluationCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "15px",
+  padding: "25px",
+  marginBottom: "20px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
   borderLeft: "6px solid #198754",
 };
 
@@ -426,16 +561,6 @@ return (
 
         <div
           style={dropdownItemStyle}
-          onClick={() => {
-            setActiveView("logs");
-            setMenuOpen(false);
-          }}
-        >
-          Weekly Logs
-        </div>
-
-        <div
-          style={dropdownItemStyle}
           onClick={handleLogout}
         >
           Logout
@@ -453,37 +578,37 @@ return (
   flexWrap: "wrap",
 }}>
   
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📘 Logs</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {logs.length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #4e54c8, #3b82f6)")}>
+  <h4>📘 Logs</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {logs.length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📝 Applications</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #11998e, #38ef7d)")}>
+  <h4>📝 Applications</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {applications.length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>✅Approved</h4>
-    <p style={{ fontSize: "18px", fontWeight: "bold", margin: "0" }}>
-       {applications.filter(a => a.status === "approved").length}
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #ff9966, #ff5e62)")}>
+  <h4>✅ Approved</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {applications.filter(a => a.status === "approved").length}
+  </p>
+</div>
 
-  <div style={cardStyle}>
-    <h4 style={{ margin: "5px 0" }}>📊 Evaluations</h4>
-    <p style={{ fontSize: "16px", fontWeight: "bold", margin: "0" }}>
-      {
-        evaluations.filter(
-          ev => ev.supervisor_type === "academic"
-       ).length
-      }
-    </p>
-  </div>
+<div style={summaryCardStyle("linear-gradient(135deg, #c94bff, #8f44fd)")}>
+  <h4>📊 Evaluations</h4>
+  <p style={{ fontSize: "32px", fontWeight: "bold" }}>
+    {
+      evaluations.filter(
+        ev => ev.supervisor_type === "academic"
+      ).length
+    }
+  </p>
+</div>
   </div>
 
 
@@ -551,6 +676,15 @@ return (
              
             <p style={{textAlign: "center"}}><strong>Start Date:</strong> {placement.start_date || "Not set"}</p>
             <p style={{textAlign: "center"}}><strong>End Date:</strong> {placement.end_date || "Not set"}</p>
+            <p style={{ textAlign: "center" }}>
+              <strong>Workplace Supervisor:</strong>{" "}
+              {placement.workplace_supervisor_name || "Not Assigned"}
+            </p>
+
+            <p style={{ textAlign: "center" }}>
+              <strong>Academic Supervisor:</strong>{" "}
+              {placement.academic_supervisor_name || "Not Assigned"}
+            </p>
           </>
         ) : (
           <p style={{textAlign: "center"}}>You have not been placed yet.</p>
@@ -560,8 +694,12 @@ return (
       <hr />
 
       {/* WEEKLY LOGS FORM */}
-      <h2 style={{textAlign: "center"}}>Add Weekly Log</h2>
-      <div style={sectionCardStyle}>
+      <h2 style={{ textAlign: "center" }}>
+        {editingLog
+          ? `Edit Week ${editingLog.week_number} Log`
+          : "Add Weekly Log"}
+      </h2>
+      <div ref={formRef} style={sectionCardStyle}>
       <form onSubmit={submitLog} style={{ textAlign: "center" }}>
         <input
           type="number"
@@ -598,6 +736,58 @@ return (
           style={inputStyle}
         />
         <br /><br />
+
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+          style={inputStyle}
+        />
+
+        {editingLog && editingLog.attachment && (
+          <div
+            style={{
+              marginTop: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <strong>📄 Current PDF:</strong>{" "}
+            <a
+              href={editingLog.attachment}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: "#198754",
+                fontWeight: "bold",
+              }}
+            >
+              View Current PDF
+            </a>
+          </div>
+        )}
+
+        {editingLog && (
+          <div
+            style={{
+              backgroundColor: "#fff3cd",
+              border: "2px solid #ffc107",
+              color: "#856404",
+              padding: "12px",
+              borderRadius: "10px",
+              marginBottom: "15px",
+              fontWeight: "bold",
+              fontSize: "16px",
+              textAlign: "center",
+            }}
+          >
+            ⚠️ Leave the file field empty to keep the current PDF.
+            <br />
+            Upload a new PDF only if you want to replace it.
+          </div>
+        )}
+
+        <br /><br />
+
         <button
   type="submit"
   disabled={!placement}
@@ -607,7 +797,7 @@ return (
     cursor: !placement ? "not-allowed" : "pointer",
   }}
 >
-          Submit Log
+          {editingLog ? "Update Log" : "Submit Log"}
         </button>
       </form>
       </div>
@@ -620,6 +810,7 @@ return (
         <p style={{textAlign: "center"}}>No logs yet</p>
       ) : (
         logs.map((log) => (
+          
           <div key={log.id} style={logCardStyle}>
             <p style={{ fontSize: "18px", fontWeight: "bold" }}>
              📅 Week {log.week_number}
@@ -635,20 +826,47 @@ return (
   <span
     style={{
       backgroundColor:
-        log.status === "reviewed" ? "#3bad56" : "#fff3cd",
-      color:
-        log.status === "reviewed" ? "#155724" : "#856404",
+        log.status === "approved"
+          ? "#198754"
+          : log.status === "rejected"
+          ? "#dc3545"
+          : "#ffc107",
+
+      color: "white",
+
       padding: "6px 12px",
       borderRadius: "20px",
       fontWeight: "bold",
-      display: "inline-block",
     }}
   >
-    {log.status === "reviewed"
-      ? "Reviewed ✅"
-      : "Pending ⏳"}
+    {log.status}
   </span>
 </p>
+
+{log.supervisor_feedback && (
+  <p>
+    <strong>Supervisor Feedback:</strong>{" "}
+    {log.supervisor_feedback}
+  </p>
+)}
+
+{log.status === "rejected" && (
+  <button
+    onClick={() => handleEdit(log)}
+    style={{
+      backgroundColor: "#0d6efd",
+      color: "white",
+      border: "none",
+      padding: "8px 15px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      marginTop: "10px",
+    }}
+  >
+    Edit & Resubmit
+  </button>
+)}
+
           </div>
         ))
       )}
@@ -697,20 +915,133 @@ return (
 
 {activeView === "applications" && (
   <>
-            {/* APPLICATIONS */}
-      <h2 style={{textAlign: "center"}}>My Applications</h2>
-      {applications.length === 0 ? (
-        <p style={{textAlign: "center"}}>No applications yet</p>
-      ) : (
-        applications.map((app) => (
-          <div key={app.id} style={{ border: "1px solid blue", margin: "10px", padding: "10px" }}>
-            <p style={{textAlign: "center"}}><strong>Organization:</strong> {app.organization_name || app.organization}</p>
-            <p style={{textAlign: "center"}}><strong>Status:</strong> {app.status}</p>
-          </div>
-        ))
-      )}
-        </>
-)} 
+    <h2 style={{ textAlign: "center" }}>My Applications</h2>
+
+    {applications.length === 0 ? (
+      <p style={{ textAlign: "center" }}>
+        No applications yet
+      </p>
+    ) : (
+      <div
+        style={{
+          backgroundColor: "white",
+          borderRadius: "15px",
+          overflow: "hidden",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          marginTop: "20px",
+        }}
+      >
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+          }}
+        >
+          <thead>
+            <tr
+              style={{
+                backgroundColor: "#198754",
+                color: "white",
+              }}
+            >
+              <th
+                style={{
+                  padding: "15px",
+                  textAlign: "left",
+                }}
+              >
+                Organization
+              </th>
+
+              <th
+                style={{
+                  padding: "15px",
+                  textAlign: "left",
+                }}
+              >
+                Status
+              </th>
+              {!placement && <th>Action</th>}
+            </tr>
+          </thead>
+
+          <tbody>
+            {applications.map((app, index) => (
+              <tr
+                key={app.id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 0
+                      ? "#f8f9fa"
+                      : "white",
+                }}
+              >
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {app.organization_name ||
+                    app.organization}
+                </td>
+
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <span
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                      color: "white",
+                      backgroundColor:
+                        app.status === "approved"
+                          ? "#198754"
+                          : app.status === "rejected"
+                          ? "#dc3545"
+                          : "#ffc107",
+                    }}
+                  >
+                    {app.status}
+                  </span>
+                </td>
+                <td
+                  style={{
+                    padding: "15px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {!placement && (
+                    <button
+                      onClick={() => {
+                        setSelectedApplication(app.id);
+                        setShowDeleteModal(true);
+                      }}
+                      style={{
+                        backgroundColor: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </>
+)}
 
 {activeView === "evaluations" && (
   <>
@@ -721,56 +1052,126 @@ return (
         <p style={{textAlign: "center"}}>No evaluations yet</p>
       ) : (
         evaluations.map((ev) => (
-          <div key={ev.id} style={{ border: "1px solid green", margin: "10px", padding: "10px" }}>
+          <div key={ev.id} style={evaluationCardStyle}>
             <p style={{textAlign: "center"}}>Supervisor: {ev.supervisor_name} ({ev.supervisor_type})</p>
-            <div key={ev.id} style={{
-  border: "1px solid #4caf50",
-  margin: "15px",
-  padding: "15px",
-  borderRadius: "10px",
-  backgroundColor: "#f9fff9"
-}}>
+            <div
+              style={{
+                backgroundColor: "#f8f9fa",
+                padding: "15px",
+                borderRadius: "10px",
+                marginTop: "10px"
+              }}
+            >               
+  <h3
+    style={{
+      color: "#198754",
+      marginBottom: "15px",
+      textAlign: "center"
+    }}
+  >
+    {ev.supervisor_type === "workplace"
+      ? "🏢 Workplace Evaluation"
+      : "🎓 Academic Evaluation"}
+  </h3>
 
-  <p style={{textAlign: "center"}}>
-    Supervisor: {ev.supervisor_name} ({ev.supervisor_type})
-  </p>
 
   {/* WORKPLACE SCORE */}
   {ev.supervisor_type === "workplace" && (
     <>
-      <h4>🔵 Workplace Evaluation</h4>
+      <h4>📋 Workplace Evaluation Breakdown</h4>
 
+      <table
+        style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        marginTop: "10px",
+      }}
+    >
+    <thead>
+      <tr style={{ backgroundColor: "#198754", color: "white" }}>
+        <th style={{ padding: "10px" }}>Criteria</th>
+        <th style={{ padding: "10px" }}>Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
       {ev.criteria_scores?.map((cs, index) => (
-        <p key={index}>
-          {cs.criteria_name || cs.criteria}: {cs.score}
-        </p>
-      ))}
+        <tr key={index}>
+          <td
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            {cs.criteria_name || cs.criteria}
+          </td>
 
-      <p><strong>Total:</strong> {ev.score} / 60</p>
+          <td
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+              textAlign: "center",
+              fontWeight: "bold",
+            }}
+          >
+            {cs.score}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <p style={{ marginTop: "15px" }}>
+    <strong>Total Workplace Score:</strong> {ev.score}/60
+  </p>
     </>
   )}
 
   {/* ACADEMIC SCORE */}
   {ev.supervisor_type === "academic" && (
     <>
-      <h4>🧑‍🏫 Academic Evaluation</h4>
+      <div
+        style={{
+          backgroundColor: "#fff3cd",
+          padding: "15px",
+          borderRadius: "10px",
+          marginTop: "15px",
+        }}
+      >
+        <h3>📊 Final Internship Result</h3>
 
-      <p><strong>Logs Score:</strong> {getLogScore()} / 20</p>
-      <p><strong>Reviewed Logs:</strong> {getReviewedLogsCount()}</p>
+      <p>
+        Workplace Evaluation:
+        <strong> {workplaceScore}/60</strong>
+      </p>
 
-      <p><strong>Academic Score:</strong> {ev.score} / 20</p>
+      <p>
+        Weekly Logs:
+        <strong> {logScore}/20</strong>
+      </p>
+
+      <p>
+        Academic Evaluation:
+        <strong> {academicScore}/20</strong>
+      </p>
 
       <hr />
 
-      <h3>🎯 Final Score: {ev.final_grade}%</h3>
+      <h2>
+        Final Grade:
+        <span style={{ color: "#198754" }}>
+          {" "}
+          {finalPercentage}%
+        </span>
+      </h2>
+     </div>
     </>
   )}
 
   <p><strong>Comments:</strong> {ev.comments}</p>
 
 </div>
-            <p style={{textAlign: "center"}}>Comments: {ev.comments}</p>
-            <p style={{textAlign: "center"}}>Final Grade: {ev.final_grade || "Not finalised"}</p>
+
           </div>
         ))
       )}
@@ -789,8 +1190,117 @@ return (
       ) : (
         organizations.map((org) => (
           <div key={org.id} style={{ border: "1px solid purple", margin: "10px", padding: "10px" }}>
-            <p style={{textAlign: "center"}}><strong>Name:</strong> {org.name}</p>
-            <p style={{textAlign: "center"}}><strong>Location:</strong> {org.location}</p>
+            <div
+              key={org.id}
+              style={{
+                backgroundColor: "white",
+                borderRadius: "15px",
+                padding: "20px",
+                marginBottom: "20px",
+                boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                borderLeft: "5px solid #198754",
+              }}
+            >
+              <h3 style={{ color: "#198754" }}>
+                🏢 {org.name}
+              </h3>
+
+              <p>
+                <strong>📍 Location:</strong> {org.location}
+              </p>
+
+              {org.description && (
+                <>
+                  <p>
+                    <strong>📖 About Organization</strong>
+                  </p>
+
+                  <div
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    marginBottom: "15px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {org.description}
+                </div>
+              </>
+            )}
+
+              {org.contact_email && (
+                <p>
+                  <strong>📧 Email:</strong> {org.contact_email}
+                </p>
+              )}
+
+              {org.phone && (
+                <p>
+                  <strong>📞 Phone:</strong> {org.phone}
+                </p>
+              )}
+
+              {org.website && (
+                <p>
+                  <strong>🌐 Website:</strong>{" "}
+                  <a
+                    href={org.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "#198754",
+                      fontWeight: "bold",
+                    }}
+                  >
+                  Visit Website
+                 </a>
+                </p>
+              )}
+
+              <div style={{ marginTop: "15px" }}>
+                {placement ? (
+                  <button
+                    disabled
+                    style={{
+                      backgroundColor: "gray",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    Already Placed
+                  </button>
+                ) : hasApplied(org.id) ? (
+                  <button
+                    disabled
+                    style={{
+                      backgroundColor: "#edf0f5",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    Applied ✅
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => applyToOrganization(org.id)}
+                    style={{
+                      backgroundColor: "#198754",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Apply
+                  </button>
+                )}
+              </div>
+            </div>
       
             {placement ? (
   <button disabled style={{ backgroundColor: "gray", cursor: "not-allowed" }}>
@@ -810,6 +1320,81 @@ return (
       )}
      </>
 )} 
+
+{showDeleteModal && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.5)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: "white",
+        padding: "25px",
+        borderRadius: "12px",
+        width: "400px",
+        textAlign: "center",
+      }}
+    >
+      <h3>Delete Application</h3>
+
+      <p>
+        Are you sure you want to delete this application?
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "15px",
+          marginTop: "20px",
+        }}
+      >
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          style={{
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={async () => {
+            await deleteApplication(selectedApplication);
+            setShowDeleteModal(false);
+          }}
+          style={{
+            backgroundColor: "#dc3545",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+<Footer />
     </div>
   );
 }

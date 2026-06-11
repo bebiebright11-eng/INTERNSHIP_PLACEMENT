@@ -23,10 +23,37 @@ class PlacementSerializer(serializers.ModelSerializer):
 
     #  ADD: student name
     student_name = serializers.CharField(source='student.username', read_only=True)
+
+    workplace_supervisor_name = serializers.SerializerMethodField()
+    academic_supervisor_name = serializers.SerializerMethodField()
+
     is_fully_assigned = serializers.ReadOnlyField()
-    workplace_supervisor_name = serializers.CharField(source='workplace_supervisor.username', read_only=True)
-    academic_supervisor_name = serializers.CharField(source='academic_supervisor.username', read_only=True)
     status = serializers.ReadOnlyField()
+
     class Meta:
         model = Placement
         fields = '__all__'
+
+    def get_workplace_supervisor_name(self, obj):
+        if not obj.workplace_supervisor:
+            return None
+
+        full_name = (
+            f"{obj.workplace_supervisor.first_name} "
+            f"{obj.workplace_supervisor.last_name}"
+        ).strip()
+
+        return full_name or obj.workplace_supervisor.username
+
+    def get_academic_supervisor_name(self, obj):
+        if not obj.academic_supervisor:
+            return None
+
+        full_name = (
+            f"{obj.academic_supervisor.first_name} "
+            f"{obj.academic_supervisor.last_name}"
+        ).strip()
+
+
+        return full_name or obj.academic_supervisor.username
+    

@@ -10,51 +10,65 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
 
     # show organization name
     organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
-    status = serializers.SerializerMethodField()
+    
+    attachment = serializers.FileField(
+        required=False,
+        allow_null=True
+    )
 
 
     class Meta:
         model = WeeklyLog
         fields = '__all__'
+
+
+    def update(self, instance, validated_data):
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        return instance
     
-    def get_status(self, obj):
-
-        placement_logs = WeeklyLog.objects.filter(
-            placement=obj.placement
-        ).order_by("submitted_at")
-
-        reviewed_ids = placement_logs[:8].values_list("id", flat=True)
-
-        if obj.id in reviewed_ids:
-            return "reviewed"
-
-        return "pending"
+    
      
     def validate(self, data):
 
-        placement = data.get("placement")
+    # Supervisor is reviewing an existing log
+        if self.instance:
+            return data
+
+        placement = data.get(
+            "placement",
+            getattr(self.instance, "placement", None)
+        )
+
+        if not placement:
+            return data
+
+        if not placement:
+            raise serializers.ValidationError(
+                "Placement is required."
+            )
 
         today = timezone.now().date()
 
-    # Prevent submission before placement starts
+        # Prevent submission before placement starts
         if placement.start_date and today < placement.start_date:
             raise serializers.ValidationError(
                 f"You cannot submit logs before {placement.start_date}"
             )
 
-    # Prevent submission after placement ends
+        # Prevent submission after placement ends
         if placement.end_date and today > placement.end_date:
             raise serializers.ValidationError(
                 "This placement has already ended"
             )
 
-    # Monday of current week
         start_of_week = today - timedelta(days=today.weekday())
-
-    # Sunday of current week
         end_of_week = start_of_week + timedelta(days=6)
 
-    # Prevent more than one submission in same week
         existing_log = WeeklyLog.objects.filter(
             placement=placement,
             submitted_at__date__gte=start_of_week,
@@ -119,7 +133,23 @@ class EvaluationSerializer(serializers.ModelSerializer):
     #  ADD: organization name
     organization_name = serializers.CharField(source='placement.organization.name', read_only=True)
 
-    supervisor_name = serializers.CharField(source='supervisor.username', read_only=True)
+    workplace_supervisor_name = serializers.SerializerMethodField()
+    academic_supervisor_name = serializers.SerializerMethodField()
+    
+    workplace_supervisor_name = serializers.CharField(
+        source='placement.workplace_supervisor.get_full_name',
+        read_only=True
+    )
+
+    academic_supervisor_name = serializers.CharField(
+        source='placement.academic_supervisor.get_full_name',
+        read_only=True
+    )
+
+
+
+
+
     supervisor_type_display = serializers.CharField(
     source='get_supervisor_type_display',
     read_only=True
@@ -151,7 +181,11 @@ class EvaluationSerializer(serializers.ModelSerializer):
             'student_registration_number',
             'student_name',
             'organization_name',
-            'supervisor_name'
+        
+
+            'workplace_supervisor_name',
+            'academic_supervisor_name',
+
         ]
 
     def get_student_name(self, obj):
@@ -165,11 +199,12 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
     def get_log_score(self, placement):
 
-        reviewed_logs = WeeklyLog.objects.filter(
-            placement=placement
-        ).order_by("submitted_at", "id")[:8]
+        approved_logs = WeeklyLog.objects.filter(
+            placement=placement,
+            status="approved"
+        )
 
-        count = reviewed_logs.count()
+        count = approved_logs.count()
 
         score = count * 2.5
 
@@ -180,10 +215,50 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+
         criteria_data = validated_data.pop('criteria_scores', [])
+
+        placement = validated_data['placement']
+        supervisor_type = validated_data['supervisor_type']
+
+    # WORKPLACE SUPERVISOR VALIDATION
+        if supervisor_type == "workplace":
+
+            pending_logs = WeeklyLog.objects.filter(
+                placement=placement,
+                status="pending"
+            ).exists()
+
+            rejected_logs = WeeklyLog.objects.filter(
+                placement=placement,
+                status="rejected"
+            ).exists()
+
+            approved_logs = WeeklyLog.objects.filter(
+                placement=placement,
+                status="approved"
+            ).exists()
+
+            if pending_logs:
+                raise serializers.ValidationError(
+                   "Please approve all weekly logs before evaluating the student."
+                )
+
+            if rejected_logs:
+                raise serializers.ValidationError(
+                   "This student has rejected weekly logs. Evaluation cannot be submitted until they are corrected and approved."
+               )
+
+            if not approved_logs:
+                raise serializers.ValidationError(
+                    "No approved weekly logs found for this student."
+                )
+
         evaluation = Evaluation.objects.create(**validated_data)
 
         total = 0
+
+    
 
     #  Workplace Supervisor → Criteria scoring (60)
         if evaluation.supervisor_type == 'workplace':

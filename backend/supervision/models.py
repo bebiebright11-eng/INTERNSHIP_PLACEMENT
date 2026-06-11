@@ -8,8 +8,9 @@ User = settings.AUTH_USER_MODEL
 
 class WeeklyLog(models.Model):
     STATUS_CHOICES = (
-        ('submitted','Submitted'),
-        ('reviewed','Reviewed')
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
     )
 
     placement = models.ForeignKey(Placement, on_delete=models.CASCADE)
@@ -21,11 +22,29 @@ class WeeklyLog(models.Model):
 
     attendance_days = models.PositiveIntegerField(default=5)
 
-    supervisor_feedback = models.TextField(blank=True)
+    supervisor_feedback = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    attachment = models.FileField(
+        upload_to='weekly_logs/',
+        blank=True,
+        null=True
+    )
 
     submitted_at = models.DateTimeField(auto_now_add=True)
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
+    reviewed_at = models.DateTimeField(
+       null=True,
+       blank=True
+    )   
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
 
     class Meta:
         unique_together = ('placement', 'week_number')

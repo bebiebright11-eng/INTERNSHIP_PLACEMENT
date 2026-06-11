@@ -1,15 +1,21 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
+import Footer from "../components/Footer";
+
 
 function AdminDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('home');
+  const navigate = useNavigate();
   
   const [applications, setApplications] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [organizations, setOrganizations] = useState([]);
+
+  const [applicationSearch, setApplicationSearch] = useState("");
 
 // Student form
   const [studentRegNo, setStudentRegNo] = useState("");
@@ -22,10 +28,56 @@ function AdminDashboard() {
 
   const [message, setMessage] = useState("");
 
+  const [activePlacementForm, setActivePlacementForm] = useState(null);
+
+
+  const [showConfirmedPlacements, setShowConfirmedPlacements] = useState(false);
+  const [placementSearch, setPlacementSearch] = useState("");
+
+
+  const firstName = localStorage.getItem("first_name");
+
+  const [showModal, setShowModal] = useState(false);
+
+  const [editingPlacement, setEditingPlacement] = useState(null);
+
+const [editPlacementData, setEditPlacementData] = useState({
+  start_date: "",
+  end_date: "",
+  workplace_supervisor: "",
+  academic_supervisor: "",
+});
+
+  const [modalConfig, setModalConfig] = useState({
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
   const handleMenuClick = (view) => {
   setActiveView(view);
   setMenuOpen(false);
 };
+  
+  const handleLogout = () => {
+  localStorage.clear();
+
+  toast.success("Logged out successfully 👋");
+
+  navigate("/");
+};
+
+
+const filteredApplications = applications.filter(
+  (app) =>
+    app.organization_name
+      ?.toLowerCase()
+      .includes(applicationSearch.toLowerCase()) ||
+
+    app.student_name
+      ?.toLowerCase()
+      .includes(applicationSearch.toLowerCase())
+);
 
   const [orgForm, setOrgForm] = useState({
     name: "",
@@ -47,7 +99,7 @@ function AdminDashboard() {
     website: "",
   });
 
-  const [activePlacementForm, setActivePlacementForm] = useState(null);
+
 
   const [placementFormData, setPlacementFormData] = useState({
     start_date: "",
@@ -259,12 +311,6 @@ const handleCreateStaff = async (e) => {
 
   const deleteUser = async (id) => {
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this user?"
-  );
-
-  if (!confirmDelete) return;
-
   try {
 
     await API.delete(`accounts/users/${id}/`);
@@ -278,7 +324,10 @@ const handleCreateStaff = async (e) => {
   } catch (error) {
     console.log(error);
 
-    toast.error("Failed to delete user");
+    toast.error(
+      error.response?.data?.error ||
+      "Failed to delete user"
+    );
 
   }
 };
@@ -301,48 +350,61 @@ const handleCreateStaff = async (e) => {
     }
   };
 
-  const deleteOrganization = async (id) => {
-    const confirmDelete = window.confirm("Delete this organization?");
-    if (!confirmDelete) return;
+const deleteOrganization = async (id) => {
 
-    try {
-      await API.delete(`internships/organizations/${id}/`);
+  try {
 
-      setOrganizations((prev) =>
-        prev.filter((org) => org.id !== id)
-      );
+    await API.delete(`internships/organizations/${id}/`);
 
-      toast.success("Organization deleted!");
-    } catch (err) {
-      console.log(err);
-      toast.error("Delete failed");
-    }
-  };
-  const deletePlacement = async (id) => {
-
-    const confirmDelete = window.confirm(
-      "Delete this placement?"
+    setOrganizations((prev) =>
+      prev.filter((org) => org.id !== id)
     );
 
-    if (!confirmDelete) return;
+    toast.success("Organization deleted successfully");
 
-    try {
+  } catch (error) {
 
-      await API.delete(`internships/placements/${id}/`);
+    console.log(error);
 
-      setPlacements((prev) =>
-        prev.filter((p) => p.id !== id)
-      );
+    toast.error(
+      error.response?.data?.error ||
+      "Failed to delete organization"
+    );
+  }
+};
 
-      toast.success("Placement deleted successfully");
+const deletePlacement = async (id) => {
 
-    } catch (error) {
+  try {
+    await API.delete(`internships/placements/${id}/`);
 
-      console.log(error);
+    setPlacements((prev) =>
+      prev.filter((p) => p.id !== id)
+    );
 
-      toast.error("Failed to delete placement");
-    }
-  };
+    toast.success("Placement deleted successfully");
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Failed to delete placement");
+  }
+};
+
+const deleteCriteria = async (id) => {
+  try {
+    await API.delete(`supervision/criteria/${id}/`);
+
+    setCriteria((prev) =>
+      prev.filter((item) => item.id !== id)
+    );
+
+    toast.success("Criteria deleted successfully");
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Delete failed");
+  }
+};
 
   
   const updateStatus = async (id, status) => {
@@ -398,6 +460,48 @@ const handleCreateStaff = async (e) => {
     }
   };
 
+  const pendingPlacements = placements.filter(
+    (p) => !p.is_fully_assigned
+  );
+
+  const pendingStudents = [
+    ...new Set(
+      applications
+        .filter((app) => app.status === "pending")
+        .map((app) => app.student)
+    )
+  ];
+
+const confirmedPlacements = placements.filter(
+  (p) => p.is_fully_assigned
+);
+
+const filteredConfirmedPlacements =
+  confirmedPlacements.filter((p) =>
+    p.student_name
+      ?.toLowerCase()
+      .includes(placementSearch.toLowerCase()) ||
+
+    p.organization_name
+      ?.toLowerCase()
+      .includes(placementSearch.toLowerCase())
+  );
+
+
+  const openConfirmationModal = (
+    title,
+    message,
+    onConfirm
+  ) => {
+    setModalConfig({
+      title,
+      message,
+      onConfirm,
+    });
+
+  setShowModal(true);
+};
+
   // ---------------- LOAD DATA ON MOUNT ----------------
   useEffect(() => {
     fetchApplications();
@@ -408,16 +512,27 @@ const handleCreateStaff = async (e) => {
     fetchFinalEvaluations();
   }, []); 
 
-  const menuButtonStyle = {
-    backgroundColor: "#198754",
-    color: "white",
-    border: "none",
-    padding: "12px 18px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "15px",
-  };
+const menuButtonStyle = {
+  background: "linear-gradient(135deg,#198754,#157347)",
+  color: "white",
+  border: "none",
+
+  padding: "12px 18px",
+
+  borderRadius: "12px",
+  cursor: "pointer",
+
+  fontWeight: "600",
+  fontSize: "16px",
+
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+
+  transition: "0.3s ease",
+};
   
 
   const menuItemStyle = {
@@ -452,13 +567,18 @@ const handleCreateStaff = async (e) => {
     zIndex: 1000,
   }; 
 
-  const sectionWrapper = {
-  background: "#fff",
-  borderRadius: "18px",
+const sectionWrapper = {
+  background: "#ffffff",
+  borderRadius: "20px",
   padding: "30px",
   marginTop: "30px",
-  border: "1px solid #e5e7eb",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+
+  borderLeft: "5px solid #198754",
+
+  boxShadow:
+    "0 8px 25px rgba(0,0,0,0.08)",
+
+  transition: "0.3s",
 };
 
 const sectionCard = {
@@ -474,16 +594,36 @@ const sectionTitle = {
   textAlign: "center",
   fontWeight: "bold",
 };
-  const cardStyle = {
-  background: "#fff",
-  borderRadius: "18px",
-  padding: "25px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-  border: "1px solid #e5e7eb",
+
+
+const purpleCard = {
   flex: 1,
   minWidth: "240px",
-  transition: "0.3s ease",
-  cursor: "pointer",
+  padding: "25px",
+  borderRadius: "20px",
+  color: "white",
+  background: "linear-gradient(135deg, #6a11cb, #2575fc)",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+};
+
+const greenCard = {
+  flex: 1,
+  minWidth: "240px",
+  padding: "25px",
+  borderRadius: "20px",
+  color: "white",
+  background: "linear-gradient(135deg, #11998e, #38ef7d)",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+};
+
+const pinkCard = {
+  flex: 1,
+  minWidth: "240px",
+  padding: "25px",
+  borderRadius: "20px",
+  color: "white",
+  background: "linear-gradient(135deg, #ff4ecd, #b5179e)",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
 };
 
   const cardTitleStyle = {
@@ -499,10 +639,15 @@ const sectionTitle = {
 
   const tableContainerStyle = {
   background: "#fff",
-  borderRadius: "18px",
-  overflow: "auto",
+
+  borderRadius: "20px",
+
+  overflow: "hidden",
+
   border: "1px solid #e5e7eb",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+
+  boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+
   marginTop: "20px",
 };
 
@@ -514,55 +659,81 @@ const tableStyle = {
 };
  
 const tableHeaderStyle = {
-  backgroundColor: "#198754",
+  background:
+    "linear-gradient(135deg,#198754,#157347)",
+
   color: "#fff",
+
   padding: "18px",
+
   fontWeight: "bold",
+
   textAlign: "left",
   fontSize: "15px",
   letterSpacing:"0.5px",
 };
 
 const tableCellStyle = {
-  padding: "18px 16px",
+  padding: "18px",
+
   borderBottom: "1px solid #f1f5f9",
-  fontSize: "15px",
-  color:"#374151",
-  verticalAlign:"middle",
-  backgroundColor: "#fff",
 };
 
 const primaryButton = {
-  background: "#198754",
+  background:
+    "linear-gradient(135deg,#198754,#157347)",
+
   color: "#fff",
+
   border: "none",
+
   padding: "12px 20px",
+
   borderRadius: "10px",
+
   cursor: "pointer",
+
   fontWeight: "600",
+
+  boxShadow:
+    "0 4px 10px rgba(25,135,84,0.25)",
 };
 
 const deleteButtonStyle = {
-  background: "#ef4444",
+  background:
+    "linear-gradient(135deg,#dc3545,#b02a37)",
+
   color: "white",
+
   border: "none",
+
   padding: "10px 16px",
+
   borderRadius: "10px",
+
   cursor: "pointer",
+
   fontWeight: "600",
-  transition: "0.3s ease",
 };
 
 const inputStyle = {
   width: "100%",
-  padding: "12px 14px",
+
+  padding: "14px",
+
   border: "1px solid #d1d5db",
-  borderRadius: "10px",
+
+  borderRadius: "12px",
+
+  background: "#fafafa",
+
   fontSize: "15px",
-  backgroundColor: "#fff",
+
+  outline: "none",
+
   boxSizing: "border-box",
+
   marginBottom: "12px",
-  transition: "0.2s",
 };
 
 const textareaStyle = {
@@ -579,6 +750,45 @@ const textareaStyle = {
   const staffUsers = supervisors.filter(
     (user) => user.role !== "student"
   );
+
+
+  const handleEditPlacement = (placement) => {
+  setEditingPlacement(placement.id);
+
+  setEditPlacementData({
+    start_date: placement.start_date || "",
+    end_date: placement.end_date || "",
+    workplace_supervisor:
+      placement.workplace_supervisor || "",
+    academic_supervisor:
+      placement.academic_supervisor || "",
+  });
+};
+
+
+const savePlacementChanges = async (id) => {
+  try {
+    await API.patch(`internships/placements/${id}/`, {
+      start_date: editPlacementData.start_date,
+      end_date: editPlacementData.end_date,
+      workplace_supervisor:
+        editPlacementData.workplace_supervisor,
+      academic_supervisor:
+        editPlacementData.academic_supervisor,
+    });
+
+    toast.success("Placement updated successfully");
+
+    setEditingPlacement(null);
+
+    fetchPlacements();
+
+  } catch (error) {
+    console.log(error);
+
+    toast.error("Failed to update placement");
+  }
+};
 
 return (
   <div
@@ -618,23 +828,18 @@ return (
           fontWeight: "bold",
         }}
       >
-        Welcome, Admin 👋
+        Welcome,  {firstName || "Admin"}  👋
       </p>
     </div>
 
     {/* MENU */}
-    <div ref ={menuRef} style={{ display: 'flex',position:"relative" }}>
+    <div ref={menuRef}style={{display: "flex",position: "relative",marginBottom: "40px",}}>
       <button
         onClick={() => setMenuOpen(!menuOpen)}
-        style={{
-          fontSize : '24px',
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-
-        }}
+        style={menuButtonStyle}
       >
-        ☰ menu
+        <span style={{ fontSize: "18px" }}>☰</span>
+        <span>Menu</span>
       </button>
 
 
@@ -697,7 +902,15 @@ return (
         🎓 Final Report
       </div>    
 
-     
+       <div
+          style={{
+            ...menuItemStyle,
+            color: "#dc3545",
+          }}
+          onClick={handleLogout}
+        >
+          🚪 Logout
+        </div>
 
       
 
@@ -708,11 +921,6 @@ return (
   
     <div>
       
-
-      
-{activeView === "home" && ( 
-
-  <> 
   <div
     style={{
       display: "flex",
@@ -721,51 +929,51 @@ return (
       flexWrap : "wrap",
     }}
   >
-   <div
-      style={cardStyle}
-      onMouseEnter ={(e) => {
-        e.currentTarget.style.transform = "translateY(-5px)";
-        e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
-      }} 
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-      }}  
-  >
-    <h3 style={cardTitleStyle}>Organizations</h3>
-    <p style={cardNumberStyle}>{organizations.length}</p>
-  </div>
+<div style={purpleCard}>
+  <div style={{ fontSize: "30px" }}>🏢</div>
+  <h3>Organizations</h3>
+  <p style={{ fontSize: "40px", fontWeight: "bold" }}>
+    {organizations.length}
+  </p>
+</div>
 
-  <div style={cardStyle}
-    onMouseEnter ={(e) => {
-      e.currentTarget.style.transform = "translateY(-5px)";
-      e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
-    }} 
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-    }}  
-  >
-    <h3 style={cardTitleStyle}>Applications</h3>
-    <p style={cardNumberStyle}>{applications.length}</p>
-  </div>
+<div style={greenCard}>
+  <div style={{ fontSize: "30px" }}>📝</div>
+  <h3>Applications</h3>
+  <p style={{ fontSize: "40px", fontWeight: "bold" }}>
+    {applications.length}
+  </p>
+</div>
 
-  <div style={cardStyle}
-    onMouseEnter ={(e) => {
-      e.currentTarget.style.transform = "translateY(-5px)";
-      e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
-    }} 
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-    }}  
-  >
-    <h3 style={cardTitleStyle}>Placements</h3>
-    <p style={cardNumberStyle}>
-      {placements.filter((p) => p.is_fully_assigned).length}
-    </p>  
-    </div>
-  </div>   
+<div style={pinkCard}>
+  <div style={{ fontSize: "30px" }}>🎓</div>
+  <h3>Placements</h3>
+  <p style={{ fontSize: "40px", fontWeight: "bold" }}>
+    {placements.filter((p) => p.is_fully_assigned).length}
+  </p>
+</div>
+  </div> 
+      
+{activeView === "home" && ( 
+
+  <>
+
+    {pendingStudents.length > 0 && (
+      <div
+        style={{
+          background: "#fff3cd",
+          color: "#856404",
+          padding: "15px",
+          borderRadius: "12px",
+          marginBottom: "20px",
+          border: "1px solid #ffeeba",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        🔔 {pendingStudents.length} student(s) have new applications waiting for review.
+      </div>
+    )}
     <div
       style={{
         display: "flex",
@@ -1038,31 +1246,24 @@ return (
   >
     {savedRows[c.id] ? "Saved ✅" : "Save"}
   </button>
-    <button 
+    <button
       style={deleteButtonStyle}
-
-      onMouseEnter = {(e) => {
+      onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = "#701010";
       }}
-
-      onMouseLeave = {(e) => {
+      onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = "#4f0909";
       }}
-
-      onClick={async () => {
-        try {
-          await API.delete(`supervision/criteria/${c.id}/`);
-
-          // ✅ remove instantly from UI
-          setCriteria((prev) => prev.filter((item) => item.id !== c.id));
-
-        } catch {
-          toast.error("Delete failed");
-        }
-      }}
-    >
-      Delete
-    </button>
+      onClick={() =>
+        openConfirmationModal(
+          "Delete Criteria",
+          "Are you sure you want to delete this criteria?",
+          () => deleteCriteria(c.id)
+        )
+     }
+   >
+    Delete
+   </button>
 
 
           </td>
@@ -1151,11 +1352,15 @@ return (
       <div
         key={org.id}
         style={{
-          border: "1px solid #ddd",
-          padding: "10px",
-          marginBottom: "10px",
-          borderRadius: "6px",
           background: "#fff",
+          padding: "20px",
+          marginBottom: "20px",
+
+          borderRadius: "16px",
+
+          borderLeft: "5px solid #198754",
+
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
         }}
       >
         {editingOrg === org.id ? (
@@ -1235,7 +1440,14 @@ return (
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = "#ef4444";
               }}
-              onClick={() => deleteOrganization(org.id)}>
+              onClick={() =>
+                openConfirmationModal(
+                  "Delete Organization",
+                  "Are you sure you want to delete this organization?",
+                  () => deleteOrganization(org.id)
+               )
+              }
+              >
               Delete
             </button>
           </>
@@ -1252,135 +1464,277 @@ return (
    
 {activeView === "applications" && (
   <>
+    <h2>Applications</h2>
 
-        <h2>Applications</h2>
+    <input
+      style={{
+        ...inputStyle,
+        maxWidth: "400px",
+        marginBottom: "20px",
+      }}
+      type="text"
+      placeholder="Search student /organization..."
+      value={applicationSearch}
+      onChange={(e) =>
+        setApplicationSearch(e.target.value)
+      }
+    />
 
-  {applications.length === 0 ? (
-    <p>No applications yet</p>
-  ) : (
-    Object.entries(groupApplicationsByStudent()).map(([student, apps]) => (
-      <div
-        key={student}
-        style={{ border: "2px solid black", margin: "15px", padding: "10px" }}
-      >
-        
-        {/* 🔥 STUDENT NAME */}
-        <h3>Student: {student}</h3>
+    {applications.length === 0 ? (
+      <p>No applications yet</p>
+    ) : (
+      Object.entries(
+        filteredApplications.reduce((grouped, app) => {
+          const student = app.student_name;
 
-        {/* 🔥 APPLICATIONS UNDER THAT STUDENT */}
-        {apps.map((app) => (
+          if (!grouped[student]) {
+            grouped[student] = [];
+          }
+
+          grouped[student].push(app);
+
+          return grouped;
+        }, {})
+      ).map(
+        ([student, apps]) => (
           <div
-            key={app.id}
+            key={student}
             style={{
-              marginLeft: "20px",
-              borderTop: "1px solid gray",
-              padding: "5px",
+              border: "2px solid black",
+              margin: "15px",
+              padding: "10px",
             }}
           >
-            <p><strong>Organization:</strong> {app.organization_name}</p>
-            <p><strong>Status:</strong> {app.status}</p>
+            <h3>Student: {student}</h3>
 
-            {app.status === "pending" && (
-              <>
-                <button onClick={() => updateStatus(app.id, "approved")}>
-                  Approve
-                </button>
+            <div style={tableContainerStyle}>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={tableHeaderStyle}>
+                      Organization
+                    </th>
 
-                <button onClick={() => updateStatus(app.id, "rejected")}>
-                  Reject
-                </button>
-              </>
-            )}
-            
+                    <th style={tableHeaderStyle}>
+                      Status
+                    </th>
 
-          
+                    <th style={tableHeaderStyle}>
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
 
-  {/* 🔥 SHOW BUTTON ONLY IF APPROVED */}
-  {app.status === "approved" && (
-    placements.some((p) => p.student === app.student) ? (
-      <p style={{ color: "green", fontWeight: "bold" }}>
-        ✅ Placement Created
-      </p>
-    ) : (
-      <button
-        onClick={() => {
-          setActivePlacementForm(app.id);
-          setPlacementFormData({
-            start_date: "",
-            end_date: "",
-          });
-        }}
-      >
-        Create Placement
-      </button>
-    )
-  )}
+                <tbody>
+                  {apps.map((app, index) => (
+                    <tr
+                      key={app.id}
+                      style={{
+                        backgroundColor:
+                          index % 2 === 0
+                            ? "#f8f9fa"
+                            : "white",
+                      }}
+                    >
+                      <td style={tableCellStyle}>
+                        {app.organization_name}
+                      </td>
 
-  {/* 🔥 INLINE PLACEMENT FORM */}
-  {activePlacementForm === app.id && (
-    <div style={{ marginTop: "10px", padding: "10px", border: "1px solid blue" }}>
-      
-      {/* START DATE */}
-      <input
-        type="date"
-        value={placementFormData.start_date}
-        onChange={(e) =>
-          setPlacementFormData({
-            ...placementFormData,
-            start_date: e.target.value,
-          })
-        }
-      />
-      {/* END DATE */}
-      <input
-        type="date"
-        value={placementFormData.end_date}
-        onChange={(e) =>
-          setPlacementFormData({
-            ...placementFormData,
-            end_date: e.target.value,
-          })
-        }
-      />
-      <br /><br />
+                      <td style={tableCellStyle}>
+                        {app.status}
+                      </td>
 
-      {/* SAVE BUTTON */}
-      <button
-        onClick={async () => {
-          try {
-            await API.post("internships/placements/", {
-              student: app.student,
-              organization: app.organization,
-              start_date: placementFormData.start_date,
-              end_date: placementFormData.end_date,
-            });
-            toast.success("Placement created!");
+                      <td style={tableCellStyle}>
+                        {app.status === "pending" && (
+                          <>
+                            <button
+                              style={{
+                                ...primaryButton,
+                                marginRight: "10px",
+                              }}
+                              onClick={() =>
+                                updateStatus(
+                                  app.id,
+                                  "approved"
+                                )
+                              }
+                            >
+                              Approve
+                            </button>
 
-            // 🔥 close form after saving
-            setActivePlacementForm(null);
+                            <button
+                              style={deleteButtonStyle}
+                              onClick={() =>
+                                updateStatus(
+                                  app.id,
+                                  "rejected"
+                                )
+                              }
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
 
-            fetchPlacements();
-          } catch (error) {
-              console.log(error.response?.data);
+                        {app.status === "approved" && (
+                          <>
+                            {placements.some(
+                              (p) =>
+                                p.student ===
+                                app.student
+                            ) ? (
+                              <p
+                                style={{
+                                  color: "green",
+                                  fontWeight: "bold",
+                                  marginTop: "10px",
+                                }}
+                              >
+                                ✅ Placement Created , Confirm placement from "Menu" placements
+                              </p>
+                            ) : (
+                              <>
+                                <button
+                                  style={primaryButton}
+                                  onClick={() => {
+                                    setActivePlacementForm(
+                                      app.id
+                                    );
 
-              if (error.response?.data?.student) {
-                toast.warning("This student already has a placement!");
-              } else {
-                toast.error("Failed to create placement");
-              }
-            }
-        }}
-      >
-        Save Placement
-      </button>
+                                    setPlacementFormData({
+                                      start_date: "",
+                                      end_date: "",
+                                    });
+                                  }}
+                                >
+                                  Create Placement
+                                </button>
 
-    </div>
-  )}
+                                {activePlacementForm ===
+                                  app.id && (
+                                  <div
+                                    style={{
+                                      marginTop: "10px",
+                                      padding: "10px",
+                                      border:
+                                        "1px solid #198754",
+                                      borderRadius:
+                                        "8px",
+                                    }}
+                                  >
+                                    <input
+                                      style={
+                                        inputStyle
+                                      }
+                                      type="date"
+                                      value={
+                                        placementFormData.start_date
+                                      }
+                                      onChange={(e) =>
+                                        setPlacementFormData(
+                                          {
+                                            ...placementFormData,
+                                            start_date:
+                                              e.target
+                                                .value,
+                                          }
+                                        )
+                                      }
+                                    />
+
+                                    <input
+                                      style={
+                                        inputStyle
+                                      }
+                                      type="date"
+                                      value={
+                                        placementFormData.end_date
+                                      }
+                                      onChange={(e) =>
+                                        setPlacementFormData(
+                                          {
+                                            ...placementFormData,
+                                            end_date:
+                                              e.target
+                                                .value,
+                                          }
+                                        )
+                                      }
+                                    />
+
+                                    <button
+                                      style={
+                                        primaryButton
+                                      }
+                                      onClick={async () => {
+                                        try {
+                                          await API.post(
+                                            "internships/placements/",
+                                            {
+                                              student:
+                                                app.student,
+                                              organization:
+                                                app.organization,
+                                              start_date:
+                                                placementFormData.start_date,
+                                              end_date:
+                                                placementFormData.end_date,
+                                            }
+                                          );
+
+                                          toast.success(
+                                            "Placement created!"
+                                          );
+
+                                          setActivePlacementForm(
+                                            null
+                                          );
+
+                                          fetchPlacements();
+                                        } catch (
+                                          error
+                                        ) {
+                                          console.log(
+                                            error
+                                              .response
+                                              ?.data
+                                          );
+
+                                          if (
+                                            error
+                                              .response
+                                              ?.data
+                                              ?.student
+                                          ) {
+                                            toast.warning(
+                                              "This student already has a placement!"
+                                            );
+                                          } else {
+                                            toast.error(
+                                              "Failed to create placement"
+                                            );
+                                          }
+                                        }
+                                      }}
+                                    >
+                                      Save Placement
+                                    </button>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        ))}
-      </div>
-    ))
-  )}
+        )
+      )
+    )}
   </>
 )}
       
@@ -1399,22 +1753,284 @@ return (
     >
       <h2>Placements</h2>
 
-      {placements.length === 0 ? (
-        <div
-          style={{
-            padding: "50px",
-            textAlign: "center",
-            color: "#9ca3af",
-            background: "white",
-            borderRadius: "16px",
-            marginTop: "20px",
-          }}
-        >
-          <h3>No Placements Yet 📭</h3>
-          <p>Placements will appear here once assigned.</p>
-        </div>
+      <button
+        style={{
+          ...primaryButton,
+          marginBottom: "20px",
+        }}
+        onClick={() =>
+          setShowConfirmedPlacements(
+          !showConfirmedPlacements
+        )
+      }
+    >
+      {showConfirmedPlacements
+        ? "Hide Confirmed Placements"
+        : "View Confirmed Placements"}
+      </button>
+
+
+      {showConfirmedPlacements && (
+  <div
+    style={{
+      width: "100%",
+      marginBottom: "30px",
+    }}
+  >
+    <input
+      style={{
+        ...inputStyle,
+        maxWidth: "400px",
+        marginBottom: "15px",
+      }}
+      placeholder="Search student or organization..."
+      value={placementSearch}
+      onChange={(e) =>
+        setPlacementSearch(e.target.value)
+      }
+    />
+
+    <div style={tableContainerStyle}>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={tableHeaderStyle}>
+              Student
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Organization
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Workplace Supervisor
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Academic Supervisor
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Start / End Date
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Status
+            </th>
+
+            <th style={tableHeaderStyle}>
+              Action
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {filteredConfirmedPlacements.map(
+            (p, index) => (
+              <tr
+                key={p.id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 0
+                      ? "#f8f9fa"
+                      : "white",
+                }}
+              >
+                <td style={tableCellStyle}>
+                  {p.student_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.organization_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.workplace_supervisor_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.academic_supervisor_name}
+                </td>
+
+                <td style={tableCellStyle}>
+                  {p.start_date} → {p.end_date}
+                </td>
+
+                <td style={tableCellStyle}>
+                  <span
+                    style={{
+                      color: "#198754",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Confirmed
+                  </span>
+                </td>
+                <td style={tableCellStyle}>
+  <button
+    style={{
+      ...primaryButton,
+      marginRight: "10px",
+    }}
+    onClick={() => handleEditPlacement(p)}
+  >
+    Edit
+  </button>
+
+  <button
+    style={deleteButtonStyle}
+    onClick={() =>
+      openConfirmationModal(
+        "Delete Placement",
+        "Are you sure you want to delete this placement?",
+        () => deletePlacement(p.id)
+      )
+    }
+  >
+    Delete
+  </button>
+
+  {editingPlacement === p.id && (
+    <div
+      style={{
+        marginTop: "15px",
+        padding: "15px",
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        background: "#f8f9fa",
+      }}
+    >
+      <input
+        type="date"
+        value={editPlacementData.start_date}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            start_date: e.target.value,
+          })
+        }
+      />
+
+      <br /><br />
+
+      <input
+        type="date"
+        value={editPlacementData.end_date}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            end_date: e.target.value,
+          })
+        }
+      />
+
+      <br /><br />
+
+      <select
+        value={editPlacementData.workplace_supervisor}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            workplace_supervisor: e.target.value,
+          })
+        }
+      >
+        <option value="">
+          Select Workplace Supervisor
+        </option>
+
+        {supervisors
+          .filter(
+            (u) =>
+              u.role === "workplace" &&
+              u.organization === p.organization
+          )
+          .map((u) => (
+            <option
+              key={u.id}
+              value={u.id}
+            >
+              {u.first_name && u.last_name
+                ? `${u.first_name} ${u.last_name}`
+                : u.username}
+            </option>
+          ))}
+      </select>
+
+      <br /><br />
+
+      <select
+        value={editPlacementData.academic_supervisor}
+        onChange={(e) =>
+          setEditPlacementData({
+            ...editPlacementData,
+            academic_supervisor: e.target.value,
+          })
+        }
+      >
+        <option value="">
+          Select Academic Supervisor
+        </option>
+
+        {supervisors
+          .filter(
+            (u) => u.role === "academic"
+          )
+          .map((u) => (
+            <option
+              key={u.id}
+              value={u.id}
+            >
+              {u.first_name && u.last_name
+                ? `${u.first_name} ${u.last_name}`
+                : u.username}
+            </option>
+          ))}
+      </select>
+
+      <br /><br />
+
+      <button
+        style={primaryButton}
+        onClick={() =>
+          savePlacementChanges(p.id)
+        }
+      >
+        Save Changes
+      </button>
+
+      <button
+        style={{
+          ...deleteButtonStyle,
+          marginLeft: "10px",
+        }}
+        onClick={() =>
+          setEditingPlacement(null)
+        }
+      >
+        Cancel
+      </button>
+    </div>
+  )}
+</td>
+
+                
+                
+              
+              </tr>
+              
+            )
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
+      {pendingPlacements.length === 0 ? (
+        <p>No placements yet</p>
       ) : (
-        placements.map((p) => {
+        pendingPlacements.map((p) => {
 
           // 🔥 FILTER SUPERVISORS (IMPORTANT — KEEP THIS)
           const workplaceSupervisors = supervisors.filter(
@@ -1432,13 +2048,22 @@ return (
               key={p.id}
               style={{
                 width: "100%",
-                maxWidth: "600px",
+                maxWidth: "700px",
+
                 margin: "0 auto 20px",
-                border: "1px solid #05072c",
-                padding: "15px",
-                borderRadius: "10px",
-                background: "#b8bfe179",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+
+                background: "#fff",
+
+                border: "1px solid #e5e7eb",
+
+                borderLeft: "5px solid #2575fc",
+
+                padding: "20px",
+
+                borderRadius: "16px",
+
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+
                 textAlign: "left",
               }}
             >
@@ -1510,7 +2135,9 @@ return (
                         key={u.id}
                         value={u.id}
                       >
-                        {u.username}
+                        {u.first_name && u.last_name
+                          ? `${u.first_name} ${u.last_name}`
+                           : u.username}
                       </option>
                     ))}
                   </select>
@@ -1538,7 +2165,9 @@ return (
                         key={u.id}
                         value={u.id}
                       >
-                        {u.username}
+                        {u.first_name && u.last_name
+                          ? `${u.first_name} ${u.last_name}`
+                           : u.username}
                       </option>
                     ))}
                   </select>
@@ -1571,7 +2200,13 @@ return (
               onMouseLeave ={(e) => {
                 e.currentTarget.style.backgroundColor = "#ef4444";
               }}  
-              onClick={() => deletePlacement(p.id)}
+              onClick={() =>
+                openConfirmationModal(
+                  "Delete Placement",
+                  "Are you sure you want to delete this placement?",
+                  () => deletePlacement(p.id)
+                )
+              }
             >
               Delete Placement
             </button>
@@ -1606,6 +2241,7 @@ return (
                 <th style={tableHeaderStyle}>Reg No.</th>
                 <th style={tableHeaderStyle}>Organization</th>
                 <th style={tableHeaderStyle}>Workplace Supervisor</th>
+                <th style={tableHeaderStyle}>Academic Supervisor</th>
                 <th style={{...tableHeaderStyle,borderTopRightRadius:'16px',}}>Final Grade</th>
               </tr>
           </thead>
@@ -1629,7 +2265,8 @@ return (
                 <td style={tableCellStyle}>{ev.student_name}</td>
                 <td style={tableCellStyle}>{ev.student_registration_number}</td>
                 <td style={tableCellStyle}>{ev.organization_name}</td>
-                <td style={tableCellStyle}>{ev.supervisor_name}</td>
+                <td style={tableCellStyle}>{ev.workplace_supervisor_name}</td>
+                <td style={tableCellStyle}>{ev.academic_supervisor_name}</td>
                 <td style={tableCellStyle}>
                   <strong>
                     {ev.final_grade}
@@ -1678,8 +2315,17 @@ return (
             <td style={tableCellStyle}>{user.username}</td>
 
             <td style={tableCellStyle}>
-              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
-                Delete
+              <button
+                style={deleteButtonStyle}
+                onClick={() =>
+                  openConfirmationModal(
+                    "Delete User",
+                    "Are you sure you want to delete this user?",
+                    () => deleteUser(user.id)
+                  )
+                }
+              >
+               Delete
               </button>
             </td>
           </tr>
@@ -1726,7 +2372,16 @@ return (
             <td style={tableCellStyle}>{user.role}</td>
 
             <td style={tableCellStyle}>
-              <button style={deleteButtonStyle} onClick={() => deleteUser(user.id)}>
+              <button
+                style={deleteButtonStyle}
+                onClick={() =>
+                  openConfirmationModal(
+                    "Delete User",
+                    "Are you sure you want to delete this user?",
+                    () => deleteUser(user.id)
+                  )
+                }
+              >
                 Delete
               </button>
             </td>
@@ -1738,10 +2393,85 @@ return (
   </>
 )}
 
+    </div> 
+  {showModal && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.5)",
+
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        background: "white",
+        padding: "30px",
+        borderRadius: "20px",
+        width: "400px",
+        textAlign: "center",
+
+        boxShadow:
+          "0 10px 30px rgba(0,0,0,0.2)",
+      }}
+    >
+      <h2
+        style={{
+          color: "#198754",
+          marginBottom: "15px",
+        }}
+      >
+        {modalConfig.title}
+      </h2>
+
+      <p
+        style={{
+          marginBottom: "25px",
+        }}
+      >
+        {modalConfig.message}
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "15px",
+        }}
+      >
+        <button
+          style={deleteButtonStyle}
+          onClick={() => {
+            modalConfig.onConfirm();
+            setShowModal(false);
+          }}
+        >
+          Delete
+        </button>
+
+        <button
+          style={primaryButton}
+          onClick={() =>
+            setShowModal(false)
+          }
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+<Footer />
 
 
-   
-    </div>    
   </div>
 );
 }
