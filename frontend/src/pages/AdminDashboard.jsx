@@ -1415,6 +1415,30 @@ return (
       </BarChart>
     </ResponsiveContainer>
   </div>
+
+  <div style={sectionWrapper}>
+    <h2 style={sectionTitle}>
+      Placements By Organization
+    </h2>
+
+    <ResponsiveContainer
+      width="100%"
+      height={400}
+    >
+      <BarChart
+        data={organizationChartData}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Bar
+          dataKey="placements"
+          fill="#2575fc"
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
   </>
 )}
 
