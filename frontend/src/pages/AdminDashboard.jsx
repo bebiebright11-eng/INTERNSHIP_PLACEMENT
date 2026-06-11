@@ -1392,9 +1392,33 @@ return (
     </tbody>
   </table>
       </div>
-  </div>    
+  </div>   
+
+  <div style={sectionWrapper}>
+    <h2 style={sectionTitle}>
+      Applications Status
+    </h2>
+
+    <ResponsiveContainer
+      width="100%"
+      height={300}
+    >
+      <BarChart data={applicationStats}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="status" />
+        <YAxis />
+        <Tooltip />
+        <Bar
+          dataKey="count"
+          fill="#198754"
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
   </>
 )}
+
+
 {activeView === "organizations" && (
   <>
  <h3>Existing Organizations</h3>
