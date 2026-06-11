@@ -1479,6 +1479,10 @@ return (
           paddingAngle={3}
           
         >
+          {userRoleData.map((entry, index) => {
+          const colors = ["#1D9E75", "#534AB7", "#EF9F27", "#D85A30"];
+          return <Cell key={entry.name} fill={colors[index % colors.length]} />;
+        })}
         </Pie>
         <Tooltip />
         <legend />
