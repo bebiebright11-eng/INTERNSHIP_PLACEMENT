@@ -163,15 +163,27 @@ const fetchWeeklyLogs = async () => {
   }, []);
 
   // 3. Handle Score Changes
-  const handleScoreChange = (placementId, criteriaId, value) => {
-    setScores((prev) => ({
-      ...prev,
-      [placementId]: {
-        ...prev[placementId],
-        [criteriaId]: parseInt(value) || 0,
-      },
-    }));
-  };
+const handleScoreChange = (
+  placementId,
+  criteriaId,
+  value,
+  maxScore
+) => {
+
+  let score = parseInt(value) || 0;
+
+  if (score < 0) score = 0;
+
+  if (score > maxScore) score = maxScore;
+
+  setScores((prev) => ({
+    ...prev,
+    [placementId]: {
+      ...prev[placementId],
+      [criteriaId]: score,
+    },
+  }));
+};
 
   // 4. Submit Evaluation
   const submitEvaluation = async (placementId) => {
@@ -186,6 +198,27 @@ console.log(
   "EVALUATION ID:",
   savedEvaluations[placementId]?.id
 );
+
+const invalidScore = Object.entries(
+  scores[placementId] || {}
+).some(([criteriaId, score]) => {
+
+  const criterion = criteria.find(
+    c => c.id === parseInt(criteriaId)
+  );
+
+  return (
+    score < 0 ||
+    score > criterion?.max_score
+  );
+});
+
+if (invalidScore) {
+  toast.error(
+    "One or more scores exceed the allowed maximum."
+  );
+  return;
+}
       const criteriaScores = Object.entries(scores[placementId] || {}).map(
         ([criteriaId, score]) => ({ 
           criteria: parseInt(criteriaId),
@@ -816,7 +849,12 @@ const renderWeeklyLogs = () => {
                                         max={c.max_score}
                                         value={scores[p.id]?.[c.id] || ""}
                                         onChange={(e) =>
-                                        handleScoreChange(p.id, c.id, e.target.value)
+                                          handleScoreChange(
+                                            p.id,
+                                            c.id,
+                                            e.target.value,
+                                            c.max_score
+                                          )
                                         }
                                         style={{
                                           width: "80px",
@@ -1329,8 +1367,13 @@ return (
                                       max={c.max_score}
                                       value={scores[p.id]?.[c.id] || ""}
                                       onChange={(e) =>
-                                        handleScoreChange(p.id, c.id, e.target.value)
-                                      }
+                                        handleScoreChange(
+                                            p.id,
+                                            c.id,
+                                            e.target.value,
+                                            c.max_score
+                                          )
+                                        }
                                         style={{
                                           width: "90px",
                                           padding: "10px",
