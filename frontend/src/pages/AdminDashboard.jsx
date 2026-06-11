@@ -1404,15 +1404,31 @@ return (
       width="100%"
       height={300}
     >
-      <BarChart data={applicationStats}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="status" />
-        <YAxis />
-        <Tooltip />
+      <BarChart data={applicationStats} barsize ={50}>
+        <CartesianGrid 
+        strokeDasharray="3 3"
+        vertical={false}
+        stroke="#f0f0f0"
+        />
+        <XAxis 
+        dataKey="status"
+        axisLine ={false}
+        tickline={false}
+        />
+        <YAxis  
+        axisLine ={false} 
+        tickline={false}
+        allowDecimals={false}
+        />
+        <Tooltip cursor={{ fill: "rgba(0, 0, 0, 0.4)" }} />
         <Bar
           dataKey="count"
           fill="#198754"
-        />
+        >
+          <cell fill ="#198754" />
+          <cell fill="#dc3545" />
+          <cell fill="#6c757d" />
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   </div>
@@ -1447,21 +1463,27 @@ return (
     <h2 style={sectionTitle}>
       User Distribution
     </h2>
-
-    <PieChart
-      width={600}
-      height={350}
+    <ResponsiveContainer
+      width="100%"
+      height={300}
     >
-      <Pie
-        data={userRoleData}
-        dataKey="value"
-        nameKey="name"
-        outerRadius={120}
-        label
-      />
-
-      <Tooltip />
-    </PieChart>
+      <PieChart>
+        <Pie
+          data={userRoleData}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          innerRadius={60}
+          outerRadius={110}
+          paddingAngle={3}
+          
+        >
+        </Pie>
+        <Tooltip />
+        <legend />
+      </PieChart>
+    </ResponsiveContainer>
   </div>
   </>
 )}
