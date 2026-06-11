@@ -552,6 +552,7 @@ const menuButtonStyle = {
     textAlign: "center",
     flex: "1",
     minWidth: "220px",
+
   };
 
   const dropdownStyle = {
