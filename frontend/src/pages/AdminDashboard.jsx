@@ -1439,6 +1439,27 @@ return (
       </BarChart>
     </ResponsiveContainer>
   </div>
+
+  <div style={sectionWrapper}>
+    <h2 style={sectionTitle}>
+      User Distribution
+    </h2>
+
+    <PieChart
+      width={600}
+      height={350}
+    >
+      <Pie
+        data={userRoleData}
+        dataKey="value"
+        nameKey="name"
+        outerRadius={120}
+        label
+      />
+
+      <Tooltip />
+    </PieChart>
+  </div>
   </>
 )}
 
