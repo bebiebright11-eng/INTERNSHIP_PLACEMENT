@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
 import Footer from "../components/Footer";
+import DashboardHeader from "../components/DashboardHeader";
 
 
 function WorkplaceDashboard() {
@@ -163,15 +164,27 @@ const fetchWeeklyLogs = async () => {
   }, []);
 
   // 3. Handle Score Changes
-  const handleScoreChange = (placementId, criteriaId, value) => {
-    setScores((prev) => ({
-      ...prev,
-      [placementId]: {
-        ...prev[placementId],
-        [criteriaId]: parseInt(value) || 0,
-      },
-    }));
-  };
+const handleScoreChange = (
+  placementId,
+  criteriaId,
+  value,
+  maxScore
+) => {
+
+  let score = parseInt(value) || 0;
+
+  if (score < 0) score = 0;
+
+  if (score > maxScore) score = maxScore;
+
+  setScores((prev) => ({
+    ...prev,
+    [placementId]: {
+      ...prev[placementId],
+      [criteriaId]: score,
+    },
+  }));
+};
 
   // 4. Submit Evaluation
   const submitEvaluation = async (placementId) => {
@@ -186,6 +199,27 @@ console.log(
   "EVALUATION ID:",
   savedEvaluations[placementId]?.id
 );
+
+const invalidScore = Object.entries(
+  scores[placementId] || {}
+).some(([criteriaId, score]) => {
+
+  const criterion = criteria.find(
+    c => c.id === parseInt(criteriaId)
+  );
+
+  return (
+    score < 0 ||
+    score > criterion?.max_score
+  );
+});
+
+if (invalidScore) {
+  toast.error(
+    "One or more scores exceed the allowed maximum."
+  );
+  return;
+}
       const criteriaScores = Object.entries(scores[placementId] || {}).map(
         ([criteriaId, score]) => ({ 
           criteria: parseInt(criteriaId),
@@ -816,7 +850,12 @@ const renderWeeklyLogs = () => {
                                         max={c.max_score}
                                         value={scores[p.id]?.[c.id] || ""}
                                         onChange={(e) =>
-                                        handleScoreChange(p.id, c.id, e.target.value)
+                                          handleScoreChange(
+                                            p.id,
+                                            c.id,
+                                            e.target.value,
+                                            c.max_score
+                                          )
                                         }
                                         style={{
                                           width: "80px",
@@ -988,115 +1027,95 @@ return (
   >
 
     {/* HEADER */}
+{/* HEADER */}
+<DashboardHeader
+  dashboardTitle="Workplace Supervisor Dashboard"
+  firstName={firstName || "Supervisor"}
+/>
+
+{/* MENU */}
 <div
   style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "30px",
     position: "relative",
+    marginBottom: "25px",
   }}
 >
-  <div>
-    <h1
+  <button
+    style={menuButtonStyle}
+    onClick={() => setShowMenu(!showMenu)}
+  >
+    ☰ Menu
+  </button>
+
+  {showMenu && (
+    <div
       style={{
-        margin: 0,
-        color: "#198754",
-        fontSize: "38px",
-        fontWeight: "bold",
+        ...dropdownStyle,
+        position: "absolute",
+        left: 0,
+        top: "50px",
+        right: "auto",
       }}
     >
-      INTERNSHIP PLACEMENT SYSTEM (ILES)
-    </h1>
-
-    <h2
-      style={{
-        color: "#198754",
-        marginTop: "10px",
-        marginBottom: "5px",
-      }}
-    >
-      Workplace Supervisor Dashboard
-    </h2>
-
-    <p
-      style={{
-        color: "#666",
-        fontSize: "18px",
-        fontWeight: "bold",
-        marginTop: "0px",
-      }}
-    >
-      Welcome, {firstName || "Supervisor"} 👋
-    </p>
-  </div>
-
-  {/* MENU */}
-  <div style={{ position: "relative" }}>
-    <button
-      style={menuButtonStyle}
-      onClick={() => setShowMenu(!showMenu)}
-    >
-      ☰ Menu
-    </button>
-
-    {showMenu && (
-      <div style={dropdownStyle}>
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActivePage("home");
-            setShowMenu(false);
-          }}
-        >
-          Home
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActivePage("students");
-            setShowMenu(false);
-          }}
-        >
-          My Students
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActivePage("evaluations");
-            setShowMenu(false);
-          }}
-        >
-          My Evaluations
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActivePage("weeklylogs");
-            setShowMenu(false);
-          }}
-        >
-          Weekly Logs
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={handleLogout}
-        >
-         Logout
-        </div>
-
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActivePage("home");
+          setShowMenu(false);
+        }}
+      >
+        🏠 Home
       </div>
-    )}
-  </div>
+
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActivePage("students");
+          setShowMenu(false);
+        }}
+      >
+        👨‍🎓 My Students
+      </div>
+
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActivePage("evaluations");
+          setShowMenu(false);
+        }}
+      >
+        📝 My Evaluations
+      </div>
+
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActivePage("weeklylogs");
+          setShowMenu(false);
+        }}
+      >
+        📅 Weekly Logs
+      </div>
+
+      <div
+        style={{
+          ...dropdownItemStyle,
+          color: "#dc3545",
+        }}
+        onClick={handleLogout}
+      >
+        🚪 Logout
+      </div>
+    </div>
+  )}
 </div>
-      <div style={{ display: "flex" }}>
-        
-        {/* 🔷 MAIN CONTENT */}
-        <div style={{ flex: 1, padding: "20px" }}>
+
+<div>
+
+
+
+  {/* MAIN CONTENT */}
+  <div style={{ flex: 1 }}>
 
 
   {/* SUMMARY CARDS */}
@@ -1329,8 +1348,13 @@ return (
                                       max={c.max_score}
                                       value={scores[p.id]?.[c.id] || ""}
                                       onChange={(e) =>
-                                        handleScoreChange(p.id, c.id, e.target.value)
-                                      }
+                                        handleScoreChange(
+                                            p.id,
+                                            c.id,
+                                            e.target.value,
+                                            c.max_score
+                                          )
+                                        }
                                         style={{
                                           width: "90px",
                                           padding: "10px",

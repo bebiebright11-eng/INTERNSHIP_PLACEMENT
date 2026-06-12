@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
 import Footer from "../components/Footer";
+import DashboardHeader from "../components/DashboardHeader";
 
 
 function AcademicDashboard() {
@@ -21,6 +22,12 @@ function AcademicDashboard() {
   const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
   const firstName = localStorage.getItem("first_name");
   const lastName = localStorage.getItem("last_name");
+
+  const handleLogout = () => {
+  localStorage.clear();
+  toast.success("Logged out successfully 👋");
+  navigate("/");
+};
 
   // --- Styles ---
 
@@ -295,96 +302,75 @@ const editButtonStyle = {
         fontFamily: "Arial",
       }}
     >
-      {/* HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "30px",
-          position: "relative",
-        }}
-      >
-        <div>
-  <h1
-    style={{
-      margin: 0,
-      color: "#198754",
-      fontSize: "38px",
-      fontWeight: "bold",
-    }}
-  >
-    INTERNSHIP PLACEMENT SYSTEM (ILES)
-  </h1>
+  {/* HEADER */}
+<DashboardHeader
+  dashboardTitle="Academic Supervisor Dashboard"
+  firstName={firstName}
+/>
 
-  <h2
-    style={{
-      color: "#198754",
-      marginTop: "10px",
-      marginBottom: "5px",
-    }}
-  >
-    Academic Supervisor Dashboard
-  </h2>
+{/* MENU */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "flex-start",
+    marginBottom: "30px",
+  }}
+>
+  <div style={{ position: "relative" }}>
+    <button
+      style={menuButtonStyle}
+      onClick={() => setShowMenu(!showMenu)}
+    >
+      ☰ Menu
+    </button>
 
-  <p
-    style={{
-      color: "#666",
-      fontSize: "18px",
-      fontWeight: "bold",
-      marginTop: "0px",
-    }}
-  >
-    Welcome,  {firstName || "Academic"} 👋 
-  </p>
-</div>
+    {showMenu && (
+      <div style={dropdownStyle}>
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActivePage("home");
+            setShowMenu(false);
+          }}
+        >
+          Home
+        </div>
 
-        
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActivePage("students");
+            setShowMenu(false);
+          }}
+        >
+          My Students
+        </div>
 
-        {/* MENU */}
-        <div style={{ position: "relative" }}>
-          <button
-            style={menuButtonStyle}
-            onClick={() => setShowMenu(!showMenu)}
-          >
-            ☰ Menu
-          </button>
+        <div
+          style={dropdownItemStyle}
+          onClick={() => {
+            setActivePage("evaluations");
+            setShowMenu(false);
+          }}
+        >
+          Evaluations
+        </div>
 
-          {showMenu && (
-            <div style={dropdownStyle}>
-              <div
-                style={dropdownItemStyle}
-                onClick={() => {
-                  setActivePage("home");
-                  setShowMenu(false);
-                }}
-              >
-                Home
-              </div>
-
-              <div
-                style={dropdownItemStyle}
-                onClick={() => {
-                  setActivePage("students");
-                  setShowMenu(false);
-                }}
-              >
-                My Students
-              </div>
-
-              <div
-                style={dropdownItemStyle}
-                onClick={() => {
-                  setActivePage("evaluations");
-                  setShowMenu(false);
-                }}
-              >
-                Evaluations
-              </div>
-            </div>
-          )}
+        <div
+          style={{
+            ...dropdownItemStyle,
+            color: "#dc3545",
+          }}
+          onClick={handleLogout}
+        >
+         🚪 Logout
         </div>
       </div>
+    )}
+  </div>
+</div>
+  
+
 
       {/* SUMMARY CARDS */}
       <div

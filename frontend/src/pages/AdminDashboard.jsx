@@ -852,38 +852,11 @@ return (
       fontFamily:"Arial",
     }}
   >
-   <div>
-      <h1
-        style={{
-          background:"white",
-          padding:"25px",
-          borderRadius:"16px",
-          marginBottom:"25px",
-          boxShadow:"0 2px 8px rgba(0,0,0,0.06)",
-        }}
-      >
-        INTERNSHIP PLACEMENT SYSTEM(ILES)
-      </h1>
 
-      <h2
-        style={{
-        color: "#198754eb",
-          marginTop: "10px",
-          marginBottom: "5px",
-        }} 
-      >
-        ADMIN DASHBOARD
-      </h2>
-      <p
-        style={{
-          color: "#a4a4a4",
-          fontSize: "18px",
-          fontWeight: "bold",
-        }}
-      >
-        Welcome,  {firstName || "Admin"}  👋
-      </p>
-    </div>
+<DashboardHeader
+  dashboardTitle="Admin Dashboard"
+  firstName={firstName || "Admin"}
+/>
 
     {/* MENU */}
     <div ref={menuRef}style={{display: "flex",position: "relative",marginBottom: "40px",}}>

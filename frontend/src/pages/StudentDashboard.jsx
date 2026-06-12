@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
 import Footer from "../components/Footer";
+import DashboardHeader from "../components/DashboardHeader";
 
 
 function StudentDashboard() {
@@ -465,110 +466,84 @@ return (
   >
 
  {/* HEADER */}
+<DashboardHeader
+  dashboardTitle="Student Dashboard"
+  firstName={firstName || "Student"}
+/>
+
+{/* MENU BELOW HEADER */}
 <div
   style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "30px",
     position: "relative",
+    marginBottom: "25px",
+    width: "fit-content",
   }}
 >
-  <div>
-    <h1
+  <button
+    style={menuButtonStyle}
+    onClick={() => setMenuOpen(!menuOpen)}
+  >
+    ☰ Menu
+  </button>
+
+  {menuOpen && (
+    <div
       style={{
-        margin: 0,
-        color: "#198754",
-        fontSize: "38px",
-        fontWeight: "bold",
+        ...dropdownStyle,
+        left: 0,
+        top: "55px",
       }}
     >
-      INTERNSHIP PLACEMENT SYSTEM (ILES)
-    </h1>
-
-    <h2
-      style={{
-        color: "#198754",
-        marginTop: "10px",
-        marginBottom: "5px",
-      }}
-    >
-      Student Dashboard
-    </h2>
-
-    <p
-      style={{
-        color: "#666",
-        fontSize: "18px",
-        fontWeight: "bold",
-        marginTop: "0px",
-      }}
-    >
-      Welcome, {firstName || "Student"} 👋
-    </p>
-  </div>
-
-  {/* MENU */}
-  <div style={{ position: "relative" }}>
-    <button
-      style={menuButtonStyle}
-      onClick={() => setMenuOpen(!menuOpen)}
-    >
-      ☰ Menu
-    </button>
-
-    {menuOpen && (
-      <div style={dropdownStyle}>
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActiveView("home");
-            setMenuOpen(false);
-          }}
-        >
-          Home
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActiveView("organizations");
-            setMenuOpen(false);
-          }}
-        >
-          Organizations
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActiveView("applications");
-            setMenuOpen(false);
-          }}
-        >
-          Applications
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={() => {
-            setActiveView("evaluations");
-            setMenuOpen(false);
-          }}
-        >
-          Evaluations
-        </div>
-
-        <div
-          style={dropdownItemStyle}
-          onClick={handleLogout}
-        >
-          Logout
-        </div>
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActiveView("home");
+          setMenuOpen(false);
+        }}
+      >
+        Home
       </div>
-    )}
-  </div>
+
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActiveView("organizations");
+          setMenuOpen(false);
+        }}
+      >
+        Organizations
+      </div>
+
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActiveView("applications");
+          setMenuOpen(false);
+        }}
+      >
+        Applications
+      </div>
+
+      <div
+        style={dropdownItemStyle}
+        onClick={() => {
+          setActiveView("evaluations");
+          setMenuOpen(false);
+        }}
+      >
+        Evaluations
+      </div>
+
+      <div
+        style={dropdownItemStyle}
+        onClick={handleLogout}
+      >
+        Logout
+      </div>
+    </div>
+  )}
 </div>
+
 
 
   <div style={{
