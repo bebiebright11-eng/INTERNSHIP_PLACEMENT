@@ -9,14 +9,4 @@ class Migration(migrations.Migration):
         ('supervision', '0006_alter_evaluation_final_grade'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='evaluation',
-            name='final_grade',
-            field=models.FloatField(
-                null=True,
-                blank=True,
-                default=0
-            ),
-        ),
-    ]
+    operations = []
