@@ -265,19 +265,13 @@ const editButtonStyle = {
       setEditingPlacement(null);
     } catch (error) {
   console.log("FULL ERROR:", error);
-
   console.log("STATUS:", error.response?.status);
-  console.log(
-    JSON.stringify(res.data, null, 2)
-  );
-
-  console.log(
-    "ERROR DATA:",
-    JSON.stringify(error.response?.data, null, 2)
-  );
+  console.log("ERROR DATA:", error.response?.data);
 
   toast.error(
-    JSON.stringify(error.response?.data)
+    error.response?.data?.detail ||
+    error.response?.data?.error ||
+    "Failed to submit evaluation"
   );
 }
   };

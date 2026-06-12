@@ -169,6 +169,19 @@ class EvaluationViewSet(viewsets.ModelViewSet):
         placement = serializer.validated_data['placement']
         supervisor_type = serializer.validated_data['supervisor_type']
 
+
+        if supervisor_type == "academic":
+
+            workplace_evaluation_exists = Evaluation.objects.filter(
+                placement=placement,
+                supervisor_type="workplace"
+            ).exists()
+
+            if not workplace_evaluation_exists:
+                raise PermissionDenied(
+                    "Workplace supervisor must submit an evaluation first."
+                )
+
         existing = Evaluation.objects.filter(
            placement=placement,
            supervisor=user,

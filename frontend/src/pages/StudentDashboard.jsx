@@ -301,13 +301,22 @@ const handleFileChange = (e) => {
 
       fetchLogs();
     } catch (error) {
-       console.log(error.response?.data);
+  console.log("FULL ERROR:", error);
+  console.log("ERROR DATA:", error.response?.data);
 
-       toast.error(
-         error.response?.data?.non_field_errors?.[0] ||
-         "Failed to submit log ❌"
-      );
-    }
+  const backendError =
+    error.response?.data?.non_field_errors?.[0];
+
+  const message =
+    backendError ===
+    "The fields placement, week_number must make a unique set."
+      ? "You have already submitted a weekly log for this week."
+      : backendError ||
+        error.response?.data?.detail ||
+        "Failed to submit log ❌";
+
+  toast.error(message);
+}
   };
 
 
