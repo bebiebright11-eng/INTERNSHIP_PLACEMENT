@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
 import Footer from "../components/Footer";
+import DashboardHeader from "../components/DashboardHeader";
 import { PieChart, Pie,Tooltip, Cell, BarChart,Bar,
   XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer,
 } from "recharts";
