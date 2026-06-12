@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
 import Footer from "../components/Footer";
-import DashboardHeader from "../components/DashboardHeader";
-
+import { PieChart, Pie,Tooltip, Cell, BarChart,Bar,
+  XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer,
+} from "recharts";
 
 function AdminDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -476,6 +477,57 @@ const deleteCriteria = async (id) => {
 const confirmedPlacements = placements.filter(
   (p) => p.is_fully_assigned
 );
+const applicationStats = [
+  {
+    status: "Pending",
+    count: applications.filter(
+      (a) => a.status === "pending"
+    ).length,
+  },
+  {
+    status: "Approved",
+    count: applications.filter(
+      (a) => a.status === "approved"
+    ).length,
+  },
+  {
+    status: "Rejected",
+    count: applications.filter(
+      (a) => a.status === "rejected"
+    ).length,
+  },
+];
+const organizationChartData = organizations.map((org) => ({
+  name: org.name,
+  placements: placements.filter((p) => p.organization === org.id).length,
+}));
+
+const userRoleData = [
+  {
+    name: "Students",
+    value: supervisors.filter(
+      (u) => u.role === "student"
+    ).length,
+  },
+  {
+    name: "Academic",
+    value: supervisors.filter(
+      (u) => u.role === "academic"
+    ).length,
+  },
+  {
+    name: "Workplace",
+    value: supervisors.filter(
+      (u) => u.role === "workplace"
+    ).length,
+  },
+  {
+    name: "Admins",
+    value: supervisors.filter(
+      (u) => u.role === "admin"
+    ).length,
+  },
+]; 
 
 const filteredConfirmedPlacements =
   confirmedPlacements.filter((p) =>
@@ -553,6 +605,7 @@ const menuButtonStyle = {
     textAlign: "center",
     flex: "1",
     minWidth: "220px",
+
   };
 
   const dropdownStyle = {
@@ -1312,9 +1365,107 @@ return (
     </tbody>
   </table>
       </div>
-  </div>    
+  </div>   
+
+{/* APPLICATION STATUS BAR CHART */}
+  <div style={sectionWrapper}>
+    <h2 style={sectionTitle}>
+      Applications Status
+    </h2>
+
+    <ResponsiveContainer
+      width="100%"
+      height={300}
+    >
+      <BarChart data={applicationStats} barsize ={50}>
+        <CartesianGrid 
+        strokeDasharray="3 3"
+        vertical={false}
+        stroke="#f0f0f0"
+        />
+        <XAxis 
+        dataKey="status"
+        axisLine ={false}
+        tickline={false}
+        />
+        <YAxis  
+        axisLine ={false} 
+        tickline={false}
+        allowDecimals={false}
+        />
+        <Tooltip cursor={{ fill: "rgba(0, 0, 0, 0.4)" }} />
+        <Bar
+          dataKey="count"
+          fill="#198754"
+        >
+          <cell fill ="#198754" />
+          <cell fill="#dc3545" />
+          <cell fill="#6c757d" />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+
+{/* PLACEMENTS BY ORGANIZATION */}
+  <div style={sectionWrapper}>
+    <h2 style={sectionTitle}>
+      Placements By Organization
+    </h2>
+
+    <ResponsiveContainer
+      width="100%"
+      height={400}
+    >
+      <BarChart
+        data={organizationChartData}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Bar
+          dataKey="placements"
+          fill="#2575fc"
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+
+ {/* USER DISTRIBUTION PIE CHART */}
+  <div style={sectionWrapper}>
+    <h2 style={sectionTitle}>
+      User Distribution
+    </h2>
+    <ResponsiveContainer
+      width="100%"
+      height={300}
+    >
+      <PieChart>
+        <Pie
+          data={userRoleData}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          innerRadius={60}
+          outerRadius={110}
+          paddingAngle={3}
+          
+        >
+          {userRoleData.map((entry, index) => {
+          const colors = ["#1D9E75", "#534AB7", "#EF9F27", "#D85A30"];
+          return <Cell key={entry.name} fill={colors[index % colors.length]} />;
+        })}
+        </Pie>
+        <Tooltip />
+        <legend />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
   </>
 )}
+
+
 {activeView === "organizations" && (
   <>
  <h3>Existing Organizations</h3>
