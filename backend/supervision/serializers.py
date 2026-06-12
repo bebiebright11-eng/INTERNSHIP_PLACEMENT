@@ -158,10 +158,10 @@ class EvaluationSerializer(serializers.ModelSerializer):
     # This grabs the "Readable Name" from your choices (e.g., 'Workplace Supervisor')
     supervisor_type = serializers.CharField()
     #  ADD THIS LINE
-    supervisor = serializers.HiddenField(default=serializers.CurrentUserDefault())
     criteria_scores = CriteriaScoreSerializer(
         many=True,
-        required=False
+        required=False,
+        default=list
     )
 
     class Meta:
@@ -169,8 +169,6 @@ class EvaluationSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'placement',
-
-            'supervisor',
             'supervisor_type',
             'supervisor_type_display',
             'score',
@@ -249,7 +247,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
                    "This student has rejected weekly logs. Evaluation cannot be submitted until they are corrected and approved."
                )
 
-            if not approved_logs:
+            if supervisor_type == "academic" and not approved_logs:
                 raise serializers.ValidationError(
                     "No approved weekly logs found for this student."
                 )
