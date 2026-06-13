@@ -153,11 +153,7 @@ const authHeader = {
 
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/criteria/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("internships/placements/", authHeader);
 
       setCriteria(res.data);
     } catch (error) {
