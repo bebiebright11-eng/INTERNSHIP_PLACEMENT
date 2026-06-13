@@ -161,11 +161,7 @@ const authHeader = {
 
   const fetchEvaluations = async () => {
     try {
-      const res = await API.get("supervision/evaluations/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("supervision/evaluations/", authHeader);
 
       
       setEvaluations(res.data);
