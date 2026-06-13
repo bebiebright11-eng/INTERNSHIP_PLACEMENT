@@ -173,11 +173,9 @@ const authHeader = {
 
   const fetchLogs = async () => {
     try {
-      const res = await API.get("supervision/weeklylogs/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("supervision/weeklylogs/", 
+        authHeader
+      );
 
       const grouped = {};
 
