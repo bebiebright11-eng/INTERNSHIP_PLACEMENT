@@ -20,6 +20,7 @@ function AcademicDashboard() {
   const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
   const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
   const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
+  const navigate = useNavigate();
   const firstName = localStorage.getItem("first_name");
   const lastName = localStorage.getItem("last_name");
 
@@ -861,6 +862,7 @@ function AcademicDashboard() {
         overflowX: "auto",
       }}
     >
+      
       <table
         style={{
           width: "100%",
@@ -868,6 +870,7 @@ function AcademicDashboard() {
           fontFamily: "Arial",
         }}
       >
+        
         <thead>
           <tr
             style={{
