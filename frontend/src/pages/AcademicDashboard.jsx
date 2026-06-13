@@ -171,8 +171,7 @@ function AcademicDashboard() {
         },
       });
 
-      console.log("EVALUATIONS FROM BACKEND:", res.data);
-
+      
       setEvaluations(res.data);
     } catch (error) {
       toast.error("Failed to load evaluations ❌");
