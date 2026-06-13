@@ -87,6 +87,19 @@ import DashboardHeader from "../components/DashboardHeader";
   boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
+   const editButtonStyle = {
+  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
+  color: "white",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+};
+
+
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]);
@@ -121,24 +134,6 @@ const authHeader = {
 
   
 
-  
-  
-
-
-  
-
-
-  const editButtonStyle = {
-  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
-  color: "white",
-  border: "none",
-  padding: "12px 24px",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontWeight: "bold",
-  fontSize: "15px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-};
 
   // --- Data Fetching Functions ---
 
