@@ -205,7 +205,7 @@ const authHeader = {
       ...prev,
       [placementId]: {
         ...prev[placementId],
-        [criteriaId]: parseInt(value),
+        [criteriaId]: Number(value) || 0,
       },
     }));
   };
