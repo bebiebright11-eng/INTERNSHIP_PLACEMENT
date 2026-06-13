@@ -48,11 +48,32 @@ import DashboardHeader from "../components/DashboardHeader";
     minWidth: "220px",
     flex: "1",
   };
-  
+
   const cardTitleStyle = {
     color: "#666",
     marginBottom: "10px",
   };
+
+  const cardNumberStyle = {
+    fontSize: "30px",
+    fontWeight: "bold",
+    color: "#198754",
+  };
+  
+  const marksInputStyle = {
+  width: "120px",
+  padding: "14px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  textAlign: "center",
+  border: "2px solid #198754",
+  borderRadius: "12px",
+  outline: "none",
+  backgroundColor: "#f8fff9",
+  color: "#198754",
+  boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
+};
+
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -89,26 +110,10 @@ const authHeader = {
   
 
   
-  const cardNumberStyle = {
-    fontSize: "30px",
-    fontWeight: "bold",
-    color: "#198754",
-  };
+  
 
 
-  const marksInputStyle = {
-  width: "120px",
-  padding: "14px",
-  fontSize: "22px",
-  fontWeight: "bold",
-  textAlign: "center",
-  border: "2px solid #198754",
-  borderRadius: "12px",
-  outline: "none",
-  backgroundColor: "#f8fff9",
-  color: "#198754",
-  boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
-};
+  
 
   const submitButtonStyle = {
   background: "linear-gradient(135deg,#198754,#20c997)",
