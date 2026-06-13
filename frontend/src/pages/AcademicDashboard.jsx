@@ -136,8 +136,7 @@ function AcademicDashboard() {
         },
       });
 
-      console.log("PLACEMENTS:", res.data);
-      console.log("USER ID:", localStorage.getItem("user_id"));
+     
 
       setPlacements(res.data);
     } catch (error) {
