@@ -99,7 +99,6 @@ import DashboardHeader from "../components/DashboardHeader";
   boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
-
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]);
@@ -114,12 +113,10 @@ function AcademicDashboard() {
   const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
   const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
   const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
-  const navigate = useNavigate();
   const firstName = localStorage.getItem("first_name") || "";
   const lastName = localStorage.getItem("last_name") || "";
   const token = localStorage.getItem("token");
   
-
 const authHeader = {
   headers: {
     Authorization: `Bearer ${token}`,
@@ -140,9 +137,8 @@ const authHeader = {
     try {
       const res = await API.get("internships/placements/", authHeader);
 
-     
 
-      setPlacements(res.data);
+     setPlacements(res.data);
     } catch (error) {
       toast.error("Failed to load placements ❌");
     }
