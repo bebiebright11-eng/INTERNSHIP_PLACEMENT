@@ -23,7 +23,14 @@ function AcademicDashboard() {
   const navigate = useNavigate();
   const firstName = localStorage.getItem("first_name");
   const lastName = localStorage.getItem("last_name");
+  
+  const token = localStorage.getItem("token");
 
+const authHeader = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+};
   const handleLogout = () => {
   localStorage.clear();
   toast.success("Logged out successfully 👋");
