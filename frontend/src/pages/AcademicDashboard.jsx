@@ -137,11 +137,7 @@ const authHeader = {
 
   const fetchPlacements = async () => {
     try {
-      const res = await API.get("internships/placements/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("internships/placements/", authHeader);
 
      
 
