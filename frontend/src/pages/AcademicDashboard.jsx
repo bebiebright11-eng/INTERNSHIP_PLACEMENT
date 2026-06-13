@@ -30,6 +30,16 @@ import DashboardHeader from "../components/DashboardHeader";
     zIndex: 1000,
   };
   
+  const dropdownItemStyle = {
+    padding: "12px",
+    cursor: "pointer",
+    borderRadius: "8px",
+    marginBottom: "5px",
+    fontWeight: "bold",
+    color: "#198754",
+    backgroundColor: "#f8f9fa",
+  };
+
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]);
@@ -65,16 +75,7 @@ const authHeader = {
 
  
 
-  const dropdownItemStyle = {
-    padding: "12px",
-    cursor: "pointer",
-    borderRadius: "8px",
-    marginBottom: "5px",
-    fontWeight: "bold",
-    color: "#198754",
-    backgroundColor: "#f8f9fa",
-  };
-
+  
   const cardStyle = {
     backgroundColor: "white",
     borderRadius: "15px",
