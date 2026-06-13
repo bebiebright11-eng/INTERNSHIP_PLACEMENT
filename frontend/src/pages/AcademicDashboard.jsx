@@ -39,6 +39,15 @@ import DashboardHeader from "../components/DashboardHeader";
     color: "#198754",
     backgroundColor: "#f8f9fa",
   };
+  
+  const cardStyle = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    minWidth: "220px",
+    flex: "1",
+  };
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -76,15 +85,7 @@ const authHeader = {
  
 
   
-  const cardStyle = {
-    backgroundColor: "white",
-    borderRadius: "15px",
-    padding: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    minWidth: "220px",
-    flex: "1",
-  };
-
+ 
   
   const cardTitleStyle = {
     color: "#666",
