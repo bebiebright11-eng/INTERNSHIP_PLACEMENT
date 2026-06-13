@@ -5,7 +5,21 @@ import API from "../api";
 import Footer from "../components/Footer";
 import DashboardHeader from "../components/DashboardHeader";
 
+ // --- Styles ---
 
+  const menuButtonStyle = {
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "12px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "15px",
+  };
+
+
+  
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
   const [criteria, setCriteria] = useState([]);
@@ -37,18 +51,7 @@ const authHeader = {
   navigate("/");
 };
 
-  // --- Styles ---
-
-  const menuButtonStyle = {
-    backgroundColor: "#198754",
-    color: "white",
-    border: "none",
-    padding: "12px 18px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "15px",
-  };
+ 
 
   const dropdownStyle = {
     position: "absolute",
@@ -161,7 +164,11 @@ const authHeader = {
 
   const fetchEvaluations = async () => {
     try {
-      const res = await API.get("supervision/placements/", authHeader);
+      const res = await API.get("supervision/evaluations/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       
       setEvaluations(res.data);
@@ -172,7 +179,11 @@ const authHeader = {
 
   const fetchLogs = async () => {
     try {
-      const res = await API.get("supervision/weeklylogs/", authHeader);
+      const res = await API.get("supervision/weeklylogs/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const grouped = {};
 
