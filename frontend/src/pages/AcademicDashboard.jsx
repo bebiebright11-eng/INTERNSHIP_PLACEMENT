@@ -5,6 +5,100 @@ import API from "../api";
 import Footer from "../components/Footer";
 import DashboardHeader from "../components/DashboardHeader";
 
+ // --- Styles ---
+
+  const menuButtonStyle = {
+    backgroundColor: "#198754",
+    color: "white",
+    border: "none",
+    padding: "12px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "15px",
+  };
+
+ const dropdownStyle = {
+    position: "absolute",
+    top: "60px",
+    left: "0",
+    backgroundColor: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+    width: "220px",
+    padding: "10px",
+    zIndex: 1000,
+  };
+  
+  const dropdownItemStyle = {
+    padding: "12px",
+    cursor: "pointer",
+    borderRadius: "8px",
+    marginBottom: "5px",
+    fontWeight: "bold",
+    color: "#198754",
+    backgroundColor: "#f8f9fa",
+  };
+  
+  const cardStyle = {
+    backgroundColor: "white",
+    borderRadius: "15px",
+    padding: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    minWidth: "220px",
+    flex: "1",
+  };
+
+  const cardTitleStyle = {
+    color: "#666",
+    marginBottom: "10px",
+  };
+
+  const cardNumberStyle = {
+    fontSize: "30px",
+    fontWeight: "bold",
+    color: "#198754",
+  };
+  
+  const marksInputStyle = {
+  width: "120px",
+  padding: "14px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  textAlign: "center",
+  border: "2px solid #198754",
+  borderRadius: "12px",
+  outline: "none",
+  backgroundColor: "#f8fff9",
+  color: "#198754",
+  boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
+};
+   
+  
+  const submitButtonStyle = {
+  background: "linear-gradient(135deg,#198754,#20c997)",
+  color: "white",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+};
+
+   const editButtonStyle = {
+  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
+  color: "white",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+};
+
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -37,101 +131,9 @@ const authHeader = {
   navigate("/");
 };
 
-  // --- Styles ---
-
-  const menuButtonStyle = {
-    backgroundColor: "#198754",
-    color: "white",
-    border: "none",
-    padding: "12px 18px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "15px",
-  };
-
-  const dropdownStyle = {
-    position: "absolute",
-    top: "60px",
-    left: "0",
-    backgroundColor: "white",
-    borderRadius: "12px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
-    width: "220px",
-    padding: "10px",
-    zIndex: 1000,
-  };
-
-  const dropdownItemStyle = {
-    padding: "12px",
-    cursor: "pointer",
-    borderRadius: "8px",
-    marginBottom: "5px",
-    fontWeight: "bold",
-    color: "#198754",
-    backgroundColor: "#f8f9fa",
-  };
-
-  const cardStyle = {
-    backgroundColor: "white",
-    borderRadius: "15px",
-    padding: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    minWidth: "220px",
-    flex: "1",
-  };
 
   
-  const cardTitleStyle = {
-    color: "#666",
-    marginBottom: "10px",
-  };
 
-  
-  const cardNumberStyle = {
-    fontSize: "30px",
-    fontWeight: "bold",
-    color: "#198754",
-  };
-
-
-  const marksInputStyle = {
-  width: "120px",
-  padding: "14px",
-  fontSize: "22px",
-  fontWeight: "bold",
-  textAlign: "center",
-  border: "2px solid #198754",
-  borderRadius: "12px",
-  outline: "none",
-  backgroundColor: "#f8fff9",
-  color: "#198754",
-  boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
-};
-
-  const submitButtonStyle = {
-  background: "linear-gradient(135deg,#198754,#20c997)",
-  color: "white",
-  border: "none",
-  padding: "12px 24px",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontWeight: "bold",
-  fontSize: "15px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-};
-
-  const editButtonStyle = {
-  background: "linear-gradient(135deg,#fd7e14,#f59f00)",
-  color: "white",
-  border: "none",
-  padding: "12px 24px",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontWeight: "bold",
-  fontSize: "15px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-};
 
   // --- Data Fetching Functions ---
 
