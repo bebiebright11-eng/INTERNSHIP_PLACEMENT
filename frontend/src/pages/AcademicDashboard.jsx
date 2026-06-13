@@ -154,10 +154,7 @@ function AcademicDashboard() {
 
       setCriteria(res.data);
     } catch (error) {
-       console.log("CRITERIA ERROR:", error.response);
-  console.log("DATA:", error.response?.data);
-  console.log("STATUS:", error.response?.status);
-
+       
   toast.error("Failed to load criteria ❌");
      
 }
