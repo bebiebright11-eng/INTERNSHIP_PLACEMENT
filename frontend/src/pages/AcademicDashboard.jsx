@@ -73,7 +73,19 @@ import DashboardHeader from "../components/DashboardHeader";
   color: "#198754",
   boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
 };
-
+   
+  
+  const submitButtonStyle = {
+  background: "linear-gradient(135deg,#198754,#20c997)",
+  color: "white",
+  border: "none",
+  padding: "12px 24px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+};
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -115,17 +127,6 @@ const authHeader = {
 
   
 
-  const submitButtonStyle = {
-  background: "linear-gradient(135deg,#198754,#20c997)",
-  color: "white",
-  border: "none",
-  padding: "12px 24px",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontWeight: "bold",
-  fontSize: "15px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-};
 
   const editButtonStyle = {
   background: "linear-gradient(135deg,#fd7e14,#f59f00)",
