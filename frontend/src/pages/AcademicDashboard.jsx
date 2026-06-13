@@ -228,11 +228,7 @@ const authHeader = {
             score: academicScore,
             comments: "Academic final evaluation",
           },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+          authHeader
         );
       } else {
         await API.post(
