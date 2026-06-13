@@ -115,10 +115,10 @@ function AcademicDashboard() {
   const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
   const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
   const navigate = useNavigate();
-  const firstName = localStorage.getItem("first_name");
-  const lastName = localStorage.getItem("last_name");
-  
+  const firstName = localStorage.getItem("first_name") || "";
+  const lastName = localStorage.getItem("last_name") || "";
   const token = localStorage.getItem("token");
+  
 
 const authHeader = {
   headers: {
@@ -132,7 +132,6 @@ const authHeader = {
 };
 
 
-  
 
 
   // --- Data Fetching Functions ---
@@ -151,7 +150,7 @@ const authHeader = {
 
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("internships/placements/", authHeader);
+      const res = await API.get("supervision/criteria/", authHeader);
 
       setCriteria(res.data);
     } catch (error) {
@@ -163,13 +162,9 @@ const authHeader = {
 
   const fetchEvaluations = async () => {
     try {
-      const res = await API.get("supervision/evaluations/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("supervision/evaluations/", authHeader);
 
-      
+  
       setEvaluations(res.data);
     } catch (error) {
       toast.error("Failed to load evaluations ❌");
@@ -178,11 +173,9 @@ const authHeader = {
 
   const fetchLogs = async () => {
     try {
-      const res = await API.get("supervision/weeklylogs/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("supervision/weeklylogs/", 
+        authHeader
+      );
 
       const grouped = {};
 
@@ -206,7 +199,7 @@ const authHeader = {
       ...prev,
       [placementId]: {
         ...prev[placementId],
-        [criteriaId]: parseInt(value),
+        [criteriaId]: Number(value) || 0,
       },
     }));
   };
@@ -235,11 +228,7 @@ const authHeader = {
             score: academicScore,
             comments: "Academic final evaluation",
           },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+          authHeader
         );
       } else {
         await API.post(
@@ -250,11 +239,7 @@ const authHeader = {
             score: academicScore,
             comments: "Academic final evaluation",
           },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+         authHeader
         );
       }
 
@@ -751,7 +736,7 @@ const authHeader = {
                                   placeholder="0 - 20"
                                   style={marksInputStyle}
                                   onChange={(e) => {
-                                  let value = parseInt(e.target.value) || 0;
+                                  let value = Number(e.target.value) || 0;
 
                                   if (value < 0) value = 0;
                                   if (value > 20) value = 20;
