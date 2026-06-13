@@ -150,7 +150,7 @@ const authHeader = {
 
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("internships/placements/", authHeader);
+      const res = await API.get("supervision/criteria/", authHeader);
 
       setCriteria(res.data);
     } catch (error) {
