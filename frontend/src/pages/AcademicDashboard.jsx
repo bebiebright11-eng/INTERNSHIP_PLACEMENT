@@ -115,10 +115,10 @@ function AcademicDashboard() {
   const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
   const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
   const navigate = useNavigate();
-  const firstName = localStorage.getItem("first_name");
-  const lastName = localStorage.getItem("last_name");
-  
+  const firstName = localStorage.getItem("first_name") || "";
+  const lastName = localStorage.getItem("last_name") || "";
   const token = localStorage.getItem("token");
+  
 
 const authHeader = {
   headers: {
@@ -132,7 +132,6 @@ const authHeader = {
 };
 
 
-  
 
 
   // --- Data Fetching Functions ---
