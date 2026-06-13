@@ -161,7 +161,7 @@ const authHeader = {
 
   const fetchEvaluations = async () => {
     try {
-      const res = await API.get("supervision/evaluations/", authHeader);
+      const res = await API.get("supervision/weeklylogs/", authHeader);
 
       
       setEvaluations(res.data);
