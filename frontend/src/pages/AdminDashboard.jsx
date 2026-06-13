@@ -322,6 +322,9 @@ const handleCreateStaff = async (e) => {
       prev.filter((user) => user.id !== id)
     );
 
+    fetchApplications();
+    fetchPlacements();
+
     toast.success("User deleted successfully");
 
   } catch (error) {
