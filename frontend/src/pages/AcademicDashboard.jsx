@@ -48,6 +48,11 @@ import DashboardHeader from "../components/DashboardHeader";
     minWidth: "220px",
     flex: "1",
   };
+  
+  const cardTitleStyle = {
+    color: "#666",
+    marginBottom: "10px",
+  };
 
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -80,17 +85,8 @@ const authHeader = {
   navigate("/");
 };
 
- 
-
- 
 
   
- 
-  
-  const cardTitleStyle = {
-    color: "#666",
-    marginBottom: "10px",
-  };
 
   
   const cardNumberStyle = {
