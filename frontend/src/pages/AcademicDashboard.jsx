@@ -736,7 +736,7 @@ const authHeader = {
                                   placeholder="0 - 20"
                                   style={marksInputStyle}
                                   onChange={(e) => {
-                                  let value = parseInt(e.target.value) || 0;
+                                  let value = Number(e.target.value) || 0;
 
                                   if (value < 0) value = 0;
                                   if (value > 20) value = 20;
