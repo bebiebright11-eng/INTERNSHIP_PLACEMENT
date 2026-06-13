@@ -5,31 +5,7 @@ import API from "../api";
 import Footer from "../components/Footer";
 import DashboardHeader from "../components/DashboardHeader";
 
-
-function AcademicDashboard() {
-  const [placements, setPlacements] = useState([]);
-  const [criteria, setCriteria] = useState([]);
-  const [evaluations, setEvaluations] = useState([]);
-  const [scores, setScores] = useState({});
-  const [logs, setLogs] = useState({});
-
-  const [editingPlacement, setEditingPlacement] = useState(null);
-  const [activePage, setActivePage] = useState("home");
-  const [showMenu, setShowMenu] = useState(false);
-  const [expandedStudent, setExpandedStudent] = useState(null);
-  const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
-  const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
-  const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
-  const firstName = localStorage.getItem("first_name");
-  const lastName = localStorage.getItem("last_name");
-
-  const handleLogout = () => {
-  localStorage.clear();
-  toast.success("Logged out successfully 👋");
-  navigate("/");
-};
-
-  // --- Styles ---
+ // --- Styles ---
 
   const menuButtonStyle = {
     backgroundColor: "#198754",
@@ -42,7 +18,7 @@ function AcademicDashboard() {
     fontSize: "15px",
   };
 
-  const dropdownStyle = {
+ const dropdownStyle = {
     position: "absolute",
     top: "60px",
     left: "0",
@@ -53,7 +29,7 @@ function AcademicDashboard() {
     padding: "10px",
     zIndex: 1000,
   };
-
+  
   const dropdownItemStyle = {
     padding: "12px",
     cursor: "pointer",
@@ -63,7 +39,7 @@ function AcademicDashboard() {
     color: "#198754",
     backgroundColor: "#f8f9fa",
   };
-
+  
   const cardStyle = {
     backgroundColor: "white",
     borderRadius: "15px",
@@ -83,8 +59,7 @@ function AcademicDashboard() {
     fontWeight: "bold",
     color: "#198754",
   };
-
-
+  
   const marksInputStyle = {
   width: "120px",
   padding: "14px",
@@ -98,8 +73,9 @@ function AcademicDashboard() {
   color: "#198754",
   boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
 };
-
-const submitButtonStyle = {
+   
+  
+  const submitButtonStyle = {
   background: "linear-gradient(135deg,#198754,#20c997)",
   color: "white",
   border: "none",
@@ -111,7 +87,7 @@ const submitButtonStyle = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
-const editButtonStyle = {
+   const editButtonStyle = {
   background: "linear-gradient(135deg,#fd7e14,#f59f00)",
   color: "white",
   border: "none",
@@ -123,18 +99,49 @@ const editButtonStyle = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
+
+function AcademicDashboard() {
+  const [placements, setPlacements] = useState([]);
+  const [criteria, setCriteria] = useState([]);
+  const [evaluations, setEvaluations] = useState([]);
+  const [scores, setScores] = useState({});
+  const [logs, setLogs] = useState({});
+
+  const [editingPlacement, setEditingPlacement] = useState(null);
+  const [activePage, setActivePage] = useState("home");
+  const [showMenu, setShowMenu] = useState(false);
+  const [expandedStudent, setExpandedStudent] = useState(null);
+  const [showWorkplaceEval, setShowWorkplaceEval] = useState(null);
+  const [showWeeklyLogs, setShowWeeklyLogs] = useState(null);
+  const [showFinalEvaluation, setShowFinalEvaluation] = useState(null);
+  const navigate = useNavigate();
+  const firstName = localStorage.getItem("first_name");
+  const lastName = localStorage.getItem("last_name");
+  
+  const token = localStorage.getItem("token");
+
+const authHeader = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+};
+  const handleLogout = () => {
+  localStorage.clear();
+  toast.success("Logged out successfully 👋");
+  navigate("/");
+};
+
+
+  
+
+
   // --- Data Fetching Functions ---
 
   const fetchPlacements = async () => {
     try {
-      const res = await API.get("internships/placements/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("internships/placements/", authHeader);
 
-      console.log("PLACEMENTS:", res.data);
-      console.log("USER ID:", localStorage.getItem("user_id"));
+     
 
       setPlacements(res.data);
     } catch (error) {
@@ -144,18 +151,11 @@ const editButtonStyle = {
 
   const fetchCriteria = async () => {
     try {
-      const res = await API.get("supervision/criteria/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await API.get("internships/placements/", authHeader);
 
       setCriteria(res.data);
     } catch (error) {
-       console.log("CRITERIA ERROR:", error.response);
-  console.log("DATA:", error.response?.data);
-  console.log("STATUS:", error.response?.status);
-
+       
   toast.error("Failed to load criteria ❌");
      
 }
@@ -169,8 +169,7 @@ const editButtonStyle = {
         },
       });
 
-      console.log("EVALUATIONS FROM BACKEND:", res.data);
-
+      
       setEvaluations(res.data);
     } catch (error) {
       toast.error("Failed to load evaluations ❌");
@@ -296,6 +295,7 @@ const editButtonStyle = {
         fontFamily: "Arial",
       }}
     >
+  
   {/* HEADER */}
 <DashboardHeader
   dashboardTitle="Academic Supervisor Dashboard"
@@ -858,6 +858,7 @@ const editButtonStyle = {
         overflowX: "auto",
       }}
     >
+      
       <table
         style={{
           width: "100%",
@@ -865,6 +866,7 @@ const editButtonStyle = {
           fontFamily: "Arial",
         }}
       >
+        
         <thead>
           <tr
             style={{
