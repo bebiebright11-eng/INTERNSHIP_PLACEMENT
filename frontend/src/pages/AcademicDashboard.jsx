@@ -73,11 +73,13 @@ function AcademicDashboard() {
     flex: "1",
   };
 
+  
   const cardTitleStyle = {
     color: "#666",
     marginBottom: "10px",
   };
 
+  
   const cardNumberStyle = {
     fontSize: "30px",
     fontWeight: "bold",
@@ -99,7 +101,7 @@ function AcademicDashboard() {
   boxShadow: "0 3px 10px rgba(25,135,84,0.15)",
 };
 
-const submitButtonStyle = {
+  const submitButtonStyle = {
   background: "linear-gradient(135deg,#198754,#20c997)",
   color: "white",
   border: "none",
@@ -111,7 +113,7 @@ const submitButtonStyle = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
 
-const editButtonStyle = {
+  const editButtonStyle = {
   background: "linear-gradient(135deg,#fd7e14,#f59f00)",
   color: "white",
   border: "none",
@@ -296,6 +298,7 @@ const editButtonStyle = {
         fontFamily: "Arial",
       }}
     >
+  
   {/* HEADER */}
 <DashboardHeader
   dashboardTitle="Academic Supervisor Dashboard"
