@@ -18,7 +18,17 @@ import DashboardHeader from "../components/DashboardHeader";
     fontSize: "15px",
   };
 
-
+ const dropdownStyle = {
+    position: "absolute",
+    top: "60px",
+    left: "0",
+    backgroundColor: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+    width: "220px",
+    padding: "10px",
+    zIndex: 1000,
+  };
   
 function AcademicDashboard() {
   const [placements, setPlacements] = useState([]);
@@ -53,17 +63,7 @@ const authHeader = {
 
  
 
-  const dropdownStyle = {
-    position: "absolute",
-    top: "60px",
-    left: "0",
-    backgroundColor: "white",
-    borderRadius: "12px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
-    width: "220px",
-    padding: "10px",
-    zIndex: 1000,
-  };
+ 
 
   const dropdownItemStyle = {
     padding: "12px",
